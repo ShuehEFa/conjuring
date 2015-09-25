@@ -6,23 +6,32 @@
 
 --[[
   @author eFa
+  @date   104.09.25
+  @brief  於特定時間播放Sonos語音
+
+  @note   當語音的時間點相同時，語音執行優先權：
+		  	1. mtDateNotice > mtWeekNotice > mtWorNnotices > mtLetsTalkInEnglish
+		  	2. 在同一個Table下，越前面越先被搜尋到的先說
+			3. 語音一個時間點只會說一句，所以越晚被執行會覆蓋先前的語音
 --]]
 
--- 日期行事曆 時間格式 MMDDhhmm
+local gTTS = "SonosTTS"	-- Sonos TTS的global value
+local mVol = 40			-- 語音音量
+
+-- 日期行事曆 時間格式 MMDDhhmm(月日時分)
 local mtDateNotice =
 {
-  [ '08280930' ] = 'wu~ wu~ ghost coming.' ,
-  [ '08271600' ] = 'E, Fa, dont forget call your friend.' ,
+  [ '12080930' ] = 'Happy birthday to you, FLH, Wu Ho' ,
 }
 
--- 星期行事曆 時間格式 dhhmm
+-- 星期行事曆 時間格式 dhhmm(星期時分)，星期日是1，星期一是2，星期六是7
 local mtWeekNotice = 
 {
   [ '31600' ] = '現在是腦力激盪時間 請大家移往會議室吧.' ,
   [ '61700' ] = 'Everybody stand up. It is time of C O I, go go go.',
 }
 
--- 工作天行事曆 時間格式 hhmm
+-- 工作天行事曆 時間格式 hhmm(時分)，僅週一到週五會播放
 local mtWorNnotices = 
 {
   [ '0930' ] = 'Good Morning everyone, have a nice day.' ,
@@ -37,6 +46,9 @@ local mtWorNnotices =
   [ '1755' ] = '泰龍.請早點回家.陪老婆歐.歐' ,
 }
 
+local mUseLetsTalkInEnglish = true		-- 是否使用每日說英語功能
+local mLetsTalkInEnglishTime = "0945"	-- 每日說英語播放時間，格式同mtWorNnotices
+-- 每日一句，會隨機播放其中一句
 local mtLetsTalkInEnglish =
 {
   "You have to make a reservation at least a day in advane." ,
@@ -79,8 +91,14 @@ local mtLetsTalkInEnglish =
   "The standard of living in Taiwan has topped the world." ,
 }
 
-function Say( _text )
-  local prefix = "lng=en|dr=auto|vol=30|txt="
+--[[
+  @brief 告訴Sonos要說什麼話
+  @_text 字串，要Sonos說的話，可以中文或英文，但不能中文標點符號，僅能英文以下符號" ,.!?'"
+  @_time 數字，語音播放時間，不填寫使用預設auto
+--]]
+function Say( _text , _time )
+  if _time == nil then _time = "auto" end
+  local prefix = "lng=en|dr=" .. tostring( _time ) .. "|vol=" .. mVol .. "|txt="
   local textLen = _text:len()
   for i = 1 , textLen do
     if string.byte( _text:sub( i ) ) > 127 then
@@ -88,10 +106,17 @@ function Say( _text )
       break
     end
   end
-  fibaro:setGlobal( 'OfficeSonosTTS' , prefix .. _text .. '|' )
-  fibaro:debug( '<span style="color:yellow">' .. prefix .. _text .. '</span>' )
+  fibaro:setGlobal( gTTS , prefix .. _text .. '|' )
+  print( os.date() )
+  print( '<span style="color:yellow">' .. prefix .. _text .. '</span>' )
 end
 
+--[[
+  @brief   檢查指定Table是否含有指定Key的值
+  @_tTable Table，被查詢的Table
+  @_key	   字串，查找的Key
+  @return  Bool，是否找到
+--]]
 function CheckContain( _tTable , _key )
   for key , value in pairs( _tTable ) do
     if key == _key then
@@ -107,18 +132,18 @@ function Update()
   local time = string.format( '%02d%02d', date.hour , date.min )
   local weekTime = tostring( date.wday ) .. time
   local dateTime = string.format( '%02d%02d', date.month , date.day ) .. time
---  fibaro:debug( 'Update @ ' .. time .. ' / ' .. weekTime .. ' / ' .. dateTime )
-  
+  -- 優先播放mtDateNotice
   if CheckContain( mtDateNotice , dateTime ) then 
-
+  -- 其次播放mtWeekNotice
   elseif CheckContain( mtWeekNotice , weekTime ) then
-    
+  -- 再來判斷是否工作日  
   elseif date.wday > 1 and date.wday < 7 then
+    -- 檢查mtWorNnotices
     if CheckContain( mtWorNnotices , time ) then
-      
-    elseif time == "1035" then
+    -- 最後判斷是否啟動說英文模式及時間點是否符合  
+    elseif time == mLetsTalkInEnglishTime and mUseLetsTalkInEnglish then
       Say( "Let's talk in english." )
-      fibaro:sleep( 5000 )
+      fibaro:sleep( 10000 )
       math.randomseed( os.time() )
       Say( mtLetsTalkInEnglish[ math.random( #mtLetsTalkInEnglish ) ] )
     end 
@@ -126,8 +151,9 @@ function Update()
   setTimeout( Update , 60000 )
 end
 
+-- main
 if fibaro:getSourceTriggerType() == "autostart" then
-  fibaro:debug( "start" )
+  print( "start @ " .. os.date() )
   Update()
 end
 
