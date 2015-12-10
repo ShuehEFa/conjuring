@@ -161,15 +161,27 @@ public class Main : MonoBehaviour
 		File.WriteAllText( VFIB_FOLDER + _filePath + VFIB_FILE , fileText );
 	}
 
-	// Use this for initialization
-	void Start () 
+	void Excute()
 	{
 		if( Directory.Exists( GIT_NAME ) == false )
 			Directory.CreateDirectory( GIT_NAME );
 		if( Directory.Exists( VFIB_FOLDER ) == false )
 			Directory.CreateDirectory( VFIB_FOLDER );
 
-		DirectoryInfo di = new DirectoryInfo( Application.dataPath.Replace( "/Assets" , "" ) );
+		string path = Application.dataPath ;
+#if UNITY_EDITOR
+		path = path.Substring( 0 , path.LastIndexOf( "/" ) );	// remove "/Assets"
+#elif UNITY_STANDALONE_OSX
+		path = path.Substring( 0 , path.LastIndexOf( "/" ) );	// remove "/Contens"
+		path = path.Substring( 0 , path.LastIndexOf( "/" ) );	// remove [product name]
+#else
+		path = path.Substring( 0 , path.LastIndexOf( "/" ) );	// remove [product name]
+#endif
+		if( path.Contains( "/" ) == false )
+			path += "/" ;
+
+		DirectoryInfo di = new DirectoryInfo( path );
+
 		FileInfo[] files = di.GetFiles();
 		for( int i = 0 , length = files.Length ; i < length ; ++i )
 		{
@@ -181,8 +193,26 @@ public class Main : MonoBehaviour
 		}
 	}
 
+	// Use this for initialization
+	void Start () 
+	{
+		Excute();
+		Application.Quit();
+	}
+
 	void OnGUI()
 	{
-		GUILayout.TextField( Application.dataPath.Replace( "/Assets" , "" ) );
+		string path = Application.dataPath ;
+#if UNITY_EDITOR
+		path = path.Substring( 0 , path.LastIndexOf( "/" ) );	// remove "/Assets"
+#elif UNITY_STANDALONE_OSX
+		path = path.Substring( 0 , path.LastIndexOf( "/" ) );	// remove "/Contens"
+		path = path.Substring( 0 , path.LastIndexOf( "/" ) );	// remove [product name]
+#else
+		path = path.Substring( 0 , path.LastIndexOf( "/" ) );	// remove [product name]
+#endif
+		if( path.Contains( "/" ) == false )
+			path += "/" ;
+		GUILayout.Label( path );
 	}
 }

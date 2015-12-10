@@ -14,8 +14,8 @@ PlayerSettings:
   productName: "VD\u81EA\u52D5\u63DB\u884C"
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
-  defaultScreenWidth: 200
-  defaultScreenHeight: 120
+  defaultScreenWidth: 600
+  defaultScreenHeight: 20
   defaultScreenWidthWeb: 960
   defaultScreenHeightWeb: 600
   m_RenderingPath: 1
