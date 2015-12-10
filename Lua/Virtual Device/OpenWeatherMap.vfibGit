@@ -1,0 +1,252 @@
+{
+	"name":"OpenWeatherMap",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author eFa
+			\n  @date   104.09.23
+			\n  @brief  網路分享的vfib
+			\n
+			\n  @note   IP Address填寫所在國家程式 ex: \"london,gb\" or \"poznan,pl\"
+			\n--]]
+			\nlocal myDeviceID = fibaro:getSelfId() 
+			\nif type(n) == \"nil\" then
+			\nn1 = tonumber(os.time())
+			\nfibaro:call(myDeviceID, \"pressButton\", \"8\")
+			\nn = 1
+			\nend
+			\n
+			\nif tonumber(os.time()) > n1 + (60 * 10) then
+			\n  fibaro:call(myDeviceID, \"pressButton\", \"8\")
+			\n  n1 = tonumber(os.time())
+			\nend
+			\n
+			\n
+			\n
+			\n",
+		"ui.Label1.value":"23.9°C(↓23.5)",
+		"ui.Label2.value":"26.7°C(↓23.8)",
+		"ui.Label3.value":"1016hPa(↑1025)",
+		"ui.Label4.value":"53%(↑100)",
+		"ui.Label5.value":" 7.2m/s(↓ 7.2)",
+		"ui.Label6.value":"Taipei",
+		"ui.Label91.value":"few clouds",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Temp min",
+						"name":"Label1",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Temp max",
+						"name":"Label2",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Pressure",
+						"name":"Label3",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Humidity",
+						"name":"Label4",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":5,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Wind",
+						"name":"Label5",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":6,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"City",
+						"name":"Label6",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":7,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Weather",
+						"name":"Label91",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":8,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Update",
+						"name":"Button1",
+						"empty":false,
+							"msg":"selfId = fibaro:getSelfId()
+							\nlocal id = fibaro:get(selfId, \"IPAddress\")
+							\n
+							\nHC3 = Net.FHttp(\"api.openweathermap.org\") 
+							\ndanem, statusm = HC3:GET(\"/data/2.5/weather?q=\"..id..\"&units=metric&appid=bd82977b86bf27fb59a04b61b657fb6f\")
+							\ndanef, statusf = HC3:GET(\"/data/2.5/forecast?q=\"..id..\"&units=metric&appid=bd82977b86bf27fb59a04b61b657fb6f\")
+							\n
+							\nlocal ajson=json.decode(danem) 
+							\nlocal tempmin=ajson.main.temp_min
+							\nlocal tempmax=ajson.main.temp_max
+							\nlocal pressure=ajson.main.pressure
+							\nlocal humidity=ajson.main.humidity
+							\nlocal city=ajson.name
+							\nlocal wind=ajson.wind.speed
+							\nlocal weather=ajson.weather[1].description
+							\n
+							\nlocal tm=ajson.dt
+							\n
+							\nlocal ajsonf=json.decode(danef) 
+							\nlocal n
+							\nlocal t
+							\n
+							\nfor i = 1,5 do
+							\n  t = ajsonf.list[i].dt
+							\n  if t > tm then
+							\n  \tn = i
+							\n    break
+							\n  end
+							\nend
+							\n
+							\nlocal ftempmin=ajsonf.list[n].main.temp_min
+							\nlocal ftempmax=ajsonf.list[n].main.temp_max
+							\nlocal fpressure=ajsonf.list[n].main.pressure
+							\nlocal fhumidity=ajsonf.list[n].main.humidity
+							\nlocal fwind=ajsonf.list[n].wind.speed
+							\n
+							\nif ftempmin > tempmin then
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label1.value\", string.format(\"%3.1f°C(↑%3.1f)\", tempmin, ftempmin))
+							\nelseif ftempmin < tempmin then
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label1.value\", string.format(\"%3.1f°C(↓%3.1f)\", tempmin, ftempmin))
+							\nelse
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label1.value\", string.format(\"%3.1f°C(-)\", tempmin))
+							\nend
+							\n
+							\nif ftempmax > tempmax then
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label2.value\", string.format(\"%3.1f°C(↑%3.1f)\", tempmax, ftempmax))
+							\nelseif ftempmax < tempmax then
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label2.value\", string.format(\"%3.1f°C(↓%3.1f)\", tempmax, ftempmax))
+							\nelse
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label2.value\", string.format(\"%3.1f°C(-)\", tempmax))
+							\nend
+							\n
+							\nif fpressure > pressure then
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label3.value\",string.format(\"%dhPa(↑%d)\", pressure, fpressure))
+							\nelseif fpressure < pressure then
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label3.value\",string.format(\"%dhPa(↓%d)\", pressure, fpressure))
+							\nelse
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label3.value\",string.format(\"%dhPa(-)\", pressure))
+							\nend
+							\n
+							\nif fhumidity > humidity then
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label4.value\",string.format(\"%d%s(↑%d)\", humidity, \"%\", fhumidity))
+							\nelseif fhumidity < humidity then
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label4.value\",string.format(\"%d%s(↓%d)\", humidity, \"%\", fhumidity))
+							\nelse
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label4.value\",string.format(\"%d%s(-)\", humidity, \"%\"))
+							\nend
+							\n
+							\nif fwind > wind then
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label5.value\",string.format(\"%4.1fm/s(↑%4.1f)\", wind, fwind))
+							\nelseif fwind < wind then
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label5.value\",string.format(\"%4.1fm/s(↓%4.1f)\", wind, fwind))
+							\nelse
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label5.value\",string.format(\"%4.1fm/s(-)\", wind))
+							\nend
+							\n  
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label6.value\",city)
+							\n  
+							\n  fibaro:call(selfId,\"setProperty\",\"ui.Label91.value\",weather)
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}

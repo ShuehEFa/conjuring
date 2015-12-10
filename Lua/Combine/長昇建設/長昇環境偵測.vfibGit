@@ -1,0 +1,229 @@
+{
+	"name":"長昇環境偵測",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author eFa
+			\n  @date   104.10.19
+			\n  @brief  取得台灣指定直轄縣市的紫外線指數、指定縣市下的區域PM2.5指數、指定國際區域的溫度
+			\n\t\t  長昇使用版本，會將值紀錄到Global Value，同時依據是否作假模式而傳真的或假的值
+			\n\t\t  Global Value儲存的值是供其他情境或Virtual Device使用，如此這些設備就不用管是否使用軟體模擬數值
+			\n\t\t  是否作假就由本Virtual Device處理，其他的則由“長昇環境偵測”的情境處理
+			\n
+			\n  @node   主要程式碼在Update的Button內，這邊僅處理多久執行Update的Button
+			\n\t\t  UVI
+			\n\t\t  http://opendata.epa.gov.tw/ws/Data/UV/?$orderby=PublishAgency&$skip=0&$top=1000&format=json
+			\n\t\t  PM2.5
+			\n\t\t  http://opendata.epa.gov.tw/ws/Data/PM25/?$orderby=MonitorDate%20desc&$skip=0&$top=1000&format=json
+			\n\t\t  Temperature
+			\n\t\t  http://api.openweathermap.org/data/2.5/weather?q=taipei&units=metric&appid=bd82977b86bf27fb59a04b61b657fb6f
+			\n--]]
+			\n
+			\n-- 是否啟動各項參數作假
+			\nlocal gUseFakeUv = \"EH_UseFakeUv\"\t\t-- 紫外線
+			\nlocal gUseFakePm = \"EH_UseFakePm\"\t\t-- PM2.4
+			\nlocal gUseFakeTe = \"EH_UseFakeOutTe\"\t-- 戶外溫度
+			\n
+			\n-- 各項參數作假值
+			\nlocal gFakeUv = \"EH_FakeUv\"\t\t\t\t-- 紫外線
+			\nlocal gFakePm = \"EH_FakePm\"\t\t\t\t-- PM2.5
+			\nlocal gFakeTe = \"EH_FakeOutTe\"\t\t\t-- 戶外溫度
+			\n
+			\n-- 儲存要給外界使用的數值
+			\nlocal gUv = \"EH_ValueUv\"\t\t\t\t-- 紫外線
+			\nlocal gPm = \"EH_ValuePm\"\t\t\t\t-- PM2.5
+			\nlocal gTe = \"EH_ValueOutTe\"\t\t\t\t-- 戶外溫度
+			\n
+			\nif mID == nil then
+			\n  mID = fibaro:getSelfId()\t\t\t\t-- 本設備ID
+			\n  mButtonId = \"4\"\t\t\t\t\t\t-- Update Button ID
+			\n  mUpdateSec = 300\t\t\t\t\t\t-- 多少秒Update一次
+			\n  mTimeStamp = os.time() - mUpdateSec\t-- 上次Udate時間
+			\nend
+			\n
+			\nif os.time() - mTimeStamp > mUpdateSec then
+			\n  mTimeStamp = os.time()
+			\n  fibaro:call( mID , \"pressButton\" , mButtonId )
+			\n  fibaro:debug( \"updating...\" )
+			\nend
+			\n
+			\n-- UV
+			\nlocal value = fibaro:getValue( mID , \"ui.UV.value\" )
+			\nlocal useFake = ( fibaro:getGlobalValue( gUseFakeUv ) == \"1\" )
+			\nif useFake then
+			\n  value = fibaro:getGlobalValue( gFakeUv )
+			\n  fibaro:debug( \"fake UV : \" .. value )
+			\nend
+			\nfibaro:setGlobal( gUv , value )
+			\n
+			\n-- PM
+			\nvalue = fibaro:getValue( mID , \"ui.PM.value\" )
+			\nuseFake = ( fibaro:getGlobalValue( gUseFakePm ) == \"1\" )
+			\nif useFake then
+			\n  value = fibaro:getGlobalValue( gFakePm )
+			\n  fibaro:debug( \"fake PM : \" .. value )
+			\nend
+			\nfibaro:setGlobal( gPm , value )
+			\n
+			\n-- 室外溫度
+			\nvalue = fibaro:getValue( mID , \"ui.Temperature.value\" )
+			\nuseFake = ( fibaro:getGlobalValue( gUseFakeTe ) == \"1\" )
+			\nif useFake then
+			\n  value = fibaro:getGlobalValue( gFakeTe )
+			\n  fibaro:debug( \"fake Temp : \" .. value )
+			\nend
+			\nfibaro:setGlobal( gTe , value )",
+		"ui.PM.value":"17",
+		"ui.Temperature.value":"22.520000000000000",
+		"ui.UV.value":"0",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"紫外線",
+						"name":"UV",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"空氣品質",
+						"name":"PM",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"室外溫度",
+						"name":"Temperature",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Update",
+						"name":"Button11",
+						"empty":false,
+							"msg":"-- 網路氣象查詢相關參數
+							\nlocal mUvCity = \"桃園\"
+							\nlocal mPmSite = \"桃園\"
+							\nlocal mTemperatureSite = \"taoyuan\"
+							\nlocal mTemperatureSiteID = \"6696918\"\t-- 改用ID，用名稱會取到大陸的桃園
+							\n
+							\nlocal mID = fibaro:getSelfId()
+							\n
+							\n--[[
+							\n  @brief\t  檢查連線狀況
+							\n  @_name\t  在Fibaro:Debug的開頭顯示的資訊，用來區隔是哪個Http連線的debug
+							\n  @_status\t  網路連線的狀況
+							\n  @_errorCode Fibaro連線的狀況
+							\n  @return\t  連線無問題才回傳true
+							\n--]]
+							\nfunction CheckHttp( _name , _status , _errorCode )
+							\n  if _errorCode > 0 then
+							\n    fibaro:debug( _name .. \" Http errorCode : \" .. _errorCode )
+							\n    return false
+							\n  elseif tonumber( _status ) < 200 or tonumber( _status ) >= 300 then
+							\n    fibaro:debug( _name .. \" Http status : \" .. _status )
+							\n    return false
+							\n  end
+							\n  return true
+							\nend
+							\n
+							\n-- UV
+							\nlocal http = Net.FHttp( \"opendata.epa.gov.tw\" )
+							\nlocal response , status , errorCode = http:GET( \"/ws/Data/UV?format=json\" )
+							\nif CheckHttp( \"UV\" , status , errorCode ) then
+							\n  local tTable = json.decode( response )
+							\n  for i = 1 , #tTable do
+							\n    if tTable[ i ].SiteName == mUvCity then
+							\n      if tTable[ i ].UVI ~= \"\" then
+							\n        value = tTable[ i ].UVI
+							\n        fibaro:call( mID , \"setProperty\", \"ui.UV.value\", value )
+							\n        fibaro:debug( \"new UV : \" .. value )
+							\n        break
+							\n      end
+							\n    end
+							\n  end
+							\nend
+							\n
+							\n-- PM2.5
+							\nresponse , status , errorCode = http:GET( \"/ws/Data/PM25?format=json\" )
+							\nif CheckHttp( \"PM25\" , status , errorCode ) then
+							\n  local tTable = json.decode( response )
+							\n  for i = 1 , #tTable do
+							\n    if tTable[ i ].SiteName == mPmSite then
+							\n      if tTable[ i ].Concentration ~= \"\" then
+							\n        value = tTable[ i ].Concentration
+							\n        fibaro:call( mID , \"setProperty\", \"ui.PM.value\", value )
+							\n        fibaro:debug( \"new PM : \" .. value )
+							\n        break
+							\n      end
+							\n    end
+							\n  end
+							\nend
+							\n
+							\n-- 室外溫度
+							\nlocal http = Net.FHttp( \"api.openweathermap.org\" )
+							\n--&appid=2de143494c0b295cca9337e1e96b00e0
+							\n--&appid=bd82977b86bf27fb59a04b61b657fb6f
+							\n--Use FLH weather map id, city use id replease name
+							\n--local response , status , errorCode = http:GET( \"/data/2.5/weather?q=\" ..mTemperatureSite .. \"&units=metric&appid=3b1d9fd2d3f4b8013e22a3f61848a8c6\" )
+							\nlocal response , status , errorCode = http:GET( \"/data/2.5/weather?id=\" ..mTemperatureSiteID .. \"&units=metric&appid=3b1d9fd2d3f4b8013e22a3f61848a8c6\" )
+							\nif CheckHttp( \"Temperature\" , status , errorCode ) then
+							\n  local tTable = json.decode( response )
+							\n  value = tTable.main.temp
+							\n  fibaro:call( mID , \"setProperty\", \"ui.Temperature.value\", value )
+							\n  fibaro:debug( \"new Temp : \" .. value )
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}

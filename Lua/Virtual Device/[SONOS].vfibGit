@@ -1,0 +1,2574 @@
+{
+	"name":"
+	[
+		SONOS
+	]",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":13,
+		"currentIcon":"13",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author eFa
+			\n  @date   104.10.22
+			\n  @brief  修改原來的Sonos
+			\n\t\t  Global Value做成參數並置頂
+			\n\t\t  支援中文語音及避免Google搜尋驗證碼
+			\n\t\t  修正Sonos.getZpStatus()內的bug
+			\n\t\t  增加log追蹤可能出現bug的地方
+			\n\t\t  Update放到Button去執行，這邊只負責每隔固定時間去press button
+			\n\t\t  記得改main loop, update button裡的Global value(gRefreshTime, gCommandTime, gGarbageTime, gCount)
+			\n
+			\n  @note   port 1400
+			\n\t\t  不要忘記建立Global Value，名稱必須與按鈕與Loop的Lua相圖
+			\n--]]
+			\nlocal gRefreshTime = \"SonosRefreshTime\" -- Sonos Refresh Excute Time
+			\nlocal gCommandTime = \"SonosCommandTime\" -- Sonos Command Excute Time
+			\nlocal gGarbageTime = \"SonosGarbageTime\" -- Sonos Grabage Excute Time
+			\nlocal gCount = \"SonosCount\" -- Sonos Retry Count
+			\n
+			\nif mId == nil then
+			\n  mId = fibaro:getSelfId()
+			\n  fibaro:setGlobal( gRefreshTime , tonumber( os.time() - 12 ) )
+			\n  fibaro:setGlobal( gCommandTime , tonumber( os.time() - 3 ) )
+			\n  fibaro:setGlobal( gGarbageTime , tonumber( os.time() - 1800 ) )
+			\n  fibaro:setGlobal( gCount , 0 )
+			\nelse
+			\n  fibaro:call( mId , \"pressButton\" , \"28\" )
+			\n  fibaro:debug( \"Refreshing...\" )
+			\nend
+			\n",
+		"ui.lblAlbum.value":"",
+		"ui.lblArtist.value":"",
+		"ui.lblDebug.value":"Set volume to 19",
+		"ui.lblEq.value":"Loudness ON",
+		"ui.lblPosition.value":"0:02:39",
+		"ui.lblState.value":"Playing",
+		"ui.lblTitle.value":"1-2000s-RnB?br=64",
+		"ui.lblZone.value":"",
+		"ui.slVolume.value":19,
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Zone:",
+						"name":"lblZone",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"State:",
+						"name":"lblState",
+						"favourite":false,
+						"main":true
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Position:",
+						"name":"lblPosition",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Title:",
+						"name":"lblTitle",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":5,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Artist:",
+						"name":"lblArtist",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":6,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Album:",
+						"name":"lblAlbum",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":7,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"› Play",
+						"name":"btnPlay",
+						"empty":false,
+							"msg":"-- PLAY
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"The play command was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"PLAY \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":8,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"• Pause",
+						"name":"btnPause",
+						"empty":false,
+							"msg":"-- PAUSE
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"The pause command was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"PAUSE \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":9,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"■ Stop",
+						"name":"btnStop",
+						"empty":false,
+							"msg":"-- STOP
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"The stop command was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"STOP \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":10,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"◄ Prev",
+						"name":"btnPrev",
+						"empty":false,
+							"msg":"-- PREV
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"The previous command was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"PREV \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":11,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Next ►",
+						"name":"btnNext",
+						"empty":false,
+							"msg":"-- NEXT
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"The next command was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"NEXT \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":12,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"OFF",
+						"name":"lblPowerOff",
+						"empty":false,
+							"msg":"-- POWER OFF
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"The power off command was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"PWOFF \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":13,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"← Seek",
+						"name":"btnSeekLeft",
+						"empty":false,
+							"msg":"-- SEEK LEFT
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"The seek left command was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"SEEKL \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":14,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Seek →",
+						"name":"btnSeekRight",
+						"empty":false,
+							"msg":"-- SEEK RIGHT
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"The seek right command was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"SEEKR \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"slider",
+				"elements":
+				[
+					{
+						"id":15,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Volume",
+						"name":"slVolume",
+							"msg":"-- SET VOLUME
+							\nlocal id = fibaro:getSelfId();
+							\nlocal vol = fibaro:getValue(id, \"ui.slVolume.value\");
+							\nlocal v, s = \"SonosCmd\", \"Set volume to \" .. vol .. \" was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"VOL\"..vol..\" \");
+							\nfibaro:setGlobal(v, cmd);",
+						"buttonIcon":0,
+						"value":19,
+						"favourite":false,
+						"main":true
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":16,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Mute",
+						"name":"btnMute",
+						"empty":false,
+							"msg":"-- MUTE
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"The mute command was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"MUTE \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":17,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"UnMute",
+						"name":"btnUnMute",
+						"empty":false,
+							"msg":"-- UNMUTE
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"The unmute command was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"UNMUTE \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":18,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Toggle",
+						"name":"btnToggleMute",
+						"empty":false,
+							"msg":"-- TOGGLE MUTE
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"The toggle mute command was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"TMUTE \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":19,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"EQ:",
+						"name":"lblEq",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":20,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Loudness ON",
+						"name":"btnLoudnessOn",
+						"empty":false,
+							"msg":"-- LOUDNESS ON
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"Loudness ON command was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"LNON \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":21,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Loudness OFF",
+						"name":"btnLoudnessOff",
+						"empty":false,
+							"msg":"-- LOUDNESS OFF
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"Loudness OFF command was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"LNOFF \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":22,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"♫ 1",
+						"name":"btnMyRadioStation1",
+						"empty":false,
+							"msg":"-- PLAY RADIO STATION 1
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"Play radio station 1 was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"RST1 \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":23,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"♫ 2",
+						"name":"btnMyRadioStation2",
+						"empty":false,
+							"msg":"-- PLAY RADIO STATION 2
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"Play radio station 2 was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"RST2 \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":24,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"♫ 3",
+						"name":"btnMyRadioStation3",
+						"empty":false,
+							"msg":"-- PLAY RADIO STATION 3
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"Play radio station 3 was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"RST3\");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":25,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"♫ 4",
+						"name":"btnMyRadioStation4",
+						"empty":false,
+							"msg":"-- PLAY RADIO STATION 4
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"Play radio station 1 was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"RST4 \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":26,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"♫ 5",
+						"name":"btnMyRadioStation5",
+						"empty":false,
+							"msg":"-- PLAY RADIO STATION 5
+							\nlocal id = fibaro:getSelfId();
+							\nlocal v, s = \"SonosCmd\", \"Play radio station 1 was sent\";
+							\nlocal cmd = tostring(fibaro:getGlobalValue(v)..\"RST5 \");
+							\nfibaro:setGlobal(v, cmd);
+							\nfibaro:log(s);
+							\nfibaro:call(id, \"setProperty\", \"ui.lblDebug.value\", s);",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":27,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"",
+						"name":"lblDebug",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":28,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Update",
+						"name":"Button71",
+						"empty":false,
+							"msg":"local gCmd = \"SonosCmd\" -- Sonos Command
+							\nlocal gTTS = \"SonosTTS\" -- Sonos TTS
+							\nlocal gRefreshTime = \"SonosRefreshTime\" -- Sonos Refresh Excute Time
+							\nlocal gCommandTime = \"SonosCommandTime\" -- Sonos Command Excute Time
+							\nlocal gGarbageTime = \"SonosGarbageTime\" -- Sonos Grabage Excute Time
+							\nlocal gCount = \"SonosCount\" -- Sonos Retry Count
+							\n
+							\n-------------------------------------------------------------------------------------------
+							\n-------------------------------------------------------------------------------------------
+							\n-- Toolkit Framework, lua library extention for HC2, hope that it will be useful.
+							\n-- This Framework is an addon for HC2 Toolkit application in a goal to aid the integration.
+							\n-- Tested on Lua 5.1 with Fibaro HC2 3.572 beta
+							\n--
+							\n-- Version 1.0.5 [02-19-2014]
+							\n--
+							\n-- Use: Toolkit or Tk shortcut to access Toolkit namespace members.
+							\n--
+							\n-- Example:
+							\n-- Toolkit:trace(\"value is %d\", 35); or Tk:trace(\"value is %d\", 35);
+							\n-- Toolkit.assertArg(\"argument\", arg, \"string\"); or Tk.assertArg(\"argument\", arg, \"string\");
+							\n--
+							\n-- current release: http://krikroff77.github.io/Fibaro-HC2-Toolkit-Framework/
+							\n-- latest release: https://github.com/Krikroff77/Fibaro-HC2-Toolkit-Framework/releases/latest
+							\n--
+							\n-- Memory is preserved: The code is loaded only the first time in a virtual device 
+							\n-- main loop and reloaded only if application pool restarded.
+							\n--
+							\n-- Copyright (C) 2013-2014 Jean-Christophe Vermandé
+							\n-- 
+							\n-- This program is free software: you can redistribute it and/or modify
+							\n-- it under the terms of the GNU General Public License as published by
+							\n-- the Free Software Foundation, either version 3 of the License, or
+							\n-- at your option) any later version.
+							\n-------------------------------------------------------------------------------------------
+							\n-------------------------------------------------------------------------------------------
+							\nif not Toolkit then Toolkit = { 
+							\n  __header = \"Toolkit\",
+							\n  __version = \"1.0.5\",
+							\n  __luaBase = \"5.1.0\", 
+							\n  __copyright = \"Jean-Christophe Vermandé\",
+							\n  __licence = [[
+							\n\tCopyright (C) 2013-2014 Jean-Christophe Vermandé
+							\n
+							\n    This program is free software: you can redistribute it and/or modify
+							\n    it under the terms of the GNU General Public License as published by
+							\n    the Free Software Foundation, either version 3 of the License, or
+							\n    (at your option) any later version.
+							\n
+							\n    This program is distributed in the hope that it will be useful,
+							\n    but WITHOUT ANY WARRANTY; without even the implied warranty of
+							\n    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+							\n    GNU General Public License for more details.
+							\n
+							\n    You should have received a copy of the GNU General Public License
+							\n    along with this program.  If not, see <http://www.gnu.org/licenses></http:>.
+							\n  ]],
+							\n  __frameworkHeader = (function(self)
+							\n    self:traceEx(\"green\", \"-------------------------------------------------------------------------\");
+							\n    self:traceEx(\"green\", \"-- HC2 Toolkit Framework version %s\", self.__version);
+							\n    self:traceEx(\"green\", \"-- Current interpreter version is %s\", self.getInterpreterVersion());
+							\n    self:traceEx(\"green\", \"-- Total memory in use by Lua: %.2f Kbytes\", self.getCurrentMemoryUsed());
+							\n    self:traceEx(\"green\", \"-------------------------------------------------------------------------\");
+							\n  end),
+							\n  -- chars
+							\n  chars = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/\",
+							\n  -- hex
+							\n  hex = \"0123456789abcdef\",
+							\n  -- now(), now(\"*t\", 906000490)
+							\n  -- system date shortcut
+							\n  now = os.date,
+							\n  -- toUnixTimestamp(t)
+							\n  -- t (table)\t\t- {year=2013, month=12, day=20, hour=12, min=00, sec=00}
+							\n  -- return Unix timestamp
+							\n  toUnixTimestamp = (function(t) return os.time(t) end),
+							\n  -- fromUnixTimestamp(ts)
+							\n  -- ts (string/integer)\t- the timestamp
+							\n  -- Example : fromUnixTimestamp(1297694343) -> 02/14/11 15:39:03
+							\n  fromUnixTimestamp = (function(s) return os.date(\"%c\", ts) end),
+							\n  -- currentTime()
+							\n  -- return current time
+							\n  currentTime = (function() return tonumber(os.date(\"%H%M%S\")) end),
+							\n  -- comparableTime(hour, min, sec)
+							\n  -- hour (string/integer)
+							\n  -- min (string/integer)
+							\n  -- sec (string/integer)
+							\n  comparableTime = (function(hour, min, sec) return tonumber(string.format(\"%02d%02d%02d\", hour, min, sec)) end),
+							\n  -- isTraceEnabled
+							\n  -- (boolean)\tget or set to enable or disable trace
+							\n  isTraceEnabled = true,
+							\n  -- isAutostartTrigger()
+							\n  isAutostartTrigger = (function() local t = fibaro:getSourceTrigger();return (t[\"type\"]==\"autostart\") end),
+							\n  -- isOtherTrigger()
+							\n  isOtherTrigger = (function() local t = fibaro:getSourceTrigger();return (t[\"type\"]==\"other\") end),
+							\n  -- raiseError(message, level)
+							\n  -- message (string)\t- message
+							\n  -- level (integer)\t- level
+							\n  raiseError = (function(message, level) error(message, level); end),
+							\n  -- colorSetToRgbwTable(colorSet)
+							\n  -- colorSet (string) - colorSet string
+							\n  -- Example: local r, g, b, w = colorSetToRgbwTable(fibaro:getValue(354, \"lastColorSet\"));
+							\n  colorSetToRgbw = (function(self, colorSet)
+							\n    self.assertArg(\"colorSet\", colorSet, \"string\");
+							\n    local t, i = {}, 1;
+							\n    for v in string.gmatch(colorSet,\"(%d+)\") do t[i] = v; i = i + 1; end
+							\n    return t[1], t[2], t[3], t[4];
+							\n  end),
+							\n  -- isValidJson(data, raise)
+							\n  -- data (string)\t- data
+							\n  -- raise (boolean)- true if must raise error
+							\n  -- check if json data is valid
+							\n  isValidJson = (function(self, data, raise)
+							\n    self.assertArg(\"data\", data, \"string\");
+							\n    self.assertArg(\"raise\", raise, \"boolean\");
+							\n    if (string.len(data)>0) then
+							\n      if (pcall(function () return json.decode(data) end)) then
+							\n        return true;
+							\n      else
+							\n        if (raise) then self.raiseError(\"invalid json\", 2) end;
+							\n      end
+							\n    end
+							\n    return false;
+							\n  end),
+							\n  -- assert_arg(name, value, typeOf)
+							\n  -- (string)\tname: name of argument
+							\n  -- (various)\tvalue: value to check
+							\n  -- (type)\t\ttypeOf: type used to check argument
+							\n  assertArg = (function(name, value, typeOf)
+							\n    if type(value) ~= typeOf then
+							\n      Tk.raiseError(\"argument \"..name..\" must be \"..typeOf, 2);
+							\n    end
+							\n  end),
+							\n  -- trace(value, args...)
+							\n  -- (string)\tvalue: value to trace (can be a string template if args)
+							\n  -- (various)\targs: data used with template (in value parameter)
+							\n  trace = (function(self, value, ...)
+							\n    if (self.isTraceEnabled) then
+							\n      if (value~=nil) then        
+							\n        return fibaro:debug(string.format(value, ...));
+							\n      end
+							\n    end
+							\n  end),
+							\n  -- traceEx(value, args...)
+							\n  -- (string)\tcolor: color use to display the message (red, green, yellow)
+							\n  -- (string)\tvalue: value to trace (can be a string template if args)
+							\n  -- (various)\targs: data used with template (in value parameter)
+							\n  traceEx = (function(self, color, value, ...)
+							\n    self:trace(string.format('<%s style=\"color:%s;\">%s</%s>', \"span\", color, string.format(value, ...), \"span\"));
+							\n  end),
+							\n  -- getInterpreterVersion()
+							\n  -- return current lua interpreter version
+							\n  getInterpreterVersion = (function()
+							\n    return _VERSION;
+							\n  end),
+							\n  -- getCurrentMemoryUsed()
+							\n  -- return total current memory in use by lua interpreter
+							\n  getCurrentMemoryUsed = (function()
+							\n    return collectgarbage(\"count\");
+							\n  end),
+							\n  -- trim(value)
+							\n  -- (string)\tvalue: the string to trim
+							\n  trim = (function(s)
+							\n    Tk.assertArg(\"value\", s, \"string\");
+							\n    return (string.gsub(s, \"^%s*(.-)%s*$\", \"%1\"));
+							\n  end),
+							\n  -- isNaN(value)
+							\n  -- return true is NaN or false if not NaN
+							\n  isNaN = (function (x) return x ~= x end),
+							\n  -- filterByPredicate(table, predicate)
+							\n  -- table (table)\t\t- table to filter
+							\n  -- predicate (function)\t- function for predicate
+							\n  -- Description: filter a table using a predicate
+							\n  -- Usage:
+							\n  -- local t = {1,2,3,4,5};
+							\n  -- local out, n = filterByPredicate(t,function(v) return v.item == true end);
+							\n  -- return out -> {2,4}, n -> 2;
+							\n  filterByPredicate = (function(table, predicate)
+							\n    Tk.assertArg(\"table\", table, \"table\");
+							\n    Tk.assertArg(\"predicate\", predicate, \"function\");
+							\n    local n, out = 1, {};
+							\n    for i = 1,#table do
+							\n      local v = table[i];
+							\n      if (v~=nil) then
+							\n        if predicate(v) then
+							\n            out[n] = v;
+							\n            n = n + 1;    
+							\n        end
+							\n      end
+							\n    end  
+							\n    return out, #out;
+							\n  end)
+							\n};Toolkit:__frameworkHeader();Tk=Toolkit;
+							\nend;
+							\n-------------------------------------------------------------------------------------------
+							\n-------------------------------------------------------------------------------------------
+							\n-- Toolkit.Debug library extention
+							\n-- Provide help to trace and debug lua code on Fibaro HC2
+							\n-- Tested on Lua 5.1 with HC2 3.572 beta
+							\n--
+							\n-- Copyright 2013 Jean-christophe Vermandé
+							\n--
+							\n-- Version 1.0.1 [12-12-2013]
+							\n-------------------------------------------------------------------------------------------
+							\n-------------------------------------------------------------------------------------------
+							\nif not Toolkit.Debug then Toolkit.Debug = { 
+							\n  __header = \"Toolkit.Debug\",
+							\n  __version = \"1.0.1\",
+							\n  -- The os.clock function returns the number of seconds of CPU time for the program.
+							\n  __clocks = {[\"fragment\"]=os.clock(), [\"all\"]=os.clock()},
+							\n  -- benchmarkPoint(name)
+							\n  -- (string)\tname: name of benchmark point
+							\n  benchmarkPoint = (function(self, name)
+							\n    __clocks[name] = os.clock();
+							\n  end),
+							\n  -- benchmark(message, template, name, reset)
+							\n  -- (string) \tmessage: value to display, used by template
+							\n  -- (string) \ttemplate: template used to diqplay message
+							\n  -- (string) \tname: name of benchmark point
+							\n  -- (boolean) \treset: true to force reset clock
+							\n  benchmark = (function(self, message, template, name, reset)
+							\n    Toolkit.assertArg(\"message\", message, \"string\");
+							\n    Toolkit.assertArg(\"template\", message, \"string\");
+							\n    if (reset~=nil) then Toolkit.assertArg(\"reset\", reset, type(true)); end
+							\n    Toolkit:traceEx(\"yellow\", \"Benchmark [\"..message..\"]: \"..
+							\n      string.format(template, os.clock() - self.__clocks[name]));
+							\n    if (reset==true) then self.__clocks[name] = os.clock(); end
+							\n  end)
+							\n};
+							\nToolkit:traceEx(\"red\", Toolkit.Debug.__header..\" loaded in memory...\");
+							\n-- benchmark code
+							\nif (Toolkit.Debug) then Toolkit.Debug:benchmark(Toolkit.Debug.__header..\" lib\", \"elapsed time: %.3f cpu secs\
+							\n\", \"fragment\", true); end ;
+							\nend;
+							\n-------------------------------------------------------------------------------------------
+							\n-- Toolkit.Collections library extention
+							\n-- Toolkit.Collections.Queue provide implementation for queue process
+							\n-- Tested on Lua 5.1 with HC2 3.580
+							\n--
+							\n-- Copyright 2014 Jean-christophe Vermandé
+							\n-- Inspired by http://www.lua.org/pil/11.4.html
+							\n--
+							\n-- Version 1.0.0 [01-12-2014]
+							\n-------------------------------------------------------------------------------------------
+							\n-------------------------------------------------------------------------------------------
+							\nif not Toolkit then error(\"You must add Toolkit\", 2) end
+							\nif not Toolkit.Collections then Toolkit.Collections = {} end
+							\nif not Toolkit.Collections.Queue then Toolkit.Collections.Queue = {
+							\n  -- private properties
+							\n  __header = \"Toolkit.Collections.Queue\",
+							\n  __version = \"1.0.0\",
+							\n  __base = {
+							\n    __first = 0,
+							\n    __count = 0,
+							\n    toArray = (function(self)
+							\n      local r = {};
+							\n      for i=1, self:count() do
+							\n        --Tk:trace(\"add %s in table at pos # %d\", tostring(self[i]), i);
+							\n        r[i] = self[i];
+							\n      end
+							\n      return r;
+							\n    end),
+							\n    clear = (function(self)
+							\n      for i=1, self:count() do
+							\n        self[i] = nil;        
+							\n      end
+							\n      self.__first = 0;
+							\n      self.__count = 0;
+							\n    end),
+							\n    enqueue = (function(self, value)
+							\n      assert(value ~= nil);
+							\n      local n = self.__first + 1;          
+							\n      self.__count = self.__count + 1;
+							\n      self.__first = n;
+							\n      self[n] = value;
+							\n      Tk:trace(\"add at pos %d value with %s type\", n, tostring(self[n]));
+							\n    end),
+							\n    dequeue = (function(self)
+							\n       local o = self:peek();
+							\n       self[1] = nil;
+							\n       self.__first = self.__first - 1;
+							\n       self.__count = self.__count -1;
+							\n       for i=1, self:count() do
+							\n         self[i] = self[i+1];
+							\n       end
+							\n       return o;
+							\n    end),
+							\n    contains = (function(self, value)
+							\n      assert(value ~= nil);
+							\n      for i=1, self:count() do
+							\n        if (self[i] == value) then
+							\n           return true;
+							\n        end
+							\n      end
+							\n      return false;
+							\n    end),
+							\n    peek = (function(self)
+							\n      return self[1]; 
+							\n    end),
+							\n    count = (function(self)
+							\n      return tonumber(self.__count);
+							\n    end),
+							\n    clone = (function(self)
+							\n      return self;
+							\n    end)
+							\n  },
+							\n  new = (function()
+							\n    -- make sure all free-able memory is freed to help process
+							\n    collectgarbage(\"collect\");
+							\n    return Toolkit.Collections.Queue.__base;
+							\n  end),
+							\n  -- version()
+							\n  version = (function()
+							\n    return Toolkit.Collections.Queue.__version;
+							\n  end)
+							\n};
+							\nToolkit:traceEx(\"red\", Toolkit.Collections.Queue.__header..\" loaded in memory...\");
+							\n-- benchmark code
+							\nif (Toolkit.Debug) then Toolkit.Debug:benchmark(Toolkit.Collections.Queue.__header..\" lib\", \"elapsed time: %.3f cpu secs\
+							\n\", \"fragment\", true); end;
+							\nend;
+							\n-------------------------------------------------------------------------------------------
+							\n-------------------------------------------------------------------------------------------
+							\n-- Toolkit.Net library extention
+							\n-- Toolkit.Net.HttpRequest provide http request with advanced functions
+							\n-- Tested on Lua 5.1 with HC2 3.572 beta
+							\n--
+							\n-- Copyright 2013 Jean-christophe Vermandé
+							\n-- Thanks to rafal.m for the decodeChunks function used when reponse body is \"chunked\"
+							\n-- http://en.wikipedia.org/wiki/Chunked_transfer_encoding
+							\n--
+							\n-- Version 1.0.3 [12-13-2013]
+							\n-------------------------------------------------------------------------------------------
+							\n-------------------------------------------------------------------------------------------
+							\nif not Toolkit then error(\"You must add Toolkit\", 2) end
+							\nif not Toolkit.Net then Toolkit.Net = {
+							\n  -- private properties
+							\n  __header = \"Toolkit.Net\",
+							\n  __version = \"1.0.3\",
+							\n  __cr = string.char(13),
+							\n  __lf = string.char(10),
+							\n  __crLf = string.char(13, 10),
+							\n  __host = nil,
+							\n  __port = nil,
+							\n  -- private methods
+							\n  __trace = (function(v, ...)
+							\n    if (Toolkit.Net.isTraceEnabled) then Toolkit:trace(v, ...) end
+							\n  end),
+							\n  __writeHeader = (function(socket, data)
+							\n    assert(tostring(data) or data==nil or data==\"\", \"Invalid header found: \"..data);
+							\n    local head = tostring(data);
+							\n    socket:write(head..Toolkit.Net.__crLf);
+							\n    Toolkit.Net.__trace(\"%s.%s::request > Add header [%s]\", 
+							\n      Toolkit.Net.__header, Toolkit.Net.__Http.__header, head);
+							\n  end),
+							\n  __decodeChunks = (function(a)
+							\n    resp = \"\";
+							\n    line = \"0\";
+							\n    lenline = 0;
+							\n    len = string.len(a);
+							\n    i = 1;
+							\n    while i<=len do
+							\n      c = string.sub(a, i, i);
+							\n      if (lenline==0) then
+							\n        if (c==Toolkit.Net.__lf) then
+							\n          lenline = tonumber(line, 16);
+							\n          if (lenline==null) then
+							\n            lenline = 0;
+							\n          end
+							\n          line = 0;
+							\n        elseif (c==Toolkit.Net.__cr) then
+							\n          lenline = 0;
+							\n        else
+							\n          line = line .. c;
+							\n        end
+							\n      else
+							\n        resp = resp .. c;
+							\n        lenline = lenline - 1;
+							\n      end
+							\n      i = i + 1;
+							\n    end
+							\n    return resp;
+							\n  end),
+							\n  __readHeader = (function(data)
+							\n    if data == nil then
+							\n      error(\"Couldn't find header\");
+							\n    end
+							\n    local buffer = \"\";
+							\n    local headers = {};
+							\n    local i, len = 1, string.len(data);
+							\n    while i<=len do
+							\n      local a = data:sub(i,i) or \"\";
+							\n      local b = data:sub(i+1,i+1) or \"\";
+							\n      if (a..b == Toolkit.Net.__crLf) then
+							\n        i = i + 1;
+							\n        table.insert(headers, buffer);
+							\n        buffer = \"\";
+							\n      else
+							\n        buffer = buffer..a;     
+							\n      end
+							\n      i = i + 1;
+							\n    end
+							\n    return headers;
+							\n  end),
+							\n  __readSocket = (function(socket)
+							\n    local err, len = 0, 1;
+							\n    local buffer, data = \"\", \"\";
+							\n    while (err==0 and len>0) do
+							\n      data, err = socket:read();
+							\n      len = string.len(data);
+							\n      buffer = buffer..data;
+							\n    end
+							\n    return buffer, err;
+							\n  end),
+							\n  __Http = {
+							\n    __header = \"HttpRequest\",
+							\n    __version = \"1.0.3\",    
+							\n    __tcpSocket = nil,
+							\n    __timeout = 250,
+							\n    __waitBeforeReadMs = 25,
+							\n    __isConnected = false,
+							\n    __isChunked = false,
+							\n    __url = nil,
+							\n    __method = \"GET\",  
+							\n    __headers = {},
+							\n    __body = nil,
+							\n    __authorization = nil,
+							\n    -- Toolkit.Net.HttpRequest:setBasicAuthentication(username, password)
+							\n    -- Sets basic credentials for all requests.
+							\n    -- username (string) – credentials username
+							\n    -- password (string) – credentials password
+							\n    setBasicAuthentication = (function(self, username, password)
+							\n      Toolkit.assertArg(\"username\", username, \"string\");
+							\n      Toolkit.assertArg(\"password\", password, \"string\");
+							\n      --see: http://en.wikipedia.org/wiki/Basic_access_authentication
+							\n      self.__authorization = Toolkit.Crypto.Base64:encode(tostring(username..\":\"..password));
+							\n    end),
+							\n    -- Toolkit.Net.HttpRequest:setBasicAuthenticationEncoded(base64String)
+							\n    -- Sets basic credentials already encoded. Avoid direct exposure for information.
+							\n    -- base64String (string)\t- username and password encoded with base64
+							\n    setBasicAuthenticationEncoded = (function(self, base64String)
+							\n      Toolkit.assertArg(\"base64String\", base64String, \"string\");
+							\n      self.__authorization = base64String;
+							\n    end),
+							\n    -- Toolkit.Net.HttpRequest:setWaitBeforeReadMs(ms)
+							\n    -- Sets ms
+							\n    -- ms (integer) – timeout value in milliseconds
+							\n    setWaitBeforeReadMs = (function(self, ms)
+							\n      Toolkit.assertArg(\"ms\", ms, \"integer\");
+							\n      self.__waitBeforeReadMs = ms;
+							\n      Toolkit.Net.__trace(\"%s.%s::setWaitBeforeReadMs > set to %d ms\", 
+							\n        Toolkit.Net.__header, Toolkit.Net.__Http.__header, ms);
+							\n    end),
+							\n    -- Toolkit.Net.HttpRequest.getWaitBeforeReadMs()
+							\n    -- Returns the value in milliseconds
+							\n    getWaitBeforeReadMs = (function(self)
+							\n      return self.__waitBeforeReadMs;
+							\n    end),
+							\n    -- Toolkit.Net.HttpRequest.setReadTimeout(ms)
+							\n    -- Sets timeout
+							\n    -- ms (integer) – timeout value in milliseconds
+							\n  \tsetReadTimeout = (function(self, ms)
+							\n      Toolkit.assertArg(\"ms\", ms, \"number\");
+							\n      self.__timeout = ms;
+							\n      Toolkit.Net.__trace(\"%s.%s::setReadTimeout > Timeout set to %d ms\", 
+							\n        Toolkit.Net.__header, Toolkit.Net.__Http.__header, ms);
+							\n    end),
+							\n    -- Toolkit.Net.HttpRequest.getReadTimeout()
+							\n    -- Returns the timeout value in milliseconds
+							\n    getReadTimeout = (function(self)
+							\n      return self.__timeout;
+							\n    end),
+							\n    -- Toolkit.Net.HttpRequest:disconnect()
+							\n    -- Disconnect the socket used by httpRequest
+							\n    disconnect = (function(self)
+							\n      self.__tcpSocket:disconnect();
+							\n      self.__isConnected = false;
+							\n      Toolkit.Net.__trace(\"%s.%s::disconnect > Connected: %s\", 
+							\n        Toolkit.Net.__header, Toolkit.Net.__Http.__header, tostring(self.__isConnected));
+							\n    end),
+							\n    -- Toolkit.Net.HttpRequest:request(method, uri, headers, body)
+							\n    -- method (string)\t- method used for the request
+							\n    -- uri (string)\t\t- uri used for the request
+							\n    -- headers (table)\t- headers used for the request (option)
+							\n    -- body (string)\t- data sent with the request (option)
+							\n    request = (function(self, method, uri, headers, body)
+							\n      -- validation
+							\n      Toolkit.assertArg(\"method\", method, \"string\");
+							\n      assert(method==\"GET\" or method==\"POST\" or method==\"PUT\" or method==\"DELETE\");
+							\n      assert(uri~=nil or uri==\"\");
+							\n      self.__isChunked = false;
+							\n      self.__tcpSocket:setReadTimeout(self.__timeout);
+							\n      self.__url = uri;
+							\n      self.__method = method;
+							\n      self.__headers = headers or {};
+							\n      self.__body = body or nil;
+							\n      
+							\n      --local r = self.__method..\" http://\"..Toolkit.Net.__host..self.__url..\" HTTP/1.1\";
+							\n      --patch 18/12/2013
+							\n      local r = self.__method..\" \"..self.__url..\" HTTP/1.1\";
+							\n      Toolkit.Net.__trace(\"%s.%s::request > %s with method %s\", 
+							\n          Toolkit.Net.__header, Toolkit.Net.__Http.__header, self.__url, self.__method);
+							\n      local p = \"\";
+							\n      if (Toolkit.Net.__port~=nil) then
+							\n        p = \":\"..tostring(Toolkit.Net.__port);
+							\n      end
+							\n      local h = \"Host: \"..Toolkit.Net.__host .. p;
+							\n      -- write to socket headers method a host!
+							\n      Toolkit.Net.__writeHeader(self.__tcpSocket, r);
+							\n      Toolkit.Net.__writeHeader(self.__tcpSocket, h);
+							\n      -- add headers if needed
+							\n      for i = 1, #self.__headers do
+							\n        Toolkit.Net.__writeHeader(self.__tcpSocket, self.__headers[i]);
+							\n      end
+							\n      if (self.__authorization~=nil) then
+							\n        Toolkit.Net.__writeHeader(self.__tcpSocket, \"Authorization: Basic \"..self.__authorization);
+							\n      end
+							\n      -- add data in body if needed
+							\n      if (self.__body~=nil) then
+							\n        Toolkit.Net.__writeHeader(self.__tcpSocket, \"Content-Length: \"..string.len(self.__body));
+							\n        Toolkit.Net.__trace(\"%s.%s::request > Body length is %d\", 
+							\n          Toolkit.Net.__header, Toolkit.Net.__Http.__header, string.len(self.__body));
+							\n      end
+							\n      self.__tcpSocket:write(Toolkit.Net.__crLf..Toolkit.Net.__crLf);
+							\n      -- write body
+							\n      if (self.__body~=nil) then
+							\n        self.__tcpSocket:write(self.__body);
+							\n      end
+							\n      -- sleep to help process
+							\n      fibaro:sleep(self.__waitBeforeReadMs);
+							\n      -- wait socket reponse
+							\n      local result, err = Toolkit.Net.__readSocket(self.__tcpSocket);
+							\n      Toolkit.Net.__trace(\"%s.%s::receive > Length of result: %d\", 
+							\n          Toolkit.Net.__header, Toolkit.Net.__Http.__header, string.len(result));
+							\n      -- parse data
+							\n      local response, status;
+							\n      if (string.len(result)>0) then
+							\n        local _flag = string.find(result, Toolkit.Net.__crLf..Toolkit.Net.__crLf);
+							\n        local _rawHeader = string.sub(result, 1, _flag + 2);
+							\n        if (string.len(_rawHeader)) then
+							\n          status = string.sub(_rawHeader, 10, 13);
+							\n          Toolkit.Net.__trace(\"%s.%s::receive > Status %s\", Toolkit.Net.__header, 
+							\n            Toolkit.Net.__Http.__header, status);
+							\n          Toolkit.Net.__trace(\"%s.%s::receive > Length of headers reponse %d\", Toolkit.Net.__header, 
+							\n            Toolkit.Net.__Http.__header, string.len(_rawHeader));
+							\n          __headers = Toolkit.Net.__readHeader(_rawHeader);
+							\n          for k, v in pairs(__headers) do
+							\n            --Toolkit.Net.__trace(\"raw #\"..k..\":\"..v)
+							\n            if (string.find(string.lower( v or \"\"), \"chunked\")) then
+							\n              self.__isChunked = true;
+							\n              Toolkit.Net.__trace(\"%s.%s::receive > Transfer-Encoding: chunked\", 
+							\n          \t\tToolkit.Net.__header, Toolkit.Net.__Http.__header, string.len(result));
+							\n            end
+							\n          end
+							\n        end
+							\n        local _rBody = string.sub(result, _flag + 4);
+							\n        --Toolkit.Net.__trace(\"Length of body reponse: \" .. string.len(_rBody));
+							\n        if (self.__isChunked) then
+							\n          response = Toolkit.Net.__decodeChunks(_rBody);
+							\n          err = 0;
+							\n        else
+							\n          response = _rBody;
+							\n          err = 0;
+							\n        end
+							\n      end
+							\n      -- return budy response
+							\n      return response, status, err;
+							\n    end),
+							\n    -- Toolkit.Net.HttpRequest.version()
+							\n    -- Return the version
+							\n    version = (function()
+							\n      return Toolkit.Net.__Http.__version;
+							\n    end),
+							\n    -- Toolkit.Net.HttpRequest:dispose()
+							\n    -- Try to free memory and resources 
+							\n    dispose = (function(self)      
+							\n      if (self.__isConnected) then
+							\n      \tself.__tcpSocket:disconnect();
+							\n      end
+							\n      self.__tcpSocket = nil;
+							\n      self.__url = nil;
+							\n      self.__headers = nil;
+							\n      self.__body = nil;
+							\n      self.__method = nil;
+							\n      if pcall(function () assert(self.__tcpSocket~=Net.FTcpSocket) end) then
+							\n        Toolkit.Net.__trace(\"%s.%s::dispose > Successfully disposed\", 
+							\n          Toolkit.Net.__header, Toolkit.Net.__Http.__header);
+							\n      end
+							\n      -- make sure all free-able memory is freed
+							\n      collectgarbage(\"collect\");
+							\n      Toolkit.Net.__trace(\"%s.%s::dispose > Total memory in use by Lua: %.2f Kbytes\", 
+							\n        Toolkit.Net.__header, Toolkit.Net.__Http.__header, collectgarbage(\"count\"));
+							\n    end)
+							\n  },
+							\n  -- Toolkit.Net.isTraceEnabled
+							\n  -- true for activate trace in HC2 debug window
+							\n  isTraceEnabled = false,
+							\n  -- Toolkit.Net.HttpRequest(host, port)
+							\n  -- Give object instance for make http request
+							\n  -- host (string)\t- host
+							\n  -- port (intager)\t- port
+							\n  -- Return HttpRequest object
+							\n  HttpRequest = (function(host, port)
+							\n    assert(host~=Toolkit.Net, \"Cannot call HttpRequest like that!\");
+							\n    assert(host~=nil, \"host invalid input\");
+							\n    assert(port==nil or tonumber(port), \"port invalid input\");
+							\n    -- make sure all free-able memory is freed to help process
+							\n    collectgarbage(\"collect\");
+							\n    Toolkit.Net.__host = host;
+							\n    Toolkit.Net.__port = port;
+							\n    local _c = Toolkit.Net.__Http;
+							\n    _c.__tcpSocket = Net.FTcpSocket(host, port);
+							\n    _c.__isConnected = true;
+							\n    Toolkit.Net.__trace(\"%s.%s > Total memory in use by Lua: %.2f Kbytes\", 
+							\n          Toolkit.Net.__header, Toolkit.Net.__Http.__header, collectgarbage(\"count\"));
+							\n    Toolkit.Net.__trace(\"%s.%s > Create Session on port: %d, host: %s\", 
+							\n          Toolkit.Net.__header, Toolkit.Net.__Http.__header, port, host);
+							\n    return _c;
+							\n  end),
+							\n  -- Toolkit.Net.version()
+							\n  version = (function()
+							\n    return Toolkit.Net.__version;
+							\n  end)
+							\n};
+							\n
+							\nToolkit:traceEx(\"red\", Toolkit.Net.__header..\" loaded in memory...\");
+							\n-- benchmark code
+							\nif (Toolkit.Debug) then Toolkit.Debug:benchmark(Toolkit.Net.__header..\" lib\", \"elapsed time: %.3f cpu secs\
+							\n\", \"fragment\", true); end;
+							\nend;
+							\n
+							\n---------------------------------------------------------------------------------
+							\n---------------------------------------------------------------------------------
+							\n-- XML parser for use with the LUA Toolkit for Fibaro HC2.
+							\n--
+							\n-- version: 1.0
+							\n--
+							\n-- NOTE: This is a modified version of Alexander Makeev's Lua-only XML parser
+							\n-- found here: http://lua-users.org/wiki/LuaXml
+							\n---------------------------------------------------------------------------------
+							\n---------------------------------------------------------------------------------
+							\nif not Toolkit then error(\"You must add Toolkit\", 2) end
+							\nif not Toolkit.Xml then Toolkit.Xml = {
+							\n  -- private properties
+							\n  __header = \"Toolkit.Xml\",
+							\n  __version = \"1.0.0\",
+							\n  __node = function(name)
+							\n    local node = {};
+							\n    node.___value = nil;
+							\n    node.___name = name;
+							\n    node.___children = {};
+							\n    node.___props = {};    
+							\n    function node:value() return self.___value end
+							\n    function node:setValue(val) self.___value = val end
+							\n    function node:name() return self.___name end
+							\n    function node:setName(name) self.___name = name end
+							\n    function node:children() return self.___children end
+							\n    function node:numChildren() return #self.___children end
+							\n    function node:addChild(child)
+							\n      if self[child:name()] ~= nil then
+							\n        if type(self[child:name()].name) == \"function\" then
+							\n          local tempTable = {}
+							\n          table.insert(tempTable, self[child:name()])
+							\n          self[child:name()] = tempTable
+							\n        end
+							\n        table.insert(self[child:name()], child)
+							\n      else
+							\n        self[child:name()] = child
+							\n      end
+							\n      table.insert(self.___children, child)
+							\n    end
+							\n    
+							\n    function node:properties() return self.___props end
+							\n    function node:numProperties() return #self.___props end
+							\n    function node:addProperty(name, value)
+							\n      local lName = \"@\" .. name
+							\n      if self[lName] ~= nil then
+							\n        if type(self[lName]) == \"string\" then
+							\n          local tempTable = {}
+							\n          table.insert(tempTable, self[lName])
+							\n          self[lName] = tempTable
+							\n        end
+							\n        table.insert(self[lName], value)
+							\n      else
+							\n        self[lName] = value
+							\n      end
+							\n      table.insert(self.___props, { name = name, value = self[name] })
+							\n    end  
+							\n    return node
+							\n  end,
+							\n  Node = (function(self, name)
+							\n    return self.__node(name);
+							\n  end),
+							\n  ToXmlString = function(value)
+							\n    value = string.gsub(value, \"&\", \"&\"..\"amp;\");
+							\n    value = string.gsub(value, \"<\", \"&\"..\"lt;\");
+							\n    value = string.gsub(value, \">\", \"&\"..\"gt;\");
+							\n    value = string.gsub(value, \"\\\"\", \"&\"..\"quot;\");
+							\n    value = string.gsub(value, \"([^%w%&%;%p%\\t% ])\", 
+							\n        function(c) 
+							\n          return string.format(\"&#x%X;\", string.byte(c))
+							\n        end);
+							\n    return value;
+							\n  end,
+							\n  FromXmlString = function(value)
+							\n    value = string.gsub(value, \"&#x([%x]+)%;\",
+							\n      function(h)
+							\n        return string.char(tonumber(h, 16))
+							\n      end);
+							\n    value = string.gsub(value, \"&#([0-9]+)%;\",
+							\n      function(h)
+							\n        return string.char(tonumber(h, 10))
+							\n      end);
+							\n    value = string.gsub(value, \"&\"..\"quot;\", \"\\\"\");
+							\n    value = string.gsub(value, \"&\"..\"apos;\", \"'\");
+							\n    value = string.gsub(value, \"&\"..\"gt;\", \">\");
+							\n    value = string.gsub(value, \"&\"..\"lt;\", \"<\");
+							\n    value = string.gsub(value, \"&\"..\"amp;\", \"&\");
+							\n    return value;
+							\n  end,
+							\n  ParseArgs = function(node, s)
+							\n    string.gsub(s, \"(%w+)=([\\\"'])(.-)%2\", function(w, _, a)
+							\n        node:addProperty(w, Toolkit.Xml.FromXmlString(a))
+							\n      end)
+							\n  end,
+							\n  ParseXmlText = function(self, xmlText)
+							\n    local stack = {};
+							\n    local top = Toolkit.Xml:Node();
+							\n    table.insert(stack, top);      
+							\n    local ni, c, label, xarg, empty;
+							\n    local i, j = 1, 1;
+							\n    while true do
+							\n      ni, j, c, label, xarg, empty = string.find(xmlText, \"<(%/?)([%w_:]+)(.-)(%/?)>\", i);
+							\n      if not ni then break end
+							\n      local text = string.sub(xmlText, i, ni - 1);      \t\t
+							\n      if not string.find(text, \"^%s*$\") then
+							\n        local lVal = (top:value() or \"\") .. Toolkit.Xml.FromXmlString(text);
+							\n        stack[#stack]:setValue(lVal);
+							\n      end
+							\n      if empty == \"/\" then -- empty element tag
+							\n        local lNode = Toolkit.Xml:Node(label);        \t\t
+							\n        Toolkit.Xml.ParseArgs(lNode, xarg);
+							\n        top:addChild(lNode);
+							\n      elseif c == \"\" then -- start tag
+							\n        local lNode = Toolkit.Xml:Node(label);
+							\n        Toolkit.Xml.ParseArgs(lNode, xarg);
+							\n        table.insert(stack, lNode);
+							\n        top = lNode;
+							\n      else -- end tag
+							\n        local toclose = table.remove(stack) -- remove top
+							\n        top = stack[#stack]
+							\n        if #stack < 1 then
+							\n          error(\"XmlParser: nothing to close with \" .. label);
+							\n        end
+							\n        if toclose:name() ~= label then
+							\n          error(\"XmlParser: trying to close \" .. toclose.name .. \" with \" .. label);
+							\n        end
+							\n        top:addChild(toclose);
+							\n      end
+							\n      i = j + 1;
+							\n    end
+							\n    local text = string.sub(xmlText, i);
+							\n    if #stack > 1 then
+							\n      error(\"XmlParser: unclosed \" .. stack[#stack]:name());
+							\n    end
+							\n    return top;
+							\n  end,
+							\n  -- Toolkit.Xml.version()
+							\n  version = (function()
+							\n    return Toolkit.Xml.__version;
+							\n  end)
+							\n};
+							\nToolkit:traceEx(\"red\", Toolkit.Xml.__header..\" loaded in memory...\");
+							\n-- benchmark code
+							\nif (Toolkit.Debug) then Toolkit.Debug:benchmark(Toolkit.Xml.__header..\" lib\", \"elapsed time: %.3f cpu secs\
+							\n\", \"fragment\", true); end;
+							\nend;
+							\n-------------------------------------------------------------------------------------------
+							\n-------------------------------------------------------------------------------------------
+							\n-- SONOS Virtual Device & Text To Speech (TTS) - Give voice to your HC2 with SONOS wireless
+							\n-- speakers.
+							\n--
+							\n-- SONOS Recommended version : 5.1
+							\n--
+							\n-- Copyright (C) 2014 Jean-Christophe Vermandé
+							\n--
+							\n-- Version 0.0.8
+							\n--
+							\n-- Play TTS: fibaro:setGlobal(\"SonosTTS\", \"lng=fr|dr=auto|vol=10|txt=Bonjour les gens du forum ! Voici le T.T.S enfin fonctionnele !|\");
+							\n-------------------------------------------------------------------------------------------
+							\n-------------------------------------------------------------------------------------------
+							\n-- CHANGE LOGS: 
+							\n-- 
+							\n-- Version 0.0.8
+							\n-- Improvement: Play TSS with auto stop mode (set dr parameter to \"auto\") now works as expected.
+							\n-- Improvement: Play TTS with fidex duration (set dr parameter to \"xx\" seconds) now works as expected.
+							\n-- Patch: Main image is now fixed after pressing a button, thanks to Labomatik & JM13.
+							\n-- Patch: Bug with XMl parsing for BrowseDirectChildren.
+							\n-- Warning: To operate the radio shortcuts you must choose at least two favorite radios.
+							\n
+							\n-- Version 0.0.7
+							\n-- Refresh process run faster and more efficiently.
+							\n-- Patch line 892: attempt to index local 'value' (a function value)
+							\n-- Patch line 1256: attempt to concatenate a nil value
+							\n-- Show plugin current version in debug window on startup
+							\n-- Add LED control \"On\" or \"Off\" -> Sonos:ledState(\"On\");
+							\n-- 
+							\n-------------------------------------------------------------------------------------------
+							\nif (Sonos == nil) then
+							\n  
+							\nSonos = {
+							\n  __header = \"SONOS Player Remote Plugin\",
+							\n  __version = \"0.0.8\",
+							\n  _commands = Tk.Collections.Queue.new(),
+							\n  _isPlaying = false,
+							\n  _isPlayingTTS = false,
+							\n  _isMuted = false,
+							\n  transportState = \"\",
+							\n  transportStatus = \"\",
+							\n  volume = 0,
+							\n  lastVolume = 0,
+							\n  lastMuteState = 0,
+							\n  lastTransportState = \"\",
+							\n  lastTrack = nil,
+							\n  ttsVolumeIsDifferent = false,
+							\n  mediaInfo = {
+							\n    title = \"\"
+							\n  },
+							\n  eq = {
+							\n    loudness = false;
+							\n  },
+							\n  zpStatus = {
+							\n    zoneName = \"\",
+							\n    localUID = \"\",
+							\n    macAddress = \"\"
+							\n  },
+							\n  radioStations = {},
+							\n  currentTrack = {
+							\n    isRadio = false,
+							\n    isFile = false,
+							\n    absCount = nil,
+							\n    artist = nil,
+							\n    album = nil,
+							\n    creator = nil,
+							\n    duration = nil,
+							\n    originalTrackNumber = nil,
+							\n    relTime = nil,
+							\n    relCount = nil,
+							\n    title = nil,
+							\n    track = nil,
+							\n    uri = nil
+							\n  },
+							\n  refreshTime = 6,
+							\n  defaultRefreshTime = 12,
+							\n  props = {
+							\n    controlURL = {
+							\n      ServerContentDirectory = \"/MediaServer/ContentDirectory/Control\",
+							\n      RendererAVTransport = \"/MediaRenderer/AVTransport/Control\",
+							\n      RendererRenderingControl = \"/MediaRenderer/RenderingControl/Control\",
+							\n      RendererConnectionManager = \"/MediaRenderer/ConnectionManager/Control\",
+							\n      RendererQueue = \"/MediaRenderer/Queue/Control\",
+							\n      DeviceProperties = \"/DeviceProperties/Control\"
+							\n    },
+							\n    serviceType = {
+							\n      MediaRenderer = \"urn:schemas-upnp-org:device:MediaRenderer:1\",
+							\n      AVTransport = \"urn:schemas-upnp-org:service:AVTransport:1\",
+							\n      RenderingControl = \"urn:schemas-upnp-org:service:RenderingControl:1\",
+							\n      Queue = \"urn:schemas-sonos-com:service:Queue:1\",
+							\n      GroupRenderingControl = \"urn:schemas-upnp-org:service:GroupRenderingControl:1\",
+							\n      ContentDirectory = \"urn:schemas-upnp-org:service:ContentDirectory:1\",
+							\n      DeviceProperties = \"urn:schemas-upnp-org:service:DeviceProperties:1\"
+							\n    },
+							\n    actions = {
+							\n      GetTransportInfo = \"GetTransportInfo\",
+							\n      GetPositionInfo = \"GetPositionInfo\",
+							\n      GetMediaInfo = \"GetMediaInfo\",
+							\n      GetVolume = \"GetVolume\",
+							\n      SetVolume = \"SetVolume\",
+							\n      GetMute = \"GetMute\",
+							\n      SetMute = \"SetMute\",
+							\n      SetLoudness = \"SetLoudness\",
+							\n      GetLoudness = \"GetLoudness\",
+							\n      SetAVTransportURI = \"SetAVTransportURI\",
+							\n      Play = \"Play\",
+							\n      Pause = \"Pause\",
+							\n      Stop = \"Stop\",
+							\n      Previous = \"Previous\",
+							\n      Next = \"Next\",
+							\n      Seek = \"Seek\",
+							\n      Browse = \"Browse\",
+							\n      SetLEDState = \"SetLEDState\",
+							\n      GetLEDState = \"GetLEDState\"
+							\n    },
+							\n    transportState = {
+							\n      playing = \"PLAYING\",
+							\n      stopped = \"STOPPED\",
+							\n      pausedPlayback = \"PAUSED_PLAYBACK\",
+							\n      transitioning = \"TRANSITIONING\"
+							\n    },
+							\n    transportStatus = {
+							\n      ok = \"OK\"
+							\n    }
+							\n  }
+							\n}
+							\n  
+							\nTk:traceEx(\"green\", \"-------------------------------------------------------------------------\");
+							\nTk:traceEx(\"green\", \"-- %s version %s\", Sonos.__header, Sonos.__version);
+							\nTk:traceEx(\"green\", \"-------------------------------------------------------------------------\");
+							\n
+							\n--Browse
+							\nSonos.browseDirectory = function(self)
+							\n  Tk:trace(\"Get browseDirectory request\");
+							\n  --Radio Stations use objectID: R:0/0
+							\n  --Radio Shows use objectID: R:0/1
+							\n  return sendSoapMessage(
+							\n  \tself.props.controlURL.ServerContentDirectory,
+							\n    self.props.serviceType.ContentDirectory,
+							\n    { name = self.props.actions.Browse, service = self.props.serviceType.ContentDirectory },
+							\n\t\"<ObjectID>R:0/0</ObjectID><BrowseFlag>BrowseDirectChildren</BrowseFlag><Filter ></Filter><StartingIndex>0</StartingIndex><RequestedCount>5</RequestedCount><SortCriteria></SortCriteria>\",
+							\n    function(response)  
+							\n      local result = decode(tostring(response:match(\"<Result>(.+)</Result>\")) or \"\");
+							\n      if (result ~= nil or result ~= \"\") then
+							\n        local parsedXml = Toolkit.Xml:ParseXmlText(result);
+							\n        local parsedDIDL = parsedXml[\"DIDL\"];
+							\n        local cnt = 1;
+							\n        if parsedDIDL ~= nil then
+							\n          local children = parsedDIDL[\"item\"] or {};
+							\n          for key, value in ipairs(children) do
+							\n            
+							\n            Tk:trace(\"key:\"..tostring(key));
+							\n            Tk:trace(\"value type:\"..type(value));
+							\n            Tk:trace(\"children value:\"..type(children[key]));
+							\n              
+							\n            -- BUG: line 892: attempt to index local 'value' (a function value)
+							\n            if (value ~= nil) then
+							\n              local rsTitle, rsRes = \"\", \"\";
+							\n              if (value[\"dc:title\"] ~= nil) then
+							\n                rsTitle = value[\"dc:title\"]:value();
+							\n              end
+							\n              if (value[\"res\"] ~= nil) then 
+							\n                rsRe = value[\"res\"]:value();
+							\n              end
+							\n              self.radioStations[cnt] = {
+							\n                  title = rsTitle,
+							\n                  res = rsRe
+							\n                  };
+							\n              Tk:traceEx(\"yellow\", \"favorite radio station #%d - %s\", cnt, self.radioStations[cnt].title);
+							\n              cnt = cnt + 1;
+							\n            end
+							\n          end
+							\n        else
+							\n          Tk:traceEx(\"red\", \"DIDL-Lite node not created!\");
+							\n        end
+							\n      else
+							\n        Tk:traceEx(\"red\", \"Radio Stations results not found!\");
+							\n      end
+							\n    end);
+							\nend
+							\n--Play
+							\n--Sonos.play = function(self, duration, callback)
+							\nSonos.play = function(self, callback)
+							\n  Tk:trace(\"Play request\");
+							\n  callback = callback or function(response) Tk:trace(\"Play sent\"); end
+							\n  self.refreshTime = 2;
+							\n  return sendSoapMessage(
+							\n    -- control url
+							\n    self.props.controlURL.RendererAVTransport,
+							\n    -- service type
+							\n    self.props.serviceType.AVTransport,
+							\n    -- action
+							\n    { name = self.props.actions.Play, service = self.props.serviceType.AVTransport },
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID><Speed>1</Speed>\",
+							\n      -- callback (options)
+							\n    callback);    
+							\nend
+							\n
+							\nSonos.pause = function(self)
+							\n  Tk:trace(\"Pause request\");
+							\n  return sendSoapMessage(
+							\n    self.props.controlURL.RendererAVTransport,
+							\n    self.props.serviceType.AVTransport,
+							\n    { name = self.props.actions.Pause, service = self.props.serviceType.AVTransport },
+							\n    \"<InstanceID>0</InstanceID><Speed>1</Speed>\",
+							\n    function(response)
+							\n      Tk:trace(\"Pause sent\");
+							\n    end);    
+							\nend
+							\n
+							\nSonos.stop = function(self)
+							\n  Tk:trace(\"Stop request\");
+							\n  return sendSoapMessage(
+							\n    self.props.controlURL.RendererAVTransport,
+							\n    self.props.serviceType.AVTransport,
+							\n    { name = self.props.actions.Stop, service = self.props.serviceType.AVTransport },
+							\n    \"<InstanceID>0</InstanceID><Speed>1</Speed>\",
+							\n    function(response)
+							\n      Tk:trace(\"Stop was sent\");
+							\n    end);    
+							\nend
+							\n
+							\nSonos.previous = function(self)
+							\n  Tk:trace(\"Previous request\");
+							\n  return sendSoapMessage(
+							\n    self.props.controlURL.RendererAVTransport,
+							\n    self.props.serviceType.AVTransport,
+							\n    { name = self.props.actions.Previous, service = self.props.serviceType.AVTransport },
+							\n    \"<InstanceID>0</InstanceID><Speed>1</Speed>\",
+							\n    function(response)
+							\n      Tk:trace(\"Previous sent\");
+							\n    end);    
+							\nend
+							\n
+							\nSonos.next = function(self)
+							\n  Tk:trace(\"Next request\");
+							\n  return sendSoapMessage(
+							\n    self.props.controlURL.RendererAVTransport,
+							\n    self.props.serviceType.AVTransport,
+							\n    { name = self.props.actions.Next, service = self.props.serviceType.AVTransport },
+							\n    \"<InstanceID>0</InstanceID><Speed>1</Speed>\",
+							\n    function(response)
+							\n      Tk:trace(\"Next sent\");
+							\n    end);    
+							\nend
+							\n--Seeks to a given position (HH:MM:SS or H:MM:SS) in the current track or track number x
+							\n--@param string type 'REL_TIME' for time position (xx:xx:xx) or 'TRACK_NR' for track in current queue
+							\n--@param string position 'xx:xx:xx' or track number x
+							\nSonos.seek = function(self, type, position)
+							\n  if (self.currentTrack.isRadio) then
+							\n    Tk:traceEx(\"Yellow\", \"Cannot seek in radio mode!\");
+							\n    return;
+							\n  end
+							\n  Tk:trace(\"seek to %s\", tostring(position));
+							\n  return sendSoapMessage(
+							\n    self.props.controlURL.RendererAVTransport,
+							\n    self.props.serviceType.AVTransport,
+							\n    { name = self.props.actions.Seek, service = self.props.serviceType.AVTransport },
+							\n    \"<InstanceID>0</InstanceID><Unit>\" .. type ..\"</Unit><Target>\" .. position .. \"</Target>\",
+							\n    function(response)
+							\n      Tk:trace(\"seek was sent\");
+							\n    end);    
+							\nend
+							\n--Seek to left
+							\nSonos.seekL = function(self)
+							\n  if (self.currentTrack ~= nil) then
+							\n    local relTime = self.currentTrack.relTime;
+							\n    local newTime = clockToSeconds(relTime);
+							\n    if (newTime >= 30) then
+							\n      newTime = newTime - 30;
+							\n    end
+							\n    self:seek(\"REL_TIME\", secondsToClock(newTime));
+							\n    --Tk:trace(\"seek left request\");
+							\n  else
+							\n    Tk:traceEx(\"yellow\", \"There is no current track loaded.\");
+							\n  end
+							\nend
+							\n--Seek to right
+							\nSonos.seekR = function(self)
+							\n  if (self.currentTrack ~= nil) then    
+							\n    local relTime = self.currentTrack.relTime;
+							\n    local newTimeInSeconds = clockToSeconds(relTime) or 0;
+							\n    local durationInSeconds = clockToSeconds(self.currentTrack.duration or \"00:00\") or 0;
+							\n    newTimeInSeconds = newTimeInSeconds + 30;
+							\n    if (newTimeInSeconds >= durationInSeconds) then
+							\n      Tk:traceEx(\"yellow\", \"try to seek out of range!\");
+							\n      return;
+							\n    end
+							\n    self:seek(\"REL_TIME\", secondsToClock(newTimeInSeconds));
+							\n    Tk:trace(\"seek right request\");
+							\n  else
+							\n    Tk:traceEx(\"yellow\", \"There is no current track loaded.\");
+							\n  end
+							\nend
+							\n-- set loudness 
+							\nSonos.loudness = function(self, state)
+							\n  Tk:trace(\"Set Loudness: \" .. tostring(state));
+							\n  local flag = 0; -- unmute
+							\n  if (state == true) then flag = 1 end;
+							\n  return sendSoapMessage(
+							\n    self.props.controlURL.RendererRenderingControl,
+							\n    self.props.serviceType.RenderingControl,
+							\n    { name = self.props.actions.SetLoudness, service = self.props.serviceType.RenderingControl },
+							\n    \"<InstanceID>0</InstanceID><Channel>Master</Channel><DesiredLoudness>\"..flag..\"</DesiredLoudness>\",
+							\n    function(response)
+							\n      if (flag == 0) then
+							\n      \tTk:trace(\"Loudness OFF was sent\");
+							\n        self.eq.loudness = false;
+							\n      else
+							\n        Tk:trace(\"Loudness ON was sent\");
+							\n        self.eq.loudness = true;
+							\n      end
+							\n    end);
+							\nend
+							\n--Get loudness
+							\nSonos.getLoudness = function(self)
+							\n  Tk:trace(\"Get loudness request\");
+							\n  return sendSoapMessage(
+							\n  \tself.props.controlURL.RendererRenderingControl,
+							\n    self.props.serviceType.AVTransport,
+							\n    { name = self.props.actions.GetLoudness, service = self.props.serviceType.RenderingControl },
+							\n    \"<InstanceID>0</InstanceID><Channel>Master</Channel>\",
+							\n    function(response)
+							\n      local current = tonumber(response:match(\"<CurrentLoudness>(.+)</CurrentLoudness>\") or 0);    
+							\n      if (current == 0) then
+							\n      \tTk:trace(\"Loudness is OFF\");
+							\n        self.eq.loudness = false;
+							\n      elseif (current == 1) then
+							\n        Tk:trace(\"Loudness is ON\");
+							\n        self.eq.loudness = true;
+							\n      else
+							\n        Tk:trace(\"Loudness N.C\");
+							\n        self.eq.loudness = false;
+							\n      end
+							\n    end);
+							\nend
+							\n--Mute current transport
+							\nSonos.mute = function(self, state)
+							\n  Tk:trace(\"Mute request\");
+							\n  local flag = 0; -- unmute
+							\n  if (state == true) then flag = 1 end;
+							\n  return sendSoapMessage(
+							\n    self.props.controlURL.RendererRenderingControl,
+							\n    self.props.serviceType.RenderingControl,
+							\n    { name = self.props.actions.SetMute, service = self.props.serviceType.RenderingControl },
+							\n    \"<InstanceID>0</InstanceID><Channel>Master</Channel><DesiredMute>\"..flag..\"</DesiredMute>\",
+							\n    function(response)
+							\n      if (flag == 0) then
+							\n      \tTk:trace(\"UnMute was sent\");
+							\n        self._isMuted = false;
+							\n      else
+							\n        Tk:trace(\"Mute was sent\");
+							\n        self._isMuted = true;
+							\n      end
+							\n    end); 
+							\nend
+							\n--Invert or Toggle current mute state
+							\nSonos.muteInvert = function(self)
+							\n  if (self._isMuted == true) then
+							\n    self:mute(false);
+							\n  elseif (self._isMuted == false) then
+							\n    self:mute(true);
+							\n  end
+							\nend
+							\n--Get Mute
+							\nSonos.getMute = function(self)
+							\n  Tk:trace(\"Get mute state request\");
+							\n  return sendSoapMessage(
+							\n  \tself.props.controlURL.RendererRenderingControl,
+							\n    self.props.serviceType.RenderingControl,
+							\n    { name = self.props.actions.GetMute, service = self.props.serviceType.RenderingControl },
+							\n    \"<InstanceID>0</InstanceID><Channel>Master</Channel>\",
+							\n    function(response)
+							\n      local flag = tonumber(response:match(\"<CurrentMute>(.+)</CurrentMute>\") or 0);
+							\n      if (flag == 0) then
+							\n        self._isMuted = false;
+							\n      elseif (flag == 1) then
+							\n        self._isMuted = true;
+							\n      end
+							\n      Tk:trace(\"mute: %s\", tostring(self._isMuted));
+							\n    end);
+							\nend
+							\n--Get Volume
+							\nSonos.getVolume = function(self)
+							\n  Tk:trace(\"Get volume request\");
+							\n  return sendSoapMessage(
+							\n  \tself.props.controlURL.RendererRenderingControl,
+							\n    self.props.serviceType.AVTransport,
+							\n    { name = self.props.actions.GetVolume, service = self.props.serviceType.RenderingControl },
+							\n    \"<InstanceID>0</InstanceID><Channel>Master</Channel>\",
+							\n    function(response)
+							\n      self.volume = tonumber(response:match(\"<CurrentVolume>(.+)</CurrentVolume>\") or 0);    
+							\n      Tk:trace(\"volume: %d\", self.volume);
+							\n    end);
+							\nend
+							\n--Set volume
+							\nSonos.setVolume = function(self, value)
+							\n  Tk:trace(\"Set volume to %s\", tostring(value));
+							\n  return sendSoapMessage(
+							\n    self.props.controlURL.RendererRenderingControl,
+							\n    self.props.serviceType.RenderingControl,
+							\n    { name = self.props.actions.SetVolume, service = self.props.serviceType.RenderingControl },
+							\n    \"<InstanceID>0</InstanceID><Channel>Master</Channel><DesiredVolume>\" .. tostring(value) .. \"</DesiredVolume>\",
+							\n    function(response)
+							\n      self.volume = tonumber(value);
+							\n      fibaro:call(_selfId, \"setProperty\", \"ui.slVolume.value\", self.volume);
+							\n      Tk:trace(\"Volume set to %d\", value); 
+							\n    end);
+							\nend
+							\n--Get transport state
+							\nSonos.getTransportState = function(self)
+							\n  Tk:trace(\"Get transport state request\");
+							\n  return sendSoapMessage(
+							\n  \tself.props.controlURL.RendererAVTransport,
+							\n    self.props.serviceType.AVTransport,
+							\n    { name = self.props.actions.GetTransportInfo, service = self.props.serviceType.AVTransport },
+							\n    \"<InstanceID>0</InstanceID>\",
+							\n    function(response)      
+							\n      self.transportState = response:match(\"<CurrentTransportState>(.+)</CurrentTransportState>\") or \"\";
+							\n      self.transportStatus = response:match(\"<CurrentTransportStatus>(.+)</CurrentTransportStatus>\") or \"\";
+							\n      --Tk:traceEx(\"green\", \"transport state: %s, status is %s\", self.transportState, Sonos.transportStatus);
+							\n    end);
+							\nend
+							\n--Set current track
+							\nSonos.setCurrentTrack = function(self, uri)
+							\n  --x-file-cifs://HOME-SERVER/Musique/CD/Dream Theater/A Change of Seasons/01-A Change of Seasons [Medley].flac  
+							\n  Tk:trace(\"Set current track to %s\", urlDecode(uri));
+							\n  return sendSoapMessage(
+							\n    self.props.controlURL.RendererAVTransport,
+							\n    self.props.serviceType.AVTransport,
+							\n    { name = self.props.actions.SetAVTransportURI, service = self.props.serviceType.AVTransport },
+							\n    \"<InstanceID>0</InstanceID>,<CurrentURI>\" .. uri .. \"</CurrentURI>,<CurrentURIMetaData></CurrentURIMetaData>\"
+							\n  );  
+							\nend
+							\n--Get current track
+							\nSonos.getCurrentTrack = function(self)
+							\n  Tk:trace(\"get current track request\");
+							\n  return sendSoapMessage(
+							\n    self.props.controlURL.RendererAVTransport,
+							\n    self.props.serviceType.AVTransport,
+							\n    { name = self.props.actions.GetPositionInfo, service = self.props.serviceType.AVTransport },
+							\n    \"<InstanceID>0</InstanceID><Channel>Master</Channel>\",
+							\n    function(response)
+							\n      -- track number
+							\n      self.currentTrack.track = tonumber(response:match(\"<Track>(.+)</Track>\") or 0);
+							\n      --Tk:trace(\"track: \"..self.currentTrack.track);
+							\n      -- duration
+							\n      self.currentTrack.duration = tostring(response:match(\"<TrackDuration>(.+)</TrackDuration>\") or \"\");
+							\n      --Tk:trace(\"duration: \"..self.currentTrack.duration);
+							\n      -- REL time
+							\n      self.currentTrack.relTime = tostring(response:match(\"<RelTime>(.+)</RelTime>\") or \"00:00:00\");
+							\n      --Tk:trace(\"relTime: \"..self.currentTrack.relTime);
+							\n      -- REL Count
+							\n      self.currentTrack.relCount = tonumber(response:match(\"<RelCount>(.+)</RelCount>\") or 0);
+							\n      --Tk:trace(\"relCount: \"..self.currentTrack.relCount);
+							\n      -- ABS count
+							\n      self.currentTrack.absCount = tonumber(response:match(\"<AbsCount>(.+)</AbsCount>\") or 0);
+							\n      --Tk:trace(\"absCount: \"..self.currentTrack.absCount);  
+							\n      -- track uri
+							\n      self.currentTrack.uri = tostring(response:match(\"<TrackURI>(.+)</TrackURI>\") or \"\");
+							\n      --Tk:trace(\"uri: %s\", urlDecode(self.currentTrack.uri));      
+							\n      local metadata = decode(tostring(response:match(\"<TrackMetaData>(.+)</TrackMetaData>\")));
+							\n      -- album title
+							\n      self.currentTrack.title = string.gsub(decode(tostring(metadata:match(\"<dc:title>(.+)</dc:title>\") or \"\")), 1, 22);
+							\n      --Tk:trace(\"title: %s\", self.currentTrack.title); 
+							\n      -- album creator
+							\n      self.currentTrack.creator = decode(tostring(metadata:match(\"<dc:creator>(.+)</dc:creator>\") or \"\"));
+							\n      --Tk:trace(\"creator: %s\", self.currentTrack.creator);
+							\n      -- album artist
+							\n      self.currentTrack.artist = decode(tostring(metadata:match(\"<r:albumArtist>(.+)</r:albumArtist>\") or \"\"));
+							\n      --Tk:trace(\"artist: %s\", self.currentTrack.artist);
+							\n      -- album name
+							\n      self.currentTrack.album = decode(tostring(metadata:match(\"<upnp:album>(.+)</upnp:album>\") or \"\"));
+							\n      --Tk:trace(\"album: %s\", self.currentTrack.album);
+							\n      -- album original track number
+							\n      self.currentTrack.originalTrackNumber = tostring(metadata:match(\"<upnp:originalTrackNumber>(.+)</upnp:originalTrackNumber>\") or \"\");
+							\n      --Tk:trace(\"album: %s\", self.currentTrack.originalTrackNumber);
+							\n      if (string.find(decode(self.currentTrack.uri or \"\"), \"x-rincon-mp3radio:\", 1, true) ~= nil) then
+							\n        self.currentTrack.isRadio = true;
+							\n        self.currentTrack.isFile = false;
+							\n        -- get media info
+							\n        if (self:getMediaInfo()) then
+							\n          self.currentTrack.title = string.gsub(self.mediaInfo.title, 1, 25);
+							\n        end
+							\n      elseif (string.find(decode(self.currentTrack.uri or \"\"), \"x-file-cifs:\", 1, true) ~= nil) then
+							\n        self.currentTrack.isRadio = false;
+							\n        self.currentTrack.isFile = true;
+							\n      else
+							\n        self.currentTrack.isRadio = false;
+							\n        self.currentTrack.isFile = false;
+							\n      end
+							\n      --Tk:trace(\"isRadio: %s\", tostring(self.currentTrack.isRadio));
+							\n      --Tk:trace(\"isFile: %s\", tostring(self.currentTrack.isFile));
+							\n    end);
+							\nend
+							\n--Get media info
+							\nSonos.getMediaInfo = function(self)
+							\n  Tk:trace(\"Get current media info request\");
+							\n  return sendSoapMessage(
+							\n    self.props.controlURL.RendererAVTransport,
+							\n    self.props.serviceType.AVTransport,
+							\n    { 
+							\n        name = self.props.actions.GetMediaInfo, 
+							\n        service = self.props.serviceType.AVTransport
+							\n    },
+							\n    \"<InstanceID>0</InstanceID><Channel>Master</Channel>\",
+							\n    function(response)
+							\n      local metadata = decode(tostring(response:match('<CurrentURIMetaData>(.+)</CurrentURIMetaData>')));
+							\n      self.mediaInfo.title = decode(tostring(metadata:match('<dc:title>(.+)</dc:title>') or ''));
+							\n    end);
+							\nend
+							\n-- Create meta data
+							\nSonos.createMetaData = function(self, title)
+							\n  local items={};
+							\n  table.insert(items,'<DIDL-Lite xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:dlna=\"urn:schemas-dlna-org:metadata-1-0\">');
+							\n  table.insert(items,'<dc:title>'.. (title or '') ..'</dc:title>');
+							\n  table.insert(items,'</DIDL-Lite>');
+							\n  return encode(table.concat(items));
+							\nend
+							\n--Set radio
+							\nSonos.playRadio = function(self, uri, title)
+							\n  Tk:trace(\"Set Radio request\");
+							\n  self:stop();
+							\n  fibaro:sleep(250);
+							\n  callback = callback or function(response) Tk:trace(\"Play sent\"); end
+							\n  local didl = encode('<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns:r=\"urn:schemas-rinconnetworks-com:metadata-1-0/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"><item><dc:title>'..title..'</dc:title><upnp:class>object.item.audioItem.audioBroadcast</upnp:class><desc id=\"cdudn\" nameSpace=\"urn:schemas-rinconnetworks-com:metadata-1-0/\">SA_RINCON65031_</desc></item></DIDL-Lite>');
+							\n  return sendSoapMessage(
+							\n    -- control url
+							\n    self.props.controlURL.RendererAVTransport,
+							\n    -- service type
+							\n    self.props.serviceType.AVTransport,
+							\n    -- action
+							\n    { name = self.props.actions.SetAVTransportURI, service = self.props.serviceType.AVTransport },
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID><CurrentURI>\"..uri..\"</CurrentURI><CurrentURIMetaData>\"..didl..\"</CurrentURIMetaData>\",
+							\n    function()
+							\n      Tk:traceEx(\"Yellow\", \"Radio: \"..title..\" pushed\");
+							\n    end,
+							\n    true
+							\n  );    
+							\nend
+							\n--Play TTS
+							\nSonos.playTTS = function(self, lng, message, duration, volume)
+							\n  self._isPlayingTTS = true;  
+							\n  Tk:traceEx(\"green\", \"TTS Play request, please wait...\");
+							\n  -- pause before play TTS
+							\n  self:pause();
+							\n  -- request TTS
+							\n  return sendSoapMessage(
+							\n    self.props.controlURL.RendererAVTransport,
+							\n    self.props.serviceType.AVTransport,
+							\n    { name = self.props.actions.SetAVTransportURI, service = self.props.serviceType.AVTransport },
+							\n--/// modify by eFa     ///--
+							\n    \"<InstanceID>0</InstanceID><CurrentURI>x-rincon-mp3radio://translate.google.com/translate_tts?ie=UTF-8\"..\"&a\"..\"mp;client=t\"..\"&a\"..\"mp;tl=\".. (lng or \"fr\") .. \"&a\" .. \"mp;q=\" .. (urlEncode(message or \"\") or \"message\") .. \"</CurrentURI><CurrentURIMetaData>\"..Sonos:createMetaData(\"TSS by Google...\")..\"</CurrentURIMetaData>\",
+							\n    --\"<InstanceID>0</InstanceID><CurrentURI>x-rincon-mp3radio://translate.google.com/translate_tts?ie=UTF-8\"..\"&a\"..\"mp;tl=\".. (lng or \"fr\") .. \"&a\" .. \"mp;q=\" .. (urlEncode(message or \"\") or \"message\") .. \"</CurrentURI><CurrentURIMetaData>\"..Sonos:createMetaData(\"TSS by Google...\")..\"</CurrentURIMetaData>\",
+							\n--/// modify by eFa end ///--
+							\n    function(response)
+							\n      if (self._isMuted == true) then
+							\n        self:mute(false);
+							\n      end
+							\n      fibaro:sleep(250);
+							\n      -- set tts volume if <> with current
+							\n      if (volume ~= nil and volume ~= self.volume) then
+							\n      \tself:setVolume(volume);
+							\n        self.ttsVolumeIsDifferent = true;
+							\n      end
+							\n      fibaro:sleep(250);
+							\n      -- play tts
+							\n      self:play(function(response)
+							\n        if (duration ~= nil) then
+							\n          if type(duration) == \"string\" and duration == \"auto\" then
+							\n            Tk:trace(\"Play TSS with auto stop mode\");
+							\n            local n = 0;
+							\n            self.transportState = \"TRANSITIONING\";
+							\n            while (self.transportState == \"TRANSITIONING\") do
+							\n               if (n > 20) then break end;
+							\n               self:getTransportState();
+							\n               Tk:trace(Sonos.transportState);
+							\n               fibaro:sleep(1000);
+							\n               n = n + 1;
+							\n            end
+							\n            self.transportState = \"PLAYING\";
+							\n            while (self.transportState == \"PLAYING\") do
+							\n               if (n > 120) then break end; -- 120 seconds break for security!
+							\n               self:getTransportState();
+							\n               Tk:trace(Sonos.transportState);
+							\n               fibaro:sleep(1000);
+							\n               n = n + 1;
+							\n            end
+							\n            fibaro:sleep(250);
+							\n            self:stop();
+							\n          elseif type(duration) ~= \"number\" then
+							\n            duration = tonumber(duration);
+							\n            Tk:trace(\"Play TTS for \" .. duration .. \" seconds\");
+							\n            fibaro:sleep(duration);
+							\n            local n = 0;
+							\n            self.transportState = \"TRANSITIONING\";
+							\n            while (self.transportState == \"TRANSITIONING\") do
+							\n               if (n > 20) then break end;
+							\n               self:getTransportState();
+							\n               Tk:trace(Sonos.transportState);
+							\n               fibaro:sleep(1000);
+							\n               n = n + 1;
+							\n            end
+							\n            if (duration > 1) then 
+							\n               duration = duration - 1;
+							\n            end        
+							\n            fibaro:sleep(duration*1000);
+							\n            self:stop();
+							\n          end
+							\n        else
+							\n          Tk:trace(\"play sent\");
+							\n          local n = 0;
+							\n          self.transportState = \"TRANSITIONING\";
+							\n          while (self.transportState == \"TRANSITIONING\") do
+							\n            if (n > 20) then break end;
+							\n            self:getTransportState();
+							\n            Tk:trace(Sonos.transportState);
+							\n            fibaro:sleep(1000);
+							\n            n = n + 1;
+							\n          end        
+							\n          local i = 0;
+							\n          self.transportState = \"PLAYING\";
+							\n          while (self.transportState == \"PLAYING\") do
+							\n            if (i > 30) then break end; -- 120 seconds break security
+							\n            self:getTransportState();
+							\n            Tk:trace(Sonos.transportState);
+							\n            fibaro:sleep(4000);
+							\n            i = i + 1;
+							\n          end
+							\n          fibaro:sleep(250);
+							\n          self:stop();
+							\n        end
+							\n        fibaro:sleep(250);
+							\n        -- update volume with value before tts if different
+							\n        if (self.ttsVolumeIsDifferent == true) then
+							\n          self:setVolume(Sonos.lastVolume);
+							\n          self.ttsVolumeIsDifferent = false;
+							\n        end
+							\n        fibaro:sleep(250);
+							\n        -- update with track before tts
+							\n        --Tk:trace(\"set track: %s to position: %s\", self.currentTrack.uri, self.currentTrack.relTime);        
+							\n        -- update with old track uri
+							\n        if(self:setCurrentTrack(self.lastTrack.uri)) then
+							\n          if not self.lastTrack.isRadio then
+							\n            self:seek(\"REL_TIME\", self.lastTrack.relTime);
+							\n            fibaro:sleep(250);
+							\n          end
+							\n          if (self.lastTransportState == self.props.transportState.playing) then
+							\n            self:play();
+							\n          elseif (self.lastTransportState == self.props.transportState.stopped) then
+							\n            self:stop();
+							\n          elseif (self.lastTransportState == self.props.transportState.pausedPlayback) then
+							\n            self:pause();
+							\n          end
+							\n        end
+							\n        fibaro:sleep(250);
+							\n        -- update mute state before tts
+							\n        if (self.lastMuteState == false) then
+							\n          self:mute(false);
+							\n        else
+							\n          self:mute(true);
+							\n        end
+							\n        self._isPlayingTTS = false;
+							\n      end);
+							\n    end);
+							\nend
+							\n--Parse TTS request...
+							\nSonos.parseOnDemandTTS = function(self, s)
+							\n  if (string.len(s)>0) then
+							\n    local returnvalue = {};
+							\n    local _a, _b;
+							\n    for _a, _b in string.gmatch(s, \"(%w+)=([%w%s?!.,;:]+)|\") do
+							\n      Tk:trace(\"%s -> %s\", tostring(_a), tostring(_b));
+							\n      returnvalue[_a] = tostring(_b);
+							\n    end
+							\n--/// add by eFa     ///--
+							\n    if returnvalue[ \"lng\" ] == \"zh\" then
+							\n      Tk:trace(\"## txt -> %s\" , tostring( s:match( \"txt=(.-)|\" ) ) );
+							\n      returnvalue[ \"txt\" ] = tostring( s:match( \"txt=(.-)|\" ) )
+							\n    end
+							\n--/// add by eFa end ///--
+							\n    return returnvalue;
+							\n  end
+							\n  return nil;
+							\nend
+							\n-- PROCESS
+							\nSonos.process = function(self)
+							\n  local cmd = fibaro:getGlobalValue(gCmd);
+							\n  -- ACTIONS
+							\n  if (cmd ~= nil and string.len(cmd)>0) then
+							\n    local last = \"\";
+							\n    for _c in string.gmatch(cmd,\"[^%s]+\") do
+							\n      if (_c ~= last) then
+							\n        self._commands:enqueue(_c);
+							\n      else
+							\n        Tk:traceEx(\"red\", \"duplicate '%s' detected and removed from actions queue:\", _c);
+							\n      end
+							\n      last = _c;
+							\n    end
+							\n    fibaro:setGlobal(gCmd, \"\");
+							\n    -- process queue in order
+							\n    while self._commands:count() > 0 do
+							\n      Tk:traceEx(\"green\", \"dequeue command %s\", self._commands:peek());
+							\n      local f = nil;
+							\n      f = exec(self._commands:dequeue());
+							\n      while f == nil do          
+							\n        fibaro:sleep(500);
+							\n      end        
+							\n      Tk:traceEx(\"green\", \"command result is %s\", tostring(f));
+							\n    end    
+							\n    fibaro:call(_selfId, \"setProperty\", \"currentIcon\", _icons.main);
+							\n  end
+							\n  --TTS -> lng=fr|dr=auto|vol=15|txt=Bonjour|
+							\n  local tts = fibaro:getGlobalValue(gTTS);
+							\n  if (tts ~= nil and string.len(tts)>0) then
+							\n    Tk:traceEx(\"green\", \"TTS data found !!!\");
+							\n    -- reset value
+							\n    fibaro:setGlobal(gTTS, \"\");
+							\n    -- process TTS
+							\n    local ttsProps = self:parseOnDemandTTS(tts);
+							\n    if (ttsProps ~= nil) then
+							\n      -- retrieve current track
+							\n      self:getCurrentTrack();
+							\n      self.lastTrack = self.currentTrack;
+							\n      -- retrieve volume
+							\n      self:getVolume();
+							\n      self.lastVolume = self.volume;
+							\n      -- unmute before
+							\n      self:getMute();
+							\n      self.lastMuteState = self._isMuted;
+							\n      -- retrieve current transport state
+							\n      self:getTransportState();
+							\n      self.lastTransportState = self.transportState;
+							\n      -- request tts
+							\n      self:playTTS(ttsProps[\"lng\"], ttsProps[\"txt\"], ttsProps[\"dr\"], ttsProps[\"vol\"]);
+							\n    end
+							\n  end  
+							\nend
+							\n-- GET/SET LED STATE  
+							\nSonos.ledState = function(self, state)
+							\n  Tk:trace(\"Set LED state request\");
+							\n  return sendSoapMessage(
+							\n    self.props.controlURL.DeviceProperties,
+							\n    self.props.serviceType.DeviceProperties,
+							\n    { name = self.props.actions.SetLEDState, service = self.props.serviceType.DeviceProperties },
+							\n    \"<DesiredLEDState>\" .. (state or \"ON\") ..\"</DesiredLEDState>\",
+							\n    function(response)
+							\n      Tk:trace(\"Set LED state sent\");
+							\n    end);    
+							\nend
+							\n-- GET ZONE PLAYER STATUS
+							\nSonos.getZpStatus = function(self, retry)
+							\n  retry = retry or 0;
+							\n  --Toolkit.Net.isTraceEnabled = true;
+							\n  local HttpClient = Tk.Net.HttpRequest(_ip, _port);
+							\n  HttpClient:setReadTimeout(2000);
+							\n  local response, status, errorCode = HttpClient:request(\"GET\", \"/status/zp\", { 
+							\n      'Content-Type: text/xml; charset=\"utf-8\"'});
+							\n  HttpClient:disconnect();
+							\n  HttpClient:dispose();
+							\n  HttpClient = nil;
+							\n  --Toolkit.Net.isTraceEnabled = false;
+							\n  
+							\n    -- check for error
+							\n  if errorCode == 0 then
+							\n    if tonumber(status) == 200 then
+							\n      self.zpStatus.zoneName = tostring(response:match(\"<ZoneName>(.+)</ZoneName>\"));
+							\n      self.zpStatus.localUID = tostring(response:match(\"<LocalUID>(.+)</LocalUID>\"));
+							\n      self.zpStatus.macAddress = tostring(response:match(\"<MACAddress>(.+)</MACAddress>\"));
+							\n      return true;
+							\n    else
+							\n      Tk:trace(\"status: %s\", status);
+							\n    end
+							\n  else
+							\n    Tk:traceEx(\"red\", \"Communication error code: \" .. errorCode);
+							\n    if (retry < 10) then
+							\n      Tk:trace(\"retry #%d\", retry);
+							\n      -- 500 ms delay before retry, prevent network overload...
+							\n      fibaro:sleep(500);
+							\n--/// modify by eFa     ///--        
+							\n      return self:getZpStatus(retry + 1);
+							\n      --return getZpStatus(retry + 1);
+							\n--/// modify by eFa end ///--
+							\n    else
+							\n      Tk:trace(\"Error: Code returned %s\", tostring(errorcode or \"n.c\"));
+							\n    end
+							\n  end  
+							\n  -- default response
+							\n  return false;  
+							\nend
+							\n  
+							\nTk:traceEx(\"red\", Sonos.__header .. \" V \" .. Sonos.__version .. \" loaded in memory...\");
+							\n-- benchmark code
+							\nif (Tk.Debug) then Tk.Debug:benchmark(Sonos.__header .. \" V \" .. Sonos.__version .. \" lib\", \"elapsed time: %.3f cpu secs\
+							\n\", \"fragment\", true); end;
+							\n
+							\nend;
+							\n
+							\nprocessResponse = function(fnc, args)
+							\n  if (fnc == nil) then
+							\n    return nil;
+							\n  end
+							\n  return fnc(args);
+							\nend
+							\n
+							\nsendSoapMessage = function(url, service, action, args, callback, ignoreError, retry)
+							\n  retry = retry or 0;
+							\n  --Toolkit.Net.isTraceEnabled = true;
+							\n  local HttpClient = Tk.Net.HttpRequest(_ip, _port);
+							\n  HttpClient:setReadTimeout(2000);
+							\n  local envelope = [[
+							\n  <s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">
+							\n  \t<s:Body>]] .. string.format('<u:%s xmlns:u=\"%s\">%s</u:%s>', action.name, action.service, tostring(args or \"\"), action.name) .. [[</s:Body>
+							\n  </s:Envelope>
+							\n  ]];
+							\n  local response, status, errorCode = HttpClient:request(\"POST\", url, { 
+							\n      'Content-Type: text/xml; charset=\"utf-8\"',
+							\n      'SOAPAction: \"' .. service .. '#' .. action.name .. '\"'
+							\n    }, envelope);
+							\n  HttpClient:disconnect();
+							\n  HttpClient:dispose();
+							\n  HttpClient = nil;
+							\n  --Toolkit.Net.isTraceEnabled = false;
+							\n  
+							\n  -- check for error
+							\n  if errorCode == 0 then
+							\n    if tonumber(status) == 200 then
+							\n      -- callback
+							\n      if (callback ~= nil) then
+							\n        processResponse(callback, response);
+							\n      end
+							\n      return true;
+							\n    else
+							\n      Tk:trace(\"status: %s\", status);
+							\n    end
+							\n  else
+							\n    Tk:traceEx(\"red\", \"Communication error code: \" .. errorCode);
+							\n    if (ignoreError ~= nil and ignoreError == true) then
+							\n      return true;
+							\n    end
+							\n    if (retry < 10) then
+							\n      Tk:trace(\"retry #%d action: %s\", retry, action.name);
+							\n      -- 500 ms delay before retry, prevent network overload...
+							\n      fibaro:sleep(1000);
+							\n      return sendSoapMessage(url, service, action, args, callback, ignoreError, (retry + 1));
+							\n    else
+							\n      Tk:trace(\"Error: Code returned %s\", tostring(errorcode or \"n.c\"));
+							\n    end
+							\n  end  
+							\n  -- default response
+							\n  return false;
+							\nend
+							\n
+							\nencode = function(val)
+							\n  return val
+							\n  :gsub(\"&\", \"&\"..\"amp;\")
+							\n  :gsub(\"<\", \"&\"..\"lt;\")
+							\n  :gsub(\">\", \"&\"..\"gt;\")
+							\n  :gsub('\"', \"&\"..\"quot;\")
+							\n  :gsub(\"'\", \"&\"..\"apos;\"); 
+							\nend
+							\n
+							\ndecode = function(val)
+							\n  return val
+							\n  \t:gsub(\"&\"..\"#38;\", '&')
+							\n    :gsub(\"&\"..\"#60;\", '<')
+							\n    :gsub(\"&\"..\"#62;\", '>')
+							\n    :gsub(\"&\"..\"#34;\", '\"')
+							\n    :gsub(\"&\"..\"#39;\", \"'\")
+							\n    :gsub(\"&\"..\"lt;\", \"<\")
+							\n    :gsub(\"&\"..\"gt;\", \">\")
+							\n    :gsub(\"&\"..\"quot;\", '\"')
+							\n    :gsub(\"&\"..\"apos;\", \"'\")
+							\n    :gsub(\"&\"..\"amp;\", \"&\")
+							\nend
+							\n
+							\nurlEncode = function(str)
+							\n  if (str) then
+							\n    str = string.gsub(str, \"\
+							\n\", \"\\r\
+							\n\");
+							\n    str = string.gsub(str, \"([^%w ])\", function (c) return string.format (\"%%%02X\", string.byte(c)) end);
+							\n    str = string.gsub(str, \" \", \"+\");
+							\n  end
+							\n  return str;
+							\nend
+							\n
+							\nurlDecode = function(str)
+							\n  str = string.gsub(str, \"+\", \" \");
+							\n  str = string.gsub(str, \"%%(%x%x)\", function(h) return string.char(tonumber(h,16)) end);
+							\n  str = string.gsub(str, \"\\r\
+							\n\", \"\
+							\n\");
+							\n  return str
+							\nend
+							\n
+							\nclockToSeconds = function(clock)
+							\n  if (clock == nil) then return; end
+							\n  local len = string.len(clock or \"\");
+							\n  local index = 1;
+							\n  local sec = 0;
+							\n  for t in clock:gmatch(\"([^:]+)\") do
+							\n    if (len == 7 or len == 8) then
+							\n      if (index == 1) then sec = sec + t*3600 end
+							\n      if (index == 2) then sec = sec + t*60 end
+							\n      if (index == 3) then sec = sec + t end
+							\n    elseif (len == 4 or len == 5) then
+							\n      if (index == 1) then sec = sec + t*60 end
+							\n      if (index == 2) then sec = sec + t end
+							\n    elseif (len == 1 or len == 2) then
+							\n      if (index == 1) then sec = sec + t end
+							\n    end
+							\n    index = index + 1;
+							\n  end
+							\n  return sec;
+							\nend
+							\n
+							\nsecondsToClock = function(sec)
+							\n  local sec = tonumber(sec)
+							\n  if sec == 0 then
+							\n    return \"0:00:00\";
+							\n  else
+							\n    nHours = string.format(\"%2.f\", math.floor(sec/3600));
+							\n    nMins = string.format(\"%02.f\", math.floor(sec/60 - (nHours*60)));
+							\n    nSecs = string.format(\"%02.f\", math.floor(sec - nHours*3600 - nMins *60));
+							\n    return nHours..\":\"..nMins..\":\"..nSecs
+							\n  end
+							\nend
+							\n
+							\nexec = function(c)
+							\n  if (c==\"PLAY\") then
+							\n    Tk:traceEx(\"yellow\", \"Execute command: Play\");
+							\n    if(Sonos:play()) then
+							\n      fibaro:log(\"Play\");
+							\n      fibaro:call(_selfId, \"setProperty\", \"ui.lblDebug.value\", \"Play\");      
+							\n      return true;
+							\n    end
+							\n  elseif (c==\"PAUSE\") then
+							\n    Tk:traceEx(\"yellow\", \"Execute command: Pause\");
+							\n    if(Sonos:pause()) then
+							\n      fibaro:log(\"Pause\");
+							\n      fibaro:call(_selfId, \"setProperty\", \"ui.lblDebug.value\", \"Pause\");      
+							\n      return true;
+							\n    end
+							\n  elseif (c==\"STOP\") then
+							\n    Tk:traceEx(\"yellow\", \"Execute command: Stop\");
+							\n    if(Sonos:stop()) then
+							\n      fibaro:log(\"Stop\");
+							\n      fibaro:call(_selfId, \"setProperty\", \"ui.lblDebug.value\", \"Stop\");      
+							\n      return true;
+							\n    end
+							\n  elseif (c==\"PREV\") then
+							\n    Tk:traceEx(\"yellow\", \"Execute command: Previous\");
+							\n    if(Sonos:previous()) then
+							\n      fibaro:log(\"Previous\");
+							\n      fibaro:call(_selfId, \"setProperty\", \"ui.lblDebug.value\", \"Previous\");      
+							\n      return true;
+							\n    end
+							\n  elseif (c==\"NEXT\") then
+							\n    Tk:traceEx(\"yellow\", \"Execute command: Next\");
+							\n    if(Sonos:next()) then
+							\n      fibaro:log(\"Next\");
+							\n      fibaro:call(_selfId, \"setProperty\", \"ui.lblDebug.value\", \"Next\");      
+							\n      return true;
+							\n    end
+							\n  elseif (c==\"SEEKL\") then
+							\n    Tk:traceEx(\"yellow\", \"Execute command: Seek left\");
+							\n    if(Sonos:seekL()) then
+							\n      fibaro:log(\"Seek left\");
+							\n      fibaro:call(_selfId, \"setProperty\", \"ui.lblDebug.value\", \"Seek left\");      
+							\n      return true;
+							\n    end
+							\n  elseif (c==\"SEEKR\") then
+							\n    Tk:traceEx(\"yellow\", \"Execute command: Seek Right\");
+							\n    if(Sonos:seekR()) then
+							\n      fibaro:log(\"Seek Right\");
+							\n      fibaro:call(_selfId, \"setProperty\", \"ui.lblDebug.value\", \"Seek Right\");      
+							\n      return true;
+							\n    end
+							\n  elseif (c==\"LNON\") then
+							\n    Tk:traceEx(\"yellow\", \"Execute command: Loudness On\");
+							\n    if(Sonos:loudness(true)) then
+							\n      fibaro:log(\"Loudness On\");
+							\n      fibaro:call(_selfId, \"setProperty\", \"ui.lblDebug.value\", \"Loudness On\");      
+							\n      return true;
+							\n    end
+							\n  elseif (c==\"LNOFF\") then
+							\n    Tk:traceEx(\"yellow\", \"Execute command: Loudness Off\");
+							\n    if(Sonos:loudness(false)) then
+							\n      fibaro:log(\"Loudness Off\");
+							\n      fibaro:call(_selfId, \"setProperty\", \"ui.lblDebug.value\", \"Loudness Off\");      
+							\n      return true;
+							\n    end
+							\n  elseif (c==\"MUTE\") then
+							\n    Tk:traceEx(\"yellow\", \"Execute command: Mute\");
+							\n    if(Sonos:mute(true)) then
+							\n      fibaro:log(\"Mute\");
+							\n      fibaro:call(_selfId, \"setProperty\", \"ui.lblDebug.value\", \"Mute\");      
+							\n      return true;
+							\n    end
+							\n  elseif (c==\"UNMUTE\") then
+							\n    Tk:traceEx(\"yellow\", \"Execute command: UnMute\");
+							\n    if(Sonos:mute(false)) then
+							\n      fibaro:log(\"UnMute\");
+							\n      fibaro:call(_selfId, \"setProperty\", \"ui.lblDebug.value\", \"UnMute\");      
+							\n      return true;
+							\n    end
+							\n  elseif (c==\"TMUTE\") then
+							\n    Tk:traceEx(\"yellow\", \"Execute command: Toggle mute\");
+							\n    if(Sonos:muteInvert()) then
+							\n      fibaro:log(\"Toggle mute\");
+							\n      fibaro:call(_selfId, \"setProperty\", \"ui.lblDebug.value\", \"Toggle mute\");      
+							\n      return true;
+							\n    end
+							\n  else
+							\n    -- parse volume
+							\n    local req = c:match(\"VOL(%d+)\");
+							\n    if (req ~= nil) then
+							\n      Tk:traceEx(\"yellow\", \"Execute command: Set volume\");
+							\n      fibaro:call(_selfId, \"setProperty\", \"ui.slVolume.value\", tonumber(req));
+							\n      if(Sonos:setVolume(tonumber(req))) then
+							\n        fibaro:log(\"Set volume to \" .. Sonos.volume or \"n.c\");
+							\n        fibaro:call(_selfId, \"setProperty\", \"ui.lblDebug.value\", \"Set volume to \".. Sonos.volume or \"n.c\");
+							\n        return true;
+							\n      end
+							\n    end
+							\n    -- parse radio stations
+							\n    local req = c:match(\"RST(%d+)\");
+							\n    if (req ~= nil) then
+							\n      Tk:traceEx(\"yellow\", \"Execute command: Set radio station\");
+							\n      if (Sonos.radioStations[tonumber(req)] ~= nil) then
+							\n        Tk:traceEx(\"yellow\", \"Try to play radio: \"..Sonos.radioStations[tonumber(req)].title);
+							\n        local uriToPlay = encode(Sonos.radioStations[tonumber(req)].res);
+							\n        if(Sonos:playRadio(uriToPlay, encode(Sonos.radioStations[tonumber(req)].title))) then
+							\n          local msg = \"Set radio station to \" .. Sonos.radioStations[tonumber(req)].title or \"n.c\";
+							\n          fibaro:log(msg);
+							\n          fibaro:call(_selfId, \"setProperty\", \"ui.lblDebug.value\", msg);          
+							\n          fibaro:sleep(4000);
+							\n          Sonos:play();
+							\n          return true;
+							\n        end
+							\n      else
+							\n        Tk:traceEx(\"yellow\", \"Cannot execute command: no radio station to play!\");
+							\n      end
+							\n    end
+							\n  end
+							\n  return false;
+							\nend
+							\n
+							\nrefresh = function()
+							\n  -- get mute state
+							\n  Sonos:getMute();
+							\n  -- get current volume
+							\n  Sonos:getVolume();
+							\n  -- get Eq
+							\n  Sonos:getLoudness();
+							\n  -- get current transport state
+							\n  if (Sonos:getTransportState()) then
+							\n    Tk:trace(\"transport state: %s\", Sonos.transportState);
+							\n    -- if sonos is active...
+							\n    if (Sonos.transportState == \"PLAYING\" or Sonos.transportState == \"TRANSITIONING\") then
+							\n      Sonos._isPlaying = true;
+							\n      -- get current track informations
+							\n      Sonos:getCurrentTrack();
+							\n      -- quick refresh (5 seconds) if device is playing
+							\n      Sonos.refreshTime = 5;
+							\n    else
+							\n      Sonos._isPlaying = false;
+							\n      -- standard refreh (30 seconds) if device is stopped
+							\n      Sonos.refreshTime = Sonos.defaultRefreshTime;
+							\n      Sonos.currentTrack = {
+							\n        absCount = 0,
+							\n        artist = \"\",
+							\n        album = \"\",
+							\n        creator = \"\",
+							\n        duration = 0,
+							\n        originalTrackNumber = \"\",
+							\n        relTime = \"00:00:00\",
+							\n        relCount = 0,
+							\n        title = \"\",
+							\n        track = \"\",
+							\n        uri = \"\"
+							\n      }
+							\n    end
+							\n  -- refresh ui
+							\n  refreshUI();
+							\n  end
+							\nend
+							\n
+							\nrefreshUI = function()
+							\n  fibaro:call(_selfId, \"setProperty\", \"ui.lblPosition.value\", Sonos.currentTrack.relTime or \"n.c\");
+							\n  local lblState = \"\";
+							\n  if (Sonos.currentTrack.isRadio) then
+							\n    lblState = lblState .. \"Radio \";
+							\n  end  
+							\n  if (Sonos.transportState == Sonos.props.transportState.playing) then
+							\n    lblState = lblState .. \"Playing\";
+							\n  elseif (Sonos.transportState == Sonos.props.transportState.pausedPlayback) then
+							\n    lblState = lblState .. \"Paused\";
+							\n  elseif (Sonos.transportState == Sonos.props.transportState.transitioning) then
+							\n    lblState = lblState .. \"Transitioning\";
+							\n  elseif (Sonos.transportState == Sonos.props.transportState.stopped) then
+							\n    lblState = lblState .. \"Stopped\";      
+							\n  end
+							\n  if (Sonos._isMuted == true) then
+							\n  \tlblState = lblState .. \" (mute)\";
+							\n  end
+							\n  local lblEq = \"\";
+							\n  if (Sonos.eq.loudness == true) then
+							\n    lblEq = \"Loudness ON\";
+							\n  elseif (Sonos.eq.loudness == false) then
+							\n    lblEq = \"Loudness OFF\";
+							\n  else
+							\n    lblEq = \"---\"
+							\n  end
+							\n  fibaro:call(_selfId, \"setProperty\", \"ui.lblEq.value\", lblEq);
+							\n  fibaro:call(_selfId, \"setProperty\", \"ui.lblState.value\", lblState);
+							\n  fibaro:call(_selfId, \"setProperty\", \"ui.slVolume.value\", Sonos.volume or \"n.c\");
+							\n  local lblTitle = \"\";
+							\n  if (string.len(Sonos.currentTrack.track)>0 and Sonos.currentTrack.isRadio == false) then
+							\n    lblTitle = lblTitle .. Sonos.currentTrack.track .. \"-\";
+							\n  end
+							\n  if (string.len(Sonos.currentTrack.originalTrackNumber)>0) then       
+							\n    lblTitle = lblTitle .. string.format(\"%s - %s\", Sonos.currentTrack.originalTrackNumber, Sonos.currentTrack.title);
+							\n  else
+							\n    lblTitle = lblTitle .. string.format(\"%s\", Sonos.currentTrack.title or \"n.c\");
+							\n  end
+							\n  fibaro:call(_selfId, \"setProperty\", \"ui.lblTitle.value\", lblTitle);
+							\n  fibaro:call(_selfId, \"setProperty\", \"ui.lblZone.value\", Sonos.zpStatus.zoneName);
+							\n  fibaro:call(_selfId, \"setProperty\", \"ui.lblArtist.value\", Sonos.currentTrack.artist or \"n.c\");
+							\n  fibaro:call(_selfId, \"setProperty\", \"ui.lblAlbum.value\", Sonos.currentTrack.album or \"n.c\");
+							\nend
+							\n
+							\nlocal refreshExecTime = fibaro:getGlobalValue( gRefreshTime )
+							\nlocal commandExecTime = fibaro:getGlobalValue( gCommandTime )
+							\nlocal garbageExecTime = fibaro:getGlobalValue( gGarbageTime )
+							\nlocal count = fibaro:getGlobalValue( gCount )
+							\nlocal _refreshExecTime = tonumber( refreshExecTime )
+							\nlocal _commandExecTime = tonumber( commandExecTime )
+							\nlocal _garbageExecTime = tonumber( garbageExecTime )
+							\nlocal _count = tonumber( count )
+							\n
+							\nmain = function()
+							\n  if (_refreshExecTime == nil) then _refreshExecTime = tonumber(os.time()-Sonos.refreshTime); end
+							\n  if (_commandExecTime == nil) then _commandExecTime = tonumber(os.time()-3); end
+							\n  if (_garbageExecTime == nil) then _garbageExecTime = tonumber(os.time()-1800); end
+							\n  -- prepare a global counter
+							\n  if (_count == nil) then
+							\n    Tk:trace(\"HC2 start script at \" .. os.date());
+							\n    _count = 0;
+							\n  else
+							\n    _count = _count + 1;    
+							\n    --Tk:trace(\"Mainloop process #\".._count);
+							\n  end
+							\n  -- create usefull global vars
+							\n  if (_selfId == nil) then
+							\n    _selfId = fibaro:getSelfId();    
+							\n    _ip = fibaro:get(_selfId, \"IPAddress\");
+							\n    _port = fibaro:get(_selfId, \"TCPPort\");
+							\n    _icons = {
+							\n      main = fibaro:get(_selfId, \"deviceIcon\");
+							\n    }    
+							\n    -- Check IP and PORT before
+							\n    if (_ip == nil or _port == nil) then
+							\n      Tk:traceEx(\"red\", \"You must configure IPAddress and TCPPort first\");
+							\n      return;
+							\n    end
+							\n  end
+							\n  
+							\n  --Tk:traceEx(\"green\", \"_isPlayingTTS: %s _isPlaying: %s _isMuted: %s\", tostring(Sonos._isPlayingTTS), tostring(Sonos._isPlaying), tostring(Sonos._isMuted));
+							\n
+							\n  -- Execute commands if needed every 3 seconds
+							\n  local elapsedTime = os.difftime(os.time(), _commandExecTime or 0);
+							\n  if (elapsedTime >= 3) then
+							\n    _commandExecTime = os.time();
+							\n    --Tk:traceEx(\"green\", \"Elapsed time for [command]\" .. elapsedTime ..\" seconds\");    
+							\n    Sonos:process();
+							\n    --fibaro:call(_selfId, \"setProperty\", \"ui.lblDebug.value\", \"\");
+							\n  end
+							\n  
+							\n  -- Execute refresh() every refreshTime (user settings)  
+							\n  local elapsedTime = os.difftime(os.time(), _refreshExecTime or 0);
+							\n  if (elapsedTime >= Sonos.refreshTime) then   
+							\n    _refreshExecTime = os.time();
+							\n    --Tk:traceEx(\"green\", \"Elapsed time for [refresh] is \" .. elapsedTime ..\" seconds\");
+							\n    refresh();
+							\n  end
+							\n  
+							\n  -- Execute a garbage every 30 minutes
+							\n  local elapsedTime = os.difftime(os.time(), _garbageExecTime or 0);
+							\n  if (elapsedTime >= 1800) then
+							\n    -- get speaker informations
+							\n    Sonos:getZpStatus();
+							\n    -- browse directory, get radio stations
+							\n   \tSonos:browseDirectory();
+							\n    -- collect garbage, preserve memory...
+							\n    collectgarbage(\"collect\");
+							\n    _garbageExecTime = os.time();
+							\n    Tk:traceEx(\"yellow\", \"Collect Garbage at \" .. os.date());
+							\n  end
+							\n
+							\nend
+							\n
+							\nTk.isTraceEnabled = false;
+							\n
+							\nmain();
+							\n
+							\nfibaro:setGlobal( gRefreshTime , _refreshExecTime )
+							\nfibaro:setGlobal( gCommandTime , _commandExecTime )
+							\nfibaro:setGlobal( gGarbageTime , _garbageExecTime )
+							\nfibaro:setGlobal( gCount , _count )
+							\n
+							\n--EOF",
+						"buttonIcon":13,
+						"favourite":false,
+						"main":true
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}

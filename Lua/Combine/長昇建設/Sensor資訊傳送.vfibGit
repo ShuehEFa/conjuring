@@ -1,0 +1,45 @@
+{
+	"name":"Sensor資訊傳送",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author Singo
+			\n  @date   104.09.24
+			\n  @brief  定時傳遞sensor數值給server
+			\n
+			\n  @note   記得填寫server ip及port
+			\n--]]
+			\nlocal mXXXSensorID = 547\t\t\t-- 某sensor id
+			\nlocal mCo2SensorID = 546\t\t\t-- co2 sensor id
+			\nlocal mAirPressureSensorID = 548\t-- 氣壓sensor id
+			\n
+			\nlocal xxxValue = fibaro:getValue( mXXXSensorID , \"value\" )
+			\nlocal co2Value = fibaro:getValue( mCo2SensorID , \"value\" )
+			\nlocal airPressureValue = fibaro:getValue( mAirPressureSensorID , \"value\" )
+			\n
+			\nlocal ip = fibaro:getValue( selfId , \"IPAddress\" )
+			\nlocal port = fibaro:getValue( selfId , \"TCPPort\" )
+			\nlocal h = Net.FHttp( ip , port )
+			\nlocal response , status , errorCode = h:GET( \"/api/demo/set/sensor/\" .. xxxValue .. \"/\" .. co2Value .. \"/\" .. airPressureValue .. \"/0\" )
+			\nif errorCode > 0 then
+			\n  fibaro:debug( \"Set Server Even Log errorCode : \" .. errorCode )
+			\nelseif tonumber( status ) < 200 or tonumber( status ) >= 300 then
+			\n  fibaro:debug( \"Set Server HEven Log status : \" .. status )
+			\nend",
+		"visible":"true",
+		"rows":
+		[
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}

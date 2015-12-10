@@ -1,0 +1,173 @@
+{
+	"name":"環境偵測",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author eFa
+			\n  @date   104.10.22
+			\n  @brief  取得台灣指定直轄縣市的紫外線指數、指定縣市下的區域PM2.5指數、指定國際區域的溫度
+			\n
+			\n  @node   主要程式碼在Update的Button內，這邊僅處理多久執行Update的Button
+			\n\t\t  UVI
+			\n\t\t  http://opendata.epa.gov.tw/ws/Data/UV/?$orderby=PublishAgency&$skip=0&$top=1000&format=json
+			\n\t\t  PM2.5
+			\n\t\t  http://opendata.epa.gov.tw/ws/Data/PM25/?$orderby=MonitorDate%20desc&$skip=0&$top=1000&format=json
+			\n\t\t  Temperature
+			\n\t\t  http://api.openweathermap.org/data/2.5/weather?q=taipei&units=metric&appid=bd82977b86bf27fb59a04b61b657fb6f
+			\n--]]
+			\n
+			\nif mID == nil then
+			\n  mID = fibaro:getSelfId()\t\t\t\t-- 本設備ID
+			\n  mButtonId = \"4\"\t\t\t\t\t\t-- Update Button ID
+			\n  mUpdateSec = 10\t\t\t\t\t\t-- 多少秒Update一次
+			\n  mTimeStamp = os.time() - mUpdateSec\t-- 上次Udate時間
+			\nend
+			\n
+			\nif os.time() - mTimeStamp > mUpdateSec then
+			\n  mTimeStamp = os.time()
+			\n  fibaro:call( mID , \"pressButton\" , mButtonId )
+			\n  fibaro:debug( \"updating...\" )
+			\nend",
+		"ui.PM.value":"26",
+		"ui.Temperature.value":"24.890000000000001",
+		"ui.UV.value":"0",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"紫外線",
+						"name":"UV",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"空氣品質",
+						"name":"PM",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"室外溫度",
+						"name":"Temperature",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Update",
+						"name":"Button11",
+						"empty":false,
+							"msg":"local mUvCity = \"臺北\"
+							\nlocal mPmSite = \"士林\"
+							\nlocal mTemperatureSite = \"taipei\"
+							\n
+							\nlocal selfID = fibaro:getSelfId()
+							\n
+							\n--[[
+							\n  @brief\t  檢查連線狀況
+							\n  @_name\t  在Fibaro:Debug的開頭顯示的資訊，用來區隔是哪個Http連線的debug
+							\n  @_status\t  網路連線的狀況
+							\n  @_errorCode Fibaro連線的狀況
+							\n  @return\t  連線無問題才回傳true
+							\n--]]
+							\nfunction CheckHttp( _name , _status , _errorCode )
+							\n  if _errorCode > 0 then
+							\n    fibaro:debug( _name .. \" Http errorCode : \" .. _errorCode )
+							\n    return false
+							\n  elseif tonumber( _status ) < 200 or tonumber( _status ) >= 300 then
+							\n    fibaro:debug( _name .. \" Http status : \" .. _status )
+							\n    return false
+							\n  end
+							\n  return true
+							\nend
+							\n
+							\n-- UV
+							\nlocal http = Net.FHttp( \"opendata.epa.gov.tw\" )
+							\nlocal response , status , errorCode = http:GET( \"/ws/Data/UV?format=json\" )
+							\nif CheckHttp( \"UV\" , status , errorCode ) then
+							\n  local tTable = json.decode( response )
+							\n  for i = 1 , #tTable do
+							\n    if tTable[ i ].SiteName == mUvCity then
+							\n      if tTable[ i ].UVI ~= \"\" then
+							\n        fibaro:call( selfID , \"setProperty\", \"ui.UV.value\", tTable[ i ].UVI )
+							\n        break
+							\n      end
+							\n    end
+							\n  end
+							\nend
+							\n
+							\n-- PM2.5
+							\nresponse , status , errorCode = http:GET( \"/ws/Data/PM25?format=json\" )
+							\nif CheckHttp( \"PM25\" , status , errorCode ) then
+							\n  local tTable = json.decode( response )
+							\n  for i = 1 , #tTable do
+							\n    if tTable[ i ].SiteName == mPmSite then
+							\n      if tTable[ i ].Concentration ~= \"\" then
+							\n        fibaro:call( selfID , \"setProperty\", \"ui.PM.value\", tTable[ i ].Concentration )
+							\n        break
+							\n      end
+							\n    end
+							\n  end
+							\nend
+							\n
+							\n-- 室外溫度
+							\nlocal http = Net.FHttp( \"api.openweathermap.org\" )
+							\nlocal response , status , errorCode = http:GET( \"/data/2.5/weather?q=\" ..mTemperatureSite .. \"&units=metric&appid=bd82977b86bf27fb59a04b61b657fb6f\" )
+							\nif CheckHttp( \"Temperature\" , status , errorCode ) then
+							\n  local tTable = json.decode( response )
+							\n  fibaro:call( selfID , \"setProperty\", \"ui.Temperature.value\", tTable.main.temp )
+							\nend
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}

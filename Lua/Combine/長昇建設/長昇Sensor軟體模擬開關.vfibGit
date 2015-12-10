@@ -1,0 +1,316 @@
+{
+	"name":"Sensor軟體模擬開關",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author eFa
+			\n  @date   104.10.19
+			\n  @brief  控制每個Sensor是否使用軟體模擬數值變化
+			\n
+			\n  @note   每個button都有對應的global value，請記得每個填寫正確，以及確定global value有這些對應的變數
+			\n--]]",
+		"ui.Label1.value":"關",
+		"ui.Label2.value":"關",
+		"ui.Label3.value":"關",
+		"ui.Label4.value":"關",
+		"ui.Label5.value":"關",
+		"ui.Label6.value":"關",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"濕度",
+						"name":"Label1",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"濕度開關",
+						"name":"Button11",
+						"empty":false,
+							"msg":"local gValue = \"EH_UseFakeHu\"
+							\n
+							\nlocal lable = \"ui.Label1.value\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal value = fibaro:getValue( selfId , lable )
+							\nif value == \"開\" then
+							\n  fibaro:call( selfId , \"setProperty\" , lable , \"關\" )
+							\n  fibaro:setGlobal( gValue , \"false\" )
+							\nelse
+							\n  fibaro:call( selfId , \"setProperty\" , lable , \"開\" )
+							\n  fibaro:setGlobal( gValue , \"true\" )
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"空氣品質",
+						"name":"Label2",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"空氣品質開關",
+						"name":"Button21",
+						"empty":false,
+							"msg":"local gValue = \"EH_UseFakePm\"
+							\n
+							\nlocal lable = \"ui.Label2.value\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal value = fibaro:getValue( selfId , lable )
+							\nif value == \"開\" then
+							\n  fibaro:call( selfId , \"setProperty\" , lable , \"關\" )
+							\n  fibaro:setGlobal( gValue , \"false\" )
+							\nelse
+							\n  fibaro:call( selfId , \"setProperty\" , lable , \"開\" )
+							\n  fibaro:setGlobal( gValue , \"true\" )
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":5,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"紫外線",
+						"name":"Label3",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":6,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"紫外線開關",
+						"name":"Button31",
+						"empty":false,
+							"msg":"local gValue = \"EH_UseFakeUv\"
+							\n
+							\nlocal lable = \"ui.Label3.value\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal value = fibaro:getValue( selfId , lable )
+							\nif value == \"開\" then
+							\n  fibaro:call( selfId , \"setProperty\" , lable , \"關\" )
+							\n  fibaro:setGlobal( gValue , \"false\" )
+							\nelse
+							\n  fibaro:call( selfId , \"setProperty\" , lable , \"開\" )
+							\n  fibaro:setGlobal( gValue , \"true\" )
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":7,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"二氧化碳",
+						"name":"Label4",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":8,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"二氧化碳開關",
+						"name":"Button41",
+						"empty":false,
+							"msg":"local gValue = \"EH_UseFakeCo\"
+							\n
+							\nlocal lable = \"ui.Label4.value\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal value = fibaro:getValue( selfId , lable )
+							\nif value == \"開\" then
+							\n  fibaro:call( selfId , \"setProperty\" , lable , \"關\" )
+							\n  fibaro:setGlobal( gValue , \"false\" )
+							\nelse
+							\n  fibaro:call( selfId , \"setProperty\" , lable , \"開\" )
+							\n  fibaro:setGlobal( gValue , \"true\" )
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":9,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"室內溫度",
+						"name":"Label5",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":10,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"室內溫度開關",
+						"name":"Button51",
+						"empty":false,
+							"msg":"local gValue = \"EH_UseFakeInTe\"
+							\n
+							\nlocal lable = \"ui.Label5.value\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal value = fibaro:getValue( selfId , lable )
+							\nif value == \"開\" then
+							\n  fibaro:call( selfId , \"setProperty\" , lable , \"關\" )
+							\n  fibaro:setGlobal( gValue , \"false\" )
+							\nelse
+							\n  fibaro:call( selfId , \"setProperty\" , lable , \"開\" )
+							\n  fibaro:setGlobal( gValue , \"true\" )
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":11,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"室外溫度",
+						"name":"Label6",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":12,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"室外溫度開關",
+						"name":"Button61",
+						"empty":false,
+							"msg":"local gValue = \"EH_UseFakeOutTe\"
+							\n
+							\nlocal lable = \"ui.Label6.value\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal value = fibaro:getValue( selfId , lable )
+							\nif value == \"開\" then
+							\n  fibaro:call( selfId , \"setProperty\" , lable , \"關\" )
+							\n  fibaro:setGlobal( gValue , \"false\" )
+							\nelse
+							\n  fibaro:call( selfId , \"setProperty\" , lable , \"開\" )
+							\n  fibaro:setGlobal( gValue , \"true\" )
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":13,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"",
+						"name":"Button71",
+						"empty":false,
+							"msg":"String to send",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}
