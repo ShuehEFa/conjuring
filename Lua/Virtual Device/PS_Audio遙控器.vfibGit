@@ -1,0 +1,251 @@
+{
+	"name":"PS Audio遙控器",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author LalA
+			\n  @date   104.12.08
+			\n  @brief  PS Audio wify開關版
+			\n  @note   每個button都要填寫powerCenterID
+			\n--]]
+			\n
+			\nselfID = fibaro:getSelfId()
+			\nfibaro:call(selfID, \"pressButton\" , \"6\")
+			\n",
+		"ui.Label1.value":"OFF",
+		"ui.Label2.value":"OFF",
+		"ui.Label3.value":"OFF",
+		"ui.Label4.value":"OFF",
+		"ui.Label5.value":"OFF",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Power：",
+						"name":"Label1",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Zone A：",
+						"name":"Label2",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Zone B：",
+						"name":"Label3",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Zone C：",
+						"name":"Label4",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":5,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Zone D：",
+						"name":"Label5",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":6,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Update",
+						"name":"Button31",
+						"empty":false,
+							"msg":"local powerCenterID = \"192.168.0.10\" 
+							\n
+							\n
+							\nlocal zone = 4  --zone的數量(不含總電源)，之後要改程式時可用
+							\nlocal selfID = fibaro:getSelfId()
+							\nlocal socket = Net.FHttp( powerCenterID , 80 )
+							\nresponse, status, errorCode = socket:GET(\"/status.xml\")
+							\n
+							\nlocal tState = {}
+							\ntState[1] = string.match(response,'<power>(%d)')
+							\nfor i = 2, (zone+1) do
+							\n  tState[i] = string.match(response,\"<zone\" .. tostring(i-1) .. \">(%d)\")
+							\nend
+							\n    
+							\nfor i = 1 ,#tState do
+							\n  fibaro:debug(tState[i])
+							\n  if tState[i] == \"0\" then
+							\n    fibaro:call( selfID, \"setProperty\", \"ui.Label\" .. tostring(i) .. \".value\", 'OFF' )
+							\n  elseif tState[i] == \"1\" then
+							\n    fibaro:call( selfID, \"setProperty\", \"ui.Label\" .. tostring(i) .. \".value\", 'ON' )
+							\n  end
+							\nend
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":7,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Power",
+						"name":"Button11",
+						"empty":false,
+							"msg":"local powerCenterID = \"192.168.0.10\" 
+							\n
+							\nlocal selfID = fibaro:getSelfId()
+							\nlocal socket = Net.FHttp( powerCenterID , 80 )
+							\nresponse, status, errorCode = socket:GET(\"/zones.cgi?zone=0\")
+							\nfibaro:call(selfID, \"pressButton\" , \"6\")",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":8,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"A",
+						"name":"Button21",
+						"empty":false,
+							"msg":"local powerCenterID = \"192.168.0.10\" 
+							\n
+							\nlocal selfID = fibaro:getSelfId()
+							\nlocal socket = Net.FHttp( powerCenterID , 80 )
+							\nresponse, status, errorCode = socket:GET(\"/zones.cgi?zone=1\")
+							\nfibaro:call(selfID, \"pressButton\" , \"6\")",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":9,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"B",
+						"name":"Button22",
+						"empty":false,
+							"msg":"local powerCenterID = \"192.168.0.10\" 
+							\n
+							\nlocal selfID = fibaro:getSelfId()
+							\nlocal socket = Net.FHttp( powerCenterID , 80 )
+							\nresponse, status, errorCode = socket:GET(\"/zones.cgi?zone=2\")
+							\nfibaro:call(selfID, \"pressButton\" , \"6\")
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":10,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"C",
+						"name":"Button23",
+						"empty":false,
+							"msg":"local powerCenterID = \"192.168.0.10\" 
+							\n
+							\nlocal selfID = fibaro:getSelfId()
+							\nlocal socket = Net.FHttp( powerCenterID , 80 )
+							\nresponse, status, errorCode = socket:GET(\"/zones.cgi?zone=3\")
+							\nfibaro:call(selfID, \"pressButton\" , \"6\")
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":11,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"D",
+						"name":"Button24",
+						"empty":false,
+							"msg":"local powerCenterID = \"192.168.0.10\" 
+							\n
+							\nlocal selfID = fibaro:getSelfId()
+							\nlocal socket = Net.FHttp( powerCenterID , 80 )
+							\nresponse, status, errorCode = socket:GET(\"/zones.cgi?zone=4\")
+							\nfibaro:call(selfID, \"pressButton\" , \"6\")
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}
