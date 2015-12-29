@@ -1,0 +1,290 @@
+{
+	"name":"Sonos",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+			"mainLoop":"--[[ 
+			\n%% properties 
+			\n%% autostart 
+			\n%% globals 
+			\n--]]
+			\n
+			\nlocal volume;
+			\nlocal TransportState;
+			\nlocal ok = pcall(function() 
+			\n
+			\ntcpSocket = Net.FTcpSocket(\"192.168.10.72\", 1400)
+			\npayload = [[POST /MediaRenderer/RenderingControl/Control HTTP/1.1
+			\nContent-Length: 290
+			\nSOAPACTION: \"urn:schemas-upnp-org:service:AVTransport:1#GetVolume\"
+			\n
+			\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:GetVolume xmlns:u=\"urn:schemas-upnp-org:service:RenderingControl:1\"><InstanceID>0</InstanceID><Channel>Master</Channel></u:GetVolume></s:Body></s:Envelope>0x0D0x0A0x0D0x0A]]
+			\nbytes, errorcode = tcpSocket:write(payload)
+			\nif errorcode == 0 then
+			\n    state = tcpSocket:read()
+			\n    volume = state:match(\"<CurrentVolume>(.+)</CurrentVolume>\")
+			\n      fibaro:debug(volume)
+			\n      fibaro:log(volume)
+			\nend
+			\ntcpSocket:disconnect()
+			\n
+			\ntcpSocket = Net.FTcpSocket(\"192.168.10.72\", 1400)
+			\npayload = [[POST /MediaRenderer/AVTransport/Control HTTP/1.1
+			\nContent-Length: 274
+			\nSOAPACTION: \"urn:schemas-upnp-org:service:AVTransport:1#GetTransportInfo\"
+			\n
+			\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:GetTransportInfo xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\"><InstanceID>0</InstanceID></u:GetTransportInfo></s:Body></s:Envelope>0x0D0x0A0x0D0x0A]]
+			\nbytes, errorcode = tcpSocket:write(payload)
+			\nif errorcode == 0 then
+			\n    state, errorcode = tcpSocket:read()
+			\n    TransportState = state:match(\"<CurrentTransportState>(.+)</CurrentTransportState>\")
+			\n    fibaro:debug (TransportState)
+			\n      fibaro:log(TransportState)
+			\n      fibaro:setGlobal(\"bedSonosState\", TransportState)
+			\nend
+			\ntcpSocket:disconnect()
+			\n
+			\nfibaro:call(168, \"setProperty\", \"ui.Slider1.value\", volume);
+			\n 
+			\n-- wrong json string
+			\n    test = json.decode('{\"a:2}')
+			\n    fibaro:debug(test.a)
+			\nend)
+			\n
+			\nif (not ok) then
+			\n  fibaro:debug('decode raised an error')
+			\nend",
+		"saveLogs":"1",
+		"ui.Slider1.value":"40",
+		"rows":
+		[
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Play",
+						"name":"Button11",
+						"empty":false,
+							"msg":"POST /MediaRenderer/AVTransport/Control HTTP/1.1
+							\nContent-Length: 266
+							\nSOAPACTION: \"urn:schemas-upnp-org:service:AVTransport:1#Play\"
+							\n
+							\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:Play xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\"><InstanceID>0</InstanceID><Speed>1</Speed></u:Play></s:Body></s:Envelope>0x0D0x0A0x0D0x0A",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Pause",
+						"name":"Button21",
+						"empty":false,
+							"msg":"POST /MediaRenderer/AVTransport/Control HTTP/1.1
+							\nContent-Length: 267
+							\nSOAPACTION: \"urn:schemas-upnp-org:service:AVTransport:1#Pause\"
+							\n
+							\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:Pause xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\"><InstanceID>0</InstanceID><Speed>1</Speed></u:Pause></s:Body></s:Envelope>0x0D0x0A0x0D0x0A",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Stop",
+						"name":"Button22",
+						"empty":false,
+							"msg":"POST /MediaRenderer/AVTransport/Control HTTP/1.1
+							\nContent-Length: 266
+							\nSOAPACTION: \"urn:schemas-upnp-org:service:AVTransport:1#Stop\"
+							\n
+							\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:Stop xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\"><InstanceID>0</InstanceID><Speed>1</Speed></u:Stop></s:Body></s:Envelope>0x0D0x0A0x0D0x0A",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Prev",
+						"name":"Button31",
+						"empty":false,
+							"msg":"POST /MediaRenderer/AVTransport/Control HTTP/1.1
+							\nContent-Length: 270
+							\nSOAPACTION: \"urn:schemas-upnp-org:service:AVTransport:1#Previous\"
+							\n
+							\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:Previous xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\"><InstanceID>0</InstanceID><Speed>1</Speed></u:Previous></s:Body></s:Envelope>0x0D0x0A0x0D0x0A",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":5,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Mute",
+						"name":"Button32",
+						"empty":false,
+							"msg":"POST /MediaRenderer/RenderingControl/Control HTTP/1.1
+							\nContent-Length: 314
+							\nSOAPACTION: \"urn:schemas-upnp-org:service:RenderingControl:1#SetMute\"
+							\n
+							\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:SetMute xmlns:u=\"urn:schemas-upnp-org:service:RenderingControl:1\"><InstanceID>0</InstanceID><Channel>Master</Channel><DesiredMute>1</DesiredMute></u:SetMute></s:Body></s:Envelope>0x0D0x0A0x0D0x0A",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":6,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"UnMute",
+						"name":"Button33",
+						"empty":false,
+							"msg":"POST /MediaRenderer/RenderingControl/Control HTTP/1.1
+							\nContent-Length: 314
+							\nSOAPACTION: \"urn:schemas-upnp-org:service:RenderingControl:1#SetMute\"
+							\n
+							\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:SetMute xmlns:u=\"urn:schemas-upnp-org:service:RenderingControl:1\"><InstanceID>0</InstanceID><Channel>Master</Channel><DesiredMute>0</DesiredMute></u:SetMute></s:Body></s:Envelope>0x0D0x0A0x0D0x0A",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":7,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Next",
+						"name":"Button34",
+						"empty":false,
+							"msg":"POST /MediaRenderer/AVTransport/Control HTTP/1.1
+							\nContent-Length: 266
+							\nSOAPACTION: \"urn:schemas-upnp-org:service:AVTransport:1#Next\"
+							\n
+							\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:Next xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\"><InstanceID>0</InstanceID><Speed>1</Speed></u:Next></s:Body></s:Envelope>0x0D0x0A0x0D0x0A",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"slider",
+				"elements":
+				[
+					{
+						"id":8,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Volume",
+						"name":"Slider1",
+							"msg":"POST /MediaRenderer/RenderingControl/Control HTTP/1.1
+							\nContent-Length: 324
+							\nSOAPACTION: \"urn:schemas-upnp-org:service:RenderingControl:1#SetVolume\"
+							\n
+							\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:SetVolume xmlns:u=\"urn:schemas-upnp-org:service:RenderingControl:1\"><InstanceID>0</InstanceID><Channel>Master</Channel><DesiredVolume>_sliderValue_</DesiredVolume></u:SetVolume></s:Body></s:Envelope>0x0D0x0A0x0D0x0A",
+						"buttonIcon":0,
+						"value":0,
+						"favourite":false,
+						"main":true
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":9,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"1",
+						"name":"Button41",
+						"empty":false,
+							"msg":"POST /MediaRenderer/AVTransport/Control HTTP/1.1
+							\nContent-Length: 449
+							\nSOAPACTION: \"urn:schemas-upnp-org:service:AVTransport:1#SetAVTransportURI\"
+							\n
+							\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:SetAVTransportURI xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\"><InstanceID>0</InstanceID>,<CurrentURI>x-rincon-mp3radio://translate.google.com/translate_tts?tl=en0x26amp;q=This+is+a+test.++You+should+hear+this.</CurrentURI>,<CurrentURIMetaData></CurrentURIMetaData></u:SetAVTransportURI></s:Body></s:Envelope>0x0D0x0A0x0D0x0A",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":10,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"2",
+						"name":"Button42",
+						"empty":false,
+							"msg":"POST /MediaRenderer/AVTransport/Control HTTP/1.1
+							\nContent-Length: 388
+							\nSOAPACTION: \"urn:schemas-upnp-org:service:AVTransport:1#SetAVTransportURI\"
+							\n
+							\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:SetAVTransportURI xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\"><InstanceID>0</InstanceID>,<CurrentURI>x-file-cifs://FB-NAS/Multimedia/brkbrain.mp3</CurrentURI>,<CurrentURIMetaData></CurrentURIMetaData></u:SetAVTransportURI></s:Body></s:Envelope>0x0D0x0A0x0D0x0A",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":11,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"3",
+						"name":"Button43",
+						"empty":false,
+							"msg":"POST /MediaRenderer/AVTransport/Control HTTP/1.1
+							\nContent-Length: 393
+							\nSOAPACTION: \"urn:schemas-upnp-org:service:AVTransport:1#SetAVTransportURI\"
+							\n
+							\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:SetAVTransportURI xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\"><InstanceID>0</InstanceID>,<CurrentURI>x-file-cifs://FB-NAS/Multimedia/HappyBirthday.mp3</CurrentURI>,<CurrentURIMetaData></CurrentURIMetaData></u:SetAVTransportURI></s:Body></s:Envelope>0x0D0x0A0x0D0x0A",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":12,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"4",
+						"name":"Button44",
+						"empty":false,
+							"msg":"POST /MediaRenderer/AVTransport/Control HTTP/1.1
+							\nContent-Length: 401
+							\nSOAPACTION: \"urn:schemas-upnp-org:service:AVTransport:1#SetAVTransportURI\"
+							\n
+							\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:SetAVTransportURI xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\"><InstanceID>0</InstanceID>,<CurrentURI>x-rincon-mp3radio://media-ice.musicradio.com/ClassicFMMP3</CurrentURI>,<CurrentURIMetaData></CurrentURIMetaData></u:SetAVTransportURI></s:Body></s:Envelope>0x0D0x0A0x0D0x0A",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":13,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"",
+						"name":"button_4_3",
+						"empty":true,
+						"msg":"","buttonIcon":0,"favourite":false,"main":false}]}]},"actions":{"pressButton":1,"setSlider":2,"setProperty":2}}
