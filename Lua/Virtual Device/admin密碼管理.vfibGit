@@ -1,0 +1,49 @@
+{
+	"name":"admin密碼管理",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author Lala
+			\n  @date   105.01.04
+			\n  @brief  部分virtual device透過api與主機溝通時需輸入user password，因此製作一個提供admin帳號密碼的VD搭配使用，避免使用者看到密碼
+			\n  @note   填寫admin的密碼
+			\n--]]
+			\n
+			\nlocal password = \"flhtest\"        --填寫admin的密碼
+			\n
+			\nlocal selfId = fibaro:getSelfId()
+			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label1.value\" , password)
+			\n",
+		"ui.Label1.value":"flhtest",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"admin密碼：",
+						"name":"Label1",
+						"favourite":false,
+						"main":false
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}

@@ -1,0 +1,174 @@
+{
+	"name":"室內環境資訊",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author LalA
+			\n  @date   104.12.24
+			\n  @brief  室內溫度、濕度、、體感溫度、舒適度
+			\n  @note   1. button: Update 填寫濕度溫度sensorID
+			\n          2. 新增globalValue: outApparentTemp (室內體感溫度，可省略)
+			\n\t         新增globalValue: outSsd (室內舒適度指數，可省略)
+			\n
+			\n--]]
+			\n
+			\nlocal selfID = fibaro:getSelfId()
+			\nlocal buttonUpdateID = \"5\" --Update按鍵編號
+			\nlocal intervalTime = 5000  -- 更新時間間隔(毫秒)
+			\n
+			\n
+			\nwhile 1 do 
+			\n  fibaro:call(selfID, \"pressButton\" , buttonUpdateID ) 
+			\n  fibaro:sleep(intervalTime)
+			\nend",
+		"ui.Label1.value":"22 °C",
+		"ui.Label2.value":"84 %",
+		"ui.Label3.value":"25 °C",
+		"ui.Label4.value":"稍熱",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"溫度：",
+						"name":"Label1",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"濕度：",
+						"name":"Label2",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"體感溫度：",
+						"name":"Label3",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"舒適度：",
+						"name":"Label4",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":5,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Update",
+						"name":"Button11",
+						"empty":false,
+							"msg":"local thermometerID =  361  --溫度計ID
+							\nlocal hygrometerID  =  363  --溼度計ID
+							\n
+							\nlocal gATemp = \"inApparentTemp\"  --室內體感溫度globalValue
+							\nlocal gSsd = \"inSsd\"             --室內舒適度指數globalValue
+							\n
+							\nlocal selfID = fibaro:getSelfId() --本VD的ID
+							\nlocal temperatureID = \"1\"         --溫度Label編號
+							\nlocal humidityID = \"2\"            --濕度Label編號
+							\nlocal apparentTemperatureID = \"3\" --體感溫度Label編號
+							\nlocal ssdLevelID = \"4\"            --舒適度Label編號
+							\n
+							\nlocal humidity = tonumber(fibaro:getValue( hygrometerID , \"value\" ))  --sensor濕度
+							\nlocal temperature = math.floor(tonumber((fibaro:getValue( thermometerID , \"value\" )) + 0.5))  --sensor溫度
+							\n
+							\n
+							\n--體感溫度
+							\nlocal e = humidity/100*6.105*math.exp(17.27*temperature/(237.7+temperature))
+							\nlocal apparentTemperature = math.floor((temperature + 0.33*e - 4) + 0.5)
+							\n
+							\n--舒適度指數
+							\nlocal ssd = tonumber(string.format(\"%.0f\" , (1.818*temperature + 18.18)*(0.88 + 0.002*humidity) + (temperature - 32)/(45 - temperature) + 18.2))
+							\n
+							\nlocal ssdLevel  --舒適度等級
+							\nif ( ssd >= 86 ) then
+							\n  ssdLevel = \"極熱，小心中暑\"
+							\nelseif ( ssd >= 80 and ssd <= 85 ) then
+							\n  ssdLevel = \"很熱\"
+							\nelseif ( ssd >= 76 and ssd <= 79 ) then
+							\n  ssdLevel = \"稍熱\"
+							\nelseif ( ssd >= 71 and ssd <= 75 ) then
+							\n  ssdLevel = \"溫暖\"
+							\nelseif ( ssd >= 59 and ssd <= 70 ) then
+							\n  ssdLevel = \"舒適\"
+							\nelseif ( ssd >= 51 and ssd <= 58 ) then
+							\n  ssdLevel = \"涼爽\"
+							\nelseif ( ssd >= 39 and ssd <= 50 ) then
+							\n  ssdLevel = \"稍冷\"
+							\nelseif ( ssd >= 26 and ssd <= 38 ) then
+							\n  ssdLevel = \"很冷\"
+							\nelseif ( ssd >= 59 and ssd <= 70 ) then
+							\n  ssdLevel = \"極冷，小心凍傷\"
+							\nend
+							\n
+							\n--更新Label
+							\nfibaro:call(selfID , \"setProperty\" , \"ui.Label\" .. humidityID .. \".value\" , humidity .. \" %\" )            
+							\nfibaro:call(selfID , \"setProperty\" , \"ui.Label\" .. temperatureID .. \".value\" , temperature .. \" °C\" )                 
+							\nfibaro:call(selfID , \"setProperty\" , \"ui.Label\" .. apparentTemperatureID .. \".value\" , apparentTemperature .. \" °C\" )    
+							\nfibaro:call(selfID , \"setProperty\" , \"ui.Label\" .. ssdLevelID .. \".value\" , ssdLevel )                      
+							\n
+							\nfibaro:setGlobal( gSsd , ssd )
+							\nfibaro:setGlobal( gATemp , apparentTemperature )
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}

@@ -1,0 +1,268 @@
+{
+	"name":"室外環境資訊",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author LalA
+			\n  @date   104.12.28
+			\n  @brief  室外環境資訊
+			\n  @note   1. 新增globalValue: outApparentTemp (室外體感溫度，可省略) 
+			\n   \t      2. 新增globalValue: outSsd (室外舒適度指數，可省略)
+			\n          3. 需搭配admin密碼管理VD，並於Update button中填寫該VD的ID方能使用
+			\n--]]
+			\n
+			\nlocal selfID = fibaro:getSelfId()
+			\nlocal buttonUpdateID = \"7\" --Update按鍵編號
+			\nlocal intervalTime = 5000  -- 更新時間間隔(毫秒)
+			\n
+			\n
+			\nwhile 1 do 
+			\n  fibaro:call(selfID, \"pressButton\" , buttonUpdateID ) 
+			\n  fibaro:sleep(intervalTime)
+			\nend",
+		"ui.Label1.value":"22 °C",
+		"ui.Label2.value":"78 %",
+		"ui.Label3.value":"2 級，輕風",
+		"ui.Label4.value":"23 °C",
+		"ui.Label6.value":"舒適",
+		"ui.Label7.value":"rain",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"溫度：",
+						"name":"Label1",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"濕度：",
+						"name":"Label2",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"風速：",
+						"name":"Label3",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"體感溫度：",
+						"name":"Label4",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":5,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"舒適度：",
+						"name":"Label6",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":6,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"天氣狀況：",
+						"name":"Label7",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":7,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Update",
+						"name":"Button11",
+						"empty":false,
+							"msg":"local passwordVD = 592  --admin密碼管理VD
+							\n
+							\nlocal userPassword = fibaro:getValue(passwordVD,\"ui.Label1.value\")
+							\nlocal gATemp = \"outApparentTemp\"  --室外體感溫度globalValue
+							\nlocal gSsd = \"outSsd\"             --室外舒適度指數globalValue
+							\n
+							\nlocal selfID = fibaro:getSelfId() --本VD的ID
+							\nlocal temperatureID = \"1\"         --溫度Label編號
+							\nlocal humidityID = \"2\"            --濕度Label編號
+							\nlocal apparentTemperatureID = \"4\" --體感溫度Label編號
+							\nlocal ssdLevelID = \"6\"            --舒適度Label編號
+							\nlocal windID = \"3\"\t              --風級數Label編號
+							\nlocal weatherConditionID = \"7\"    --天氣狀況Label編號
+							\n
+							\n
+							\nHC2 = Net.FHttp( \"127.0.0.1\" ) 
+							\nHC2:setBasicAuthentication( \"admin\" , userPassword )
+							\nresponse, status, errorCode = HC2:GET(\"/api/weather\")
+							\ntResponse = json.decode( response )
+							\n
+							\nlocal humidity = tonumber(tResponse.Humidity)
+							\nlocal temperature = tonumber(tResponse.Temperature)
+							\nlocal wind = ((tResponse.Wind)*1000/3600)
+							\n--local windUI = math.floor(tonumber((tResponse.Wind)*1000/3600) + 0.5) 
+							\nlocal weatherCondition = tResponse.WeatherConditionConverted
+							\n
+							\n--體感溫度
+							\nlocal e = humidity/100*6.105*math.exp(17.27*temperature/(237.7+temperature))
+							\nlocal apparentTemperature = math.floor((temperature + 0.33*e - 0.7*wind - 4 )+0.5)
+							\n
+							\n--舒適度指數
+							\nlocal ssd = tonumber( (1.818*temperature + 18.18)*(0.88 + 0.002*humidity) + (temperature - 32)/(45 - temperature) - 3.2*wind + 18.2)
+							\n
+							\n
+							\nlocal ssdLevel  --舒適度等級
+							\nif ( ssd >= 86 ) then
+							\n  ssdLevel = \"極熱，小心中暑\"
+							\nelseif ( ssd >= 80 and ssd <= 85 ) then
+							\n  ssdLevel = \"很熱\"
+							\nelseif ( ssd >= 76 and ssd <= 79 ) then
+							\n  ssdLevel = \"稍熱\"
+							\nelseif ( ssd >= 71 and ssd <= 75 ) then
+							\n  ssdLevel = \"溫暖\"
+							\nelseif ( ssd >= 59 and ssd <= 70 ) then
+							\n  ssdLevel = \"舒適\"
+							\nelseif ( ssd >= 51 and ssd <= 58 ) then
+							\n  ssdLevel = \"涼爽\"
+							\nelseif ( ssd >= 39 and ssd <= 50 ) then
+							\n  ssdLevel = \"稍冷\"
+							\nelseif ( ssd >= 26 and ssd <= 38 ) then
+							\n  ssdLevel = \"很冷\"
+							\nelseif ( ssd >= 59 and ssd <= 70 ) then
+							\n  ssdLevel = \"極冷，小心凍傷\"
+							\nend
+							\n
+							\nlocal windDescrip , windLevel
+							\nif ( wind >= 0 and wind < 0.3 )then
+							\n  windDescrip = \"無風\"
+							\n  windLevel = 0
+							\nelseif ( wind >= 0.3 and wind < 1.6 ) then
+							\n  windDescrip = \"軟風\"
+							\n  windLevel = 1
+							\nelseif ( wind >= 1.6  and wind < 3.4 ) then
+							\n  windDescrip = \"輕風\"
+							\n  windLevel = 2
+							\nelseif ( wind >= 3.4 and wind < 5.5 ) then
+							\n  windDescrip = \"微風\"
+							\n  windLevel = 3
+							\nelseif ( wind >= 5.5 and wind < 8.0 ) then
+							\n  windDescrip = \"和風\"
+							\n  windLevel = 4
+							\nelseif ( wind >= 8.0 and wind < 10.8 ) then
+							\n  windDescrip = \"清風\"
+							\n  windLevel = 5
+							\nelseif ( wind >= 10.8 and wind < 13.9 ) then
+							\n  windDescrip = \"強風\"
+							\n  windLevel = 6
+							\nelseif ( wind >= 13.9 and wind < 17.2 ) then
+							\n  windDescrip = \"疾風\"
+							\n  windLevel = 7
+							\nelseif ( wind >= 17.2 and wind < 20.8 ) then
+							\n  windDescrip = \"大風\"
+							\n  windLevel = 8
+							\nelseif ( wind >= 20.8 and wind < 24.5 ) then
+							\n  windDescrip = \"烈風\"
+							\n  windLevel = 9
+							\nelseif ( wind >= 24.5 and wind < 28.5 ) then
+							\n  windDescrip = \"狂風\"
+							\n  windLevel = 10
+							\nelseif ( wind >= 28.5 and wind < 32.7 ) then
+							\n  windDescrip = \"暴風\"
+							\n  windLevel = 11
+							\nelseif ( wind >= 32.7 ) then
+							\n  windDescrip = \"颶風\"
+							\n  windLevel = 12
+							\nend
+							\n
+							\n--更新Label
+							\nfibaro:call(selfID , \"setProperty\" , \"ui.Label\" .. temperatureID .. \".value\" , temperature .. \" °C\" )
+							\nfibaro:call(selfID , \"setProperty\" , \"ui.Label\" .. humidityID .. \".value\" , humidity .. \" %\" )            
+							\nfibaro:call(selfID , \"setProperty\" , \"ui.Label\" .. apparentTemperatureID .. \".value\" , apparentTemperature .. \" °C\" )    
+							\nfibaro:call(selfID , \"setProperty\" , \"ui.Label\" .. ssdLevelID .. \".value\" , ssdLevel ) 
+							\nfibaro:call(selfID , \"setProperty\" , \"ui.Label\" .. windID .. \".value\" , windLevel .. \" 級，\" .. windDescrip ) 
+							\nfibaro:call(selfID , \"setProperty\" , \"ui.Label\" .. weatherConditionID .. \".value\" , weatherCondition ) 
+							\n
+							\nfibaro:setGlobal( gSsd , ssd )
+							\nfibaro:setGlobal( gATemp , apparentTemperature )
+							\n
+							\n
+							\nfibaro:debug(string.format(\"%d %%\" , humidity))
+							\nfibaro:debug(string.format(\"%d °C\" , temperature))
+							\nfibaro:debug(string.format(\"%d m/s\" , wind))
+							\nfibaro:debug(weatherCondition)
+							\nfibaro:debug(apparentTemperature..\" °C\")
+							\nfibaro:debug(ssdLevel)
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}
