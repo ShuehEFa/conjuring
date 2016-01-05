@@ -1,0 +1,755 @@
+{
+	"name":"
+	[
+		BOSE
+	] FLH",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author LalA
+			\n  @date   104.12.29
+			\n  @brief  Bose遙控器
+			\n  @note   1. 新增global value: \"BoseCmd\"
+			\n\t\t  2. 填寫IP Addr、TCP Port
+			\n          3. 若介面有變，button跟Main loop要更改updateId
+			\n--]]
+			\n
+			\nlocal updateId = \"32\"
+			\nlocal updateInterval = 2000
+			\n
+			\nlocal selfId = fibaro:getSelfId()
+			\n
+			\nwhile 1 do
+			\n  fibaro:call(selfId, \"pressButton\" ,updateId )
+			\n  fibaro:sleep(updateInterval)
+			\nend
+			\n",
+		"ui.LabelAlbum.value":"",
+		"ui.LabelArtist.value":"",
+		"ui.LabelSource.value":"",
+		"ui.LabelStation.value":"",
+		"ui.LabelStatus.value":"",
+		"ui.LabelTrack.value":"",
+		"ui.Slider1.value":18,
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Play Status：",
+						"name":"LabelStatus",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Source：",
+						"name":"LabelSource",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Track：",
+						"name":"LabelTrack",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Album：",
+						"name":"LabelAlbum",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":5,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Artist：",
+						"name":"LabelArtist",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":6,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Station Name：",
+						"name":"LabelStation",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":7,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Power",
+						"name":"Button81",
+						"empty":false,
+							"msg":"--POWER
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'POWER'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":8,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"► Play",
+						"name":"Button51",
+						"empty":false,
+							"msg":"--PLAY
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'PLAY'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":9,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"■ Stop",
+						"name":"Button52",
+						"empty":false,
+							"msg":"--STOP
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'STOP'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":10,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"|&lt;&lt; ",
+						"name":"Button61",
+						"empty":false,
+							"msg":"--PREV_TRACK
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'PREV_TRACK'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":11,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"▌▌Pause",
+						"name":"Button62",
+						"empty":false,
+							"msg":"--PAUSE
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'PAUSE'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":12,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":" &gt;&gt;|",
+						"name":"Button63",
+						"empty":false,
+							"msg":"--NEXT_TRACK
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'NEXT_TRACK'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":13,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Shuffle On",
+						"name":"Button41",
+						"empty":false,
+							"msg":"--SHUFFLE_ON
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'SHUFFLE_ON'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":14,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Shuffle Off",
+						"name":"Button42",
+						"empty":false,
+							"msg":"--SHUFFLE_OFF
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'SHUFFLE_OFF'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":15,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Re One",
+						"name":"Button101",
+						"empty":false,
+							"msg":"local updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'REPEAT_ONE'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":16,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Re All",
+						"name":"Button102",
+						"empty":false,
+							"msg":"local updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'REPEAT_ALL'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":17,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Re Off",
+						"name":"Button103",
+						"empty":false,
+							"msg":"local updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'REPEAT_OFF'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":18,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"▲ Vol",
+						"name":"Button71",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\nlocal boseIP = fibaro:get(selfId, \"IPAddress\")
+							\nlocal port = fibaro:get(selfId, \"TCPPort\")
+							\n
+							\n
+							\nlocal body = '<key state=\"release\" sender=\"Gabbo\">VOLUME_UP</key>'
+							\nlocal socket = Net.FHttp( boseIP , port )
+							\nresponse, status, errorCode = socket:POST('/key', tostring(body) )
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":19,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"♫× Mute",
+						"name":"Button72",
+						"empty":false,
+							"msg":"--MUTE
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'MUTE'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":20,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"▼ Vol",
+						"name":"Button73",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\nlocal boseIP = fibaro:get(selfId, \"IPAddress\")
+							\nlocal port = fibaro:get(selfId, \"TCPPort\")
+							\n
+							\n
+							\nlocal body = '<key state=\"release\" sender=\"Gabbo\">VOLUME_DOWN</key>'
+							\nlocal socket = Net.FHttp( boseIP , port )
+							\nresponse, status, errorCode = socket:POST('/key', tostring(body) )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"slider",
+				"elements":
+				[
+					{
+						"id":21,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Volume",
+						"name":"Slider1",
+							"msg":"local selfId = fibaro:getSelfId()
+							\nlocal boseIP = fibaro:get(selfId, \"IPAddress\")
+							\nlocal port = fibaro:get(selfId, \"TCPPort\")
+							\n
+							\n--VOLUME Slider
+							\nlocal vol = tonumber( fibaro:getValue( selfId , \"ui.Slider1.value\" ) )
+							\nlocal apiVol = Net.FHttp( boseIP , port )
+							\nvolResponse, volStatus, volError = apiVol:POST( '/volume' , '<volume>'.. vol .. '</volume>' )
+							\n",
+						"buttonIcon":0,
+						"value":18,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":22,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Set 1",
+						"name":"ButtonSet1",
+						"empty":false,
+							"msg":"--PRESET_1
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'PRESET_1'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":23,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Set 2",
+						"name":"ButtonSet2",
+						"empty":false,
+							"msg":"--PRESET_2
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'PRESET_2'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":24,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Set 3",
+						"name":"ButtonSet3",
+						"empty":false,
+							"msg":"--PRESET_3
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'PRESET_3'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":25,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Set 4",
+						"name":"ButtonSet4",
+						"empty":false,
+							"msg":"--PRESET_4
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'PRESET_4'
+							\nlocal gCmd = \"BoseCmd\"
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":26,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Set 5",
+						"name":"ButtonSet5",
+						"empty":false,
+							"msg":"--PRESET_5
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'PRESET_5'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":27,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Set 6",
+						"name":"ButtonSet6",
+						"empty":false,
+							"msg":"--PRESET_6
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'PRESET_6'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":28,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Add Fav",
+						"name":"Button91",
+						"empty":false,
+							"msg":"--ADD_FAVORITE
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'ADD_FAVORITE'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":29,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Rm Fav",
+						"name":"Button92",
+						"empty":false,
+							"msg":"--REMOVE_FAVORITE
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'REMOVE_FAVORITE'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":30,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Bookmark",
+						"name":"Button93",
+						"empty":false,
+							"msg":"--BOOKMARK
+							\nlocal updateId = \"32\"
+							\n
+							\nlocal gCmd = \"BoseCmd\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal cmdBody = 'BOOKMARK'
+							\nfibaro:setGlobal( gCmd , cmdBody )
+							\nfibaro:call(selfId, \"pressButton\" ,updateId )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":31,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Select",
+						"name":"Button111",
+						"empty":false,
+							"msg":"local source = \"\"
+							\nlocal account = \"\"
+							\nlocal location = \"\"
+							\nlocal itemName = \"\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal boseIP = fibaro:get(selfId, \"IPAddress\")
+							\nlocal port = fibaro:get(selfId, \"TCPPort\")
+							\n
+							\n
+							\nlocal body = '<ContentItem source=\"' .. source .. '\" sourceAccount=\"' .. account.. '\" location=\"' .. location ..'\"><itemName>' .. itemName .. '</itemName></ContentItem>'
+							\n
+							\nlocal apiSelect = Net.FHttp( boseIP , port )
+							\nselectResponse, selectStatus, selectError = apiSelect:POST('/select', tostring(body) )
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":32,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Update",
+						"name":"Button21",
+						"empty":false,
+							"msg":"local gCmd = \"BoseCmd\" --globalValue
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal boseIP = fibaro:get(selfId, \"IPAddress\")
+							\nlocal port = fibaro:get(selfId, \"TCPPort\")
+							\nlocal lastCmd = tostring(fibaro:getGlobal( gCmd ))
+							\n
+							\nlocal url = '/key'
+							\nlocal bodyStand1 = '<key state=\"press\" sender=\"Gabbo\">'
+							\nlocal bodyStand2 = '</key>'
+							\n
+							\nif (lastCmd ~= \"0\") then
+							\n  local apiKey = Net.FHttp( boseIP , port )
+							\n  keyResponse, keyStatus, keyError = apiKey:POST( url , tostring(bodyStand1 .. lastCmd .. bodyStand2))
+							\n  fibaro:setGlobal( gCmd , \"0\" )
+							\n  fibaro:debug(\"keyResponse:\" .. keyResponse)
+							\n  fibaro:debug(\"keyStatus:\" .. keyStatus)
+							\n  fibaro:debug( tostring(bodyStand1 .. lastCmd .. bodyStand2) )
+							\nend
+							\n  
+							\n-----更新Label-----
+							\nlocal apiNowPlay = Net.FHttp( boseIP , port )
+							\nnowPlayResponse, nowPlayStatus, nowPlayError = apiNowPlay:GET( '/now_playing' )
+							\n
+							\nlocal status = string.match(nowPlayResponse,'<playStatus>(.-)</playStatus>')
+							\nlocal source = string.match(nowPlayResponse,'source=\"(.-)\">')
+							\nlocal track = string.match(nowPlayResponse,'<track>(.-)</track>')
+							\nlocal artist = string.match(nowPlayResponse,'<artist>(.-)</artist>')
+							\nlocal album = string.match(nowPlayResponse,'<album>(.-)</album>')
+							\nlocal station = string.match(nowPlayResponse,'<stationName>(.-)</stationName>')
+							\n
+							\n--fibaro:debug(\"nowPlayResponse:\"..nowPlayResponse)
+							\n--fibaro:debug(\"nowPlayStatus:\".. nowPlayStatus)
+							\n
+							\nfibaro:debug(\"status:\" .. status)
+							\nfibaro:debug(\"station:\" .. station)
+							\n
+							\nfibaro:call(selfId , \"setProperty\" , \"ui.LabelStatus.value\" , status)
+							\nfibaro:call(selfId , \"setProperty\" , \"ui.LabelSource.value\" , source)
+							\nfibaro:call(selfId , \"setProperty\" , \"ui.LabelTrack.value\" , track)
+							\nfibaro:call(selfId , \"setProperty\" , \"ui.LabelArtist.value\" , artist)
+							\nfibaro:call(selfId , \"setProperty\" , \"ui.LabelAlbum.value\" , album)
+							\nfibaro:call(selfId , \"setProperty\" , \"ui.LabelStation.value\" , station)
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}
