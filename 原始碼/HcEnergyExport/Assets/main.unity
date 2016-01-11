@@ -102,11 +102,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4e9d55b37de940bbae2c46fd9fe80c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ip: 192.168.0.78
-  m_port: 80
-  m_account: admin
-  m_passWord: flhtest
-  m_deviceId: 12
+  m_data: {fileID: 11400000, guid: 299aed971b0c24d2aa6d1bd8a78cb0cb, type: 2}
 --- !u!20 &598211279
 Camera:
   m_ObjectHideFlags: 0
@@ -116,7 +112,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: .192156866, g: .301960796, b: .474509805, a: .0196078438}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: .0196078438}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
