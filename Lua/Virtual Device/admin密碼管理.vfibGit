@@ -14,12 +14,23 @@
 			\n  @note   填寫admin的密碼
 			\n--]]
 			\n
-			\nlocal password = \"flhtest\"        --填寫admin的密碼
+			\nlocal password = \"flhtest\"    --填寫admin的密碼
+			\nlocal ping1 = \"0\"          --填寫ping碼，注意ping碼為字串，非數字
+			\nlocal ping2 = \"0\"
+			\nlocal ping3 = \"0\"
+			\nlocal ping4 = \"0\"
 			\n
 			\nlocal selfId = fibaro:getSelfId()
 			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label1.value\" , password)
-			\n",
+			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label2.value\" , ping1)
+			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label3.value\" , ping2)
+			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label4.value\" , ping3)
+			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label5.value\" , ping4)",
 		"ui.Label1.value":"flhtest",
+		"ui.Label2.value":"0",
+		"ui.Label3.value":"0",
+		"ui.Label4.value":"0",
+		"ui.Label5.value":"0",
 		"visible":"true",
 		"rows":
 		[
@@ -33,6 +44,66 @@
 						"waitForResponse":false,
 						"caption":"admin密碼：",
 						"name":"Label1",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"ping碼1：",
+						"name":"Label2",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"ping碼2：",
+						"name":"Label3",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"ping碼3：",
+						"name":"Label4",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":5,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"ping碼4：",
+						"name":"Label5",
 						"favourite":false,
 						"main":false
 					}
