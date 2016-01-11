@@ -15,17 +15,17 @@
 			\n--]]
 			\n
 			\nlocal password = \"flhtest\"    --填寫admin的密碼
-			\nlocal ping1 = \"0\"          --填寫ping碼，注意ping碼為字串，非數字
-			\nlocal ping2 = \"0\"
-			\nlocal ping3 = \"0\"
-			\nlocal ping4 = \"0\"
+			\nlocal pin1 = \"0\"          --填寫ping碼，注意ping碼為字串，非數字
+			\nlocal pin2 = \"0\"
+			\nlocal pin3 = \"0\"
+			\nlocal pin4 = \"0\"
 			\n
 			\nlocal selfId = fibaro:getSelfId()
 			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label1.value\" , password)
-			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label2.value\" , ping1)
-			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label3.value\" , ping2)
-			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label4.value\" , ping3)
-			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label5.value\" , ping4)",
+			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label2.value\" , pin1)
+			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label3.value\" , pin2)
+			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label4.value\" , pin3)
+			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label5.value\" , pin4)",
 		"ui.Label1.value":"flhtest",
 		"ui.Label2.value":"0",
 		"ui.Label3.value":"0",
@@ -57,7 +57,7 @@
 						"id":2,
 						"lua":false,
 						"waitForResponse":false,
-						"caption":"ping碼1：",
+						"caption":"PIN碼1：",
 						"name":"Label2",
 						"favourite":false,
 						"main":false
@@ -72,7 +72,7 @@
 						"id":3,
 						"lua":false,
 						"waitForResponse":false,
-						"caption":"ping碼2：",
+						"caption":"PIN碼2：",
 						"name":"Label3",
 						"favourite":false,
 						"main":false
@@ -87,7 +87,7 @@
 						"id":4,
 						"lua":false,
 						"waitForResponse":false,
-						"caption":"ping碼3：",
+						"caption":"PIN碼3：",
 						"name":"Label4",
 						"favourite":false,
 						"main":false
@@ -102,7 +102,7 @@
 						"id":5,
 						"lua":false,
 						"waitForResponse":false,
-						"caption":"ping碼4：",
+						"caption":"PIN碼4：",
 						"name":"Label5",
 						"favourite":false,
 						"main":false
