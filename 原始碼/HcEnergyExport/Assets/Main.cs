@@ -114,9 +114,9 @@ public class Main : MonoBehaviour
 				ret += m_ip[ i ] + "." ;
 			ret = ret.Substring( 0 , ret.Length - 1 );
 			
-			string endTime = "now-" +  PeriodSecString ;
+			string beginTime = "now-" +  PeriodSecString ;
 			
-			ret += "/api/energy/now/" + endTime + "/summary-graph/devices/power/" ;
+			ret += "/api/energy/" + beginTime + "/now/summary-graph/devices/power/" ;
 			
 			return ret ;
 		}
