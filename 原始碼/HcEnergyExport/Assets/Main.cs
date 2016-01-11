@@ -6,6 +6,16 @@ using System.Collections.Generic ;
 
 public class Main : MonoBehaviour 
 {	
+	enum LogPeriod : int
+	{
+		Day ,
+		Week ,
+		Month ,
+		Season ,
+		Year ,
+		TwoYears ,
+	}
+
 	enum LogType : int
 	{
 		Nono ,
@@ -24,6 +34,15 @@ public class Main : MonoBehaviour
 		Done ,
 	}
 
+	const string DATA_ACCOUNT = "account" ;
+	const string DATA_PASSWORD = "password" ;
+	const string DATA_IP0 = "ip0" ;
+	const string DATA_IP1 = "ip1" ;
+	const string DATA_IP2 = "ip2" ;
+	const string DATA_IP3 = "ip3" ;
+	const string DATA_PORT = "port" ;
+	const string DATA_DEVICES = "devices" ;
+
 	const int READ_TIMEOUT_SEC = 10 ;
 	const int LOG_DISPLAY_SEC = 2 ;
 
@@ -35,27 +54,48 @@ public class Main : MonoBehaviour
 	readonly string[] NORMAL_SEPERATOR = new string[]{ "," };
 	readonly string[] POWER_DATA_SEPERATOR = new string[]{ "],[" };
 
-	[ SerializeField ] AccountScriptableObject m_data ;
-
 	string m_account = "" ;
 	string m_passWord = "" ;
 	string[] m_ip = new string[]{ "0" , "0" , "0" , "0" } ;
 	string m_port = "0" ;
 	string m_deviceIds = "" ;
+	LogPeriod m_logPeriod = LogPeriod.TwoYears ;
 
-	int m_timePeriodSec = 60 * 60 * 24 * 365 ;
 	int m_timeZoneOffsetHour = 0 ;
 
 	LogType m_logType = LogType.Nono ;
 	float m_logTimer = 0 ;
 	string m_connectErr = "";
-	
+
+	string PeriodSecString
+	{
+		get 
+		{ 
+			switch( m_logPeriod )
+			{
+			case LogPeriod.Day :
+				return "86400" ;		//< 1 day = 24 hours * 60 mins * 60 secs = 86400 secs
+			case LogPeriod.Week :
+				return "604800" ;		//< 1 week = 7 days = 7 * 86400 secs = 604800 secs 
+			case LogPeriod.Month :
+				return "2592000" ;	//< 1 month = 30 days = 30 * 86400 secs = 2592000 secs
+			case LogPeriod.Season :
+				return "7776000" ;	//< 1 season = 3 months = 3 * 2592000 secs = 7776000 secs
+			case LogPeriod.Year :
+				return "31536000" ;	//< 1 year = 365 days = 365 * 86400 secs = 31536000 secs
+			case LogPeriod.TwoYears :
+				return "63072000" ;	//< 2 years = 2 * 1 year = 2 * 31536000 secs = 63072000 secs
+			}
+			return "0" ;
+		}
+	}
+
 	LogType Log 
 	{
 		get { return m_logType ; }
 		set { m_logType = value ; m_logTimer = LOG_DISPLAY_SEC ; }
 	}
-	
+
 	string Url
 	{
 		get
@@ -69,15 +109,15 @@ public class Main : MonoBehaviour
 					ret += ":" + m_passWord ;
 				ret += "@" ;
 			}
-
+			
 			for( int i = 0 , length = m_ip.Length ; i < length ; ++i )
 				ret += m_ip[ i ] + "." ;
 			ret = ret.Substring( 0 , ret.Length - 1 );
-
-			string endTime = "now-" +  m_timePeriodSec.ToString();
-
+			
+			string endTime = "now-" +  PeriodSecString ;
+			
 			ret += "/api/energy/now/" + endTime + "/summary-graph/devices/power/" ;
-
+			
 			return ret ;
 		}
 	}
@@ -261,25 +301,43 @@ public class Main : MonoBehaviour
 	void OnButtonGUI()
 	{
 		GUILayout.BeginHorizontal();
-		GUILayout.Space( Screen.width - LABEL_WIDTH );
-		if( GUILayout.Button( "GO" , GUILayout.Width( LABEL_WIDTH ) ) )
+		int length = Enum.GetValues( typeof( LogPeriod ) ).Length ;
+		int width = ( Screen.width - LABEL_WIDTH - 20 ) / length ;
+		GUILayout.Label( "Period: " , GUILayout.Width( LABEL_WIDTH ) );
+		for( int i = 0 ; i < length ; ++i )
+		{
+			GUI.contentColor = ( int )m_logPeriod == i ? Color.yellow : Color.white ;
+			if( GUILayout.Button( ( ( LogPeriod )i ).ToString() , GUILayout.Width( width ) ) )
+				m_logPeriod = ( LogPeriod )i ;
+		}
+		GUILayout.Label( "" , GUILayout.Width( width ) );
+		GUILayout.EndHorizontal();
+
+		GUI.contentColor = Color.cyan ;
+
+		GUILayout.BeginHorizontal();
+		GUILayout.Label( "" , GUILayout.Width( LABEL_WIDTH ) );
+		if( GUILayout.Button( "EXPORT" , GUILayout.Width( Screen.width - LABEL_WIDTH - 10 ) ) )
 			if( CheckUrl() )
 				StartCoroutine( Export() );
 		GUILayout.EndHorizontal();
+
+		GUI.contentColor = Color.white ;
 	}
 
 	void Start()
 	{
 		m_timeZoneOffsetHour = TimeZone.CurrentTimeZone.GetUtcOffset( DateTime.Now ).Hours ;
 //		Debug.Log( m_timeZoneOffsetHour.ToString() );
-		if( m_data != null )
-		{
-			m_account = m_data.Account ;
-			m_passWord = m_data.Password ;
-			m_ip = m_data.IP ;
-			m_port = m_data.Port ;
-			m_deviceIds = m_data.Devices ;
-		}
+
+		m_account = PlayerPrefs.GetString( DATA_ACCOUNT );
+		m_passWord = PlayerPrefs.GetString( DATA_PASSWORD );
+		m_ip[ 0 ] = PlayerPrefs.GetString( DATA_IP0 );
+		m_ip[ 1 ] = PlayerPrefs.GetString( DATA_IP1 );
+		m_ip[ 2 ] = PlayerPrefs.GetString( DATA_IP2 );
+		m_ip[ 3 ] = PlayerPrefs.GetString( DATA_IP3 );
+		m_port = PlayerPrefs.GetString( DATA_PORT );
+		m_deviceIds = PlayerPrefs.GetString( DATA_DEVICES );
 	}
 
 	void Update()
@@ -294,14 +352,16 @@ public class Main : MonoBehaviour
 
 	void OnDisable()
 	{
-		if( m_data != null )
-		{
-			m_data.Account = m_account ;
-			m_data.Password = m_passWord ;
-			m_data.IP = m_ip ;
-			m_data.Port = m_port ;
-			m_data.Devices = m_deviceIds ;
-		}
+		PlayerPrefs.SetString( DATA_ACCOUNT , m_account );
+		PlayerPrefs.SetString( DATA_PASSWORD , m_passWord );
+		PlayerPrefs.SetString( DATA_IP0 , m_ip[ 0 ] );
+		PlayerPrefs.SetString( DATA_IP1 , m_ip[ 1 ] );
+		PlayerPrefs.SetString( DATA_IP2 , m_ip[ 2 ] );
+		PlayerPrefs.SetString( DATA_IP3 , m_ip[ 3 ] );
+		PlayerPrefs.SetString( DATA_PORT , m_port );
+		PlayerPrefs.SetString( DATA_DEVICES , m_deviceIds );
+
+		PlayerPrefs.Save();
 	}
 
 	void OnGUI()
