@@ -1,0 +1,94 @@
+{
+	"name":"解除警報",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author Lala
+			\n  @date   105.1.12
+			\n  @brief  解除警報並寄發email
+			\n  @note   (1) button內容1~5行須填寫
+			\n          (2) 需搭配密碼管理VD
+			\n--]]",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"解除警報",
+						"name":"Button11",
+						"empty":false,
+							"msg":"local passwordVD = 592  --admin密碼管理VD
+							\nlocal userId = 000      --接收mail通知的userId
+							\nlocal subject = \"警報異常解除\"      --通知訊息主旨
+							\nlocal msg = \"警報異常解除，請確認家中狀況\"    --通知訊息內容
+							\nlocal armedDeviceId = \"619\"  --欲解除警報的device
+							\n
+							\n
+							\nlocal labelId1 = 1  --admin密碼為1，PIN碼為2
+							\nlocal labelId2 = 2  --admin密碼為1，PIN碼為2
+							\n
+							\n
+							\n--取回密碼
+							\nlocal labelId = 1         --1為admin密碼，2為PIN碼
+							\n
+							\nlocal getVDPassword = fibaro:getValue(passwordVD, \"ui.Label\" .. labelId .. \".value\")
+							\nlocal truePassword = \"\"
+							\nlocal getChar
+							\n
+							\nfor i = 2, 50, 2 do
+							\n  getChar = string.sub(getVDPassword, i, i)
+							\n  truePassword = truePassword .. getChar
+							\nend
+							\n------------
+							\n
+							\n--取回PIN碼
+							\nlocal labelId2 = 2         --1為admin密碼，2為PIN碼
+							\n
+							\nlocal getVDPassword2 = fibaro:getValue(passwordVD, \"ui.Label\" .. labelId2 .. \".value\")
+							\nlocal truePassword2 = \"\"
+							\nlocal getChar2
+							\n
+							\nfor i = 2, 50, 2 do
+							\n  getChar2 = string.sub(getVDPassword2, i, i)
+							\n  truePassword2 = truePassword2 .. getChar2
+							\nend
+							\n------------
+							\n
+							\nlocal url = '/api/devices/1/action/multiSetArmed'
+							\nlocal body = '{\"args\":[0, \"' .. armedDeviceId .. '\" ,\"' .. truePassword2 .. '\"]}'
+							\n
+							\nHC2 = Net.FHttp( \"127.0.0.1\" ) 
+							\nHC2:setBasicAuthentication( \"admin\" , truePassword )
+							\nresponse, status, errorCode = HC2:POST(url , tostring(body))
+							\nfibaro:debug(response)
+							\n
+							\n--------------------------------------------------------
+							\nfibaro:call( userId , \"sendEmail\", subject, msg)
+							\n--fibaro:call( 261 , \"sendDefinedEmailNotifacation\" , \"598\" )
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}

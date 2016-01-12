@@ -25,12 +25,12 @@
 			\n  fibaro:call(selfID, \"pressButton\" , buttonUpdateID ) 
 			\n  fibaro:sleep(intervalTime)
 			\nend",
-		"ui.Label1.value":"16 °C",
-		"ui.Label2.value":"72 %",
-		"ui.Label3.value":"3 級，微風",
-		"ui.Label4.value":"13 °C",
-		"ui.Label6.value":"稍冷",
-		"ui.Label7.value":"cloudy",
+		"ui.Label1.value":"22 °C",
+		"ui.Label2.value":"78 %",
+		"ui.Label3.value":"2 級，輕風",
+		"ui.Label4.value":"23 °C",
+		"ui.Label6.value":"舒適",
+		"ui.Label7.value":"rain",
 		"visible":"true",
 		"rows":
 		[
@@ -137,6 +137,7 @@
 						"empty":false,
 							"msg":"local passwordVD = 592  --admin密碼管理VD
 							\n
+							\nlocal userPassword = fibaro:getValue(passwordVD,\"ui.Label1.value\")
 							\nlocal gATemp = \"outApparentTemp\"  --室外體感溫度globalValue
 							\nlocal gSsd = \"outSsd\"             --室外舒適度指數globalValue
 							\n
@@ -148,20 +149,9 @@
 							\nlocal windID = \"3\"\t              --風級數Label編號
 							\nlocal weatherConditionID = \"7\"    --天氣狀況Label編號
 							\n
-							\n---取回admin密碼
-							\nlocal labelId = 1         --1為admin密碼，2為PIN碼
-							\n
-							\nlocal getVDPassword = fibaro:getValue(passwordVD, \"ui.Label\" .. labelId .. \".value\")
-							\nlocal truePassword = \"\"
-							\nlocal getChar
-							\n
-							\nfor i = 2, 50, 2 do
-							\n  getChar = string.sub(getVDPassword, i, i)
-							\n  truePassword = truePassword .. getChar
-							\nend
 							\n
 							\nHC2 = Net.FHttp( \"127.0.0.1\" ) 
-							\nHC2:setBasicAuthentication( \"admin\" , truePassword )
+							\nHC2:setBasicAuthentication( \"admin\" , userPassword )
 							\nresponse, status, errorCode = HC2:GET(\"/api/weather\")
 							\ntResponse = json.decode( response )
 							\n

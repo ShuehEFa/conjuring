@@ -1,0 +1,120 @@
+{
+	"name":"admin密碼管理",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author Lala
+			\n  @date   105.01.04
+			\n  @brief  部分virtual device透過api與主機溝通時需輸入user password，因此製作一個提供admin帳號密碼的VD搭配使用，避免使用者看到密碼
+			\n  @note   填寫admin的密碼
+			\n--]]
+			\n
+			\nlocal password = \"flhtest\"    --填寫admin的密碼
+			\nlocal pin1 = \"0\"          --填寫ping碼，注意ping碼為字串，非數字
+			\nlocal pin2 = \"0\"
+			\nlocal pin3 = \"0\"
+			\nlocal pin4 = \"0\"
+			\n
+			\nlocal selfId = fibaro:getSelfId()
+			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label1.value\" , password)
+			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label2.value\" , pin1)
+			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label3.value\" , pin2)
+			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label4.value\" , pin3)
+			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label5.value\" , pin4)",
+		"ui.Label1.value":"flhtest",
+		"ui.Label2.value":"0",
+		"ui.Label3.value":"0",
+		"ui.Label4.value":"0",
+		"ui.Label5.value":"0",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"admin密碼：",
+						"name":"Label1",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"PIN碼1：",
+						"name":"Label2",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"PIN碼2：",
+						"name":"Label3",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"PIN碼3：",
+						"name":"Label4",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":5,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"PIN碼4：",
+						"name":"Label5",
+						"favourite":false,
+						"main":false
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}

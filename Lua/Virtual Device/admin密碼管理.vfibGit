@@ -9,28 +9,49 @@
 		"logTemp":"",
 			"mainLoop":"--[[
 			\n  @author Lala
-			\n  @date   105.01.04
-			\n  @brief  部分virtual device透過api與主機溝通時需輸入user password，因此製作一個提供admin帳號密碼的VD搭配使用，避免使用者看到密碼
-			\n  @note   填寫admin的密碼
+			\n  @date   105.01.12
+			\n  @brief  (1)部分virtual device透過api與主機溝通時需輸入user password，
+			\n             因此製作一個提供admin帳號密碼的VD搭配使用
+			\n  @note   (1)填寫admin的密碼
+			\n          (2)＊＊＊重要！！＊＊＊　請勿開放此VD之使用權限給一般user，否則密碼會被看到
 			\n--]]
 			\n
-			\nlocal password = \"flhtest\"    --填寫admin的密碼
-			\nlocal pin1 = \"0\"          --填寫ping碼，注意ping碼為字串，非數字
-			\nlocal pin2 = \"0\"
-			\nlocal pin3 = \"0\"
-			\nlocal pin4 = \"0\"
+			\n--[[從密碼管理VD取回密碼方式，取回密碼之變數名稱為truePassword
+			\n
+			\nlocal passwordVD = 592    --密碼管理vd的id
+			\nlocal labelId = 1         --1為admin密碼，2為PIN碼
+			\n
+			\nlocal getVDPassword = fibaro:getValue(passwordVD, \"ui.Label\" .. labelId .. \".value\")
+			\nlocal truePassword = \"\"
+			\nlocal getChar
+			\n
+			\nfor i = 2, 50, 2 do
+			\n  getChar = string.sub(getVDPassword, i, i)
+			\n  truePassword = truePassword .. getChar
+			\nend
+			\n--]]
 			\n
 			\nlocal selfId = fibaro:getSelfId()
-			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label1.value\" , password)
-			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label2.value\" , pin1)
-			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label3.value\" , pin2)
-			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label4.value\" , pin3)
-			\nfibaro:call(selfId, \"setProperty\" , \"ui.Label5.value\" , pin4)",
-		"ui.Label1.value":"flhtest",
-		"ui.Label2.value":"0",
-		"ui.Label3.value":"0",
-		"ui.Label4.value":"0",
-		"ui.Label5.value":"0",
+			\nlocal isNil
+			\n
+			\nif (isNil == nil) then
+			\n  fibaro:call(selfId, \"pressButton\", \"3\")
+			\n  fibaro:call(selfId, \"pressButton\", \"4\")
+			\nend
+			\n",
+		"ui.Label1.value":",
+		f,
+		l,
+		h,
+		t,
+		e,
+		s,
+		t",
+		"ui.Label2.value":",
+		0,
+		0,
+		0,
+		0",
 		"visible":"true",
 		"rows":
 		[
@@ -57,7 +78,7 @@
 						"id":2,
 						"lua":false,
 						"waitForResponse":false,
-						"caption":"PIN碼1：",
+						"caption":"PIN碼：",
 						"name":"Label2",
 						"favourite":false,
 						"main":false
@@ -65,45 +86,63 @@
 				]
 			},
 			{
-				"type":"label",
+				"type":"button",
 				"elements":
 				[
 					{
 						"id":3,
-						"lua":false,
+						"lua":true,
 						"waitForResponse":false,
-						"caption":"PIN碼2：",
-						"name":"Label3",
+						"caption":"Update admin",
+						"name":"Button11",
+						"empty":false,
+							"msg":"local password = \"flhtest\"    --填寫admin的密碼
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal lenth = string.len(password)
+							\nlocal getPassword
+							\nlocal label = \"\"
+							\n
+							\nfor i = 1, lenth do
+							\n  getPassword = \",\" .. string.sub(password,i,i)
+							\n  label = label .. getPassword
+							\n  end
+							\n  
+							\nfibaro:call( selfId, \"setProperty\", \"ui.Label1.value\", label )
+							\nfibaro:debug(label)",
+						"buttonIcon":0,
 						"favourite":false,
-						"main":false
+						"main":true
 					}
 				]
 			},
 			{
-				"type":"label",
+				"type":"button",
 				"elements":
 				[
 					{
 						"id":4,
-						"lua":false,
+						"lua":true,
 						"waitForResponse":false,
-						"caption":"PIN碼3：",
-						"name":"Label4",
-						"favourite":false,
-						"main":false
-					}
-				]
-			},
-			{
-				"type":"label",
-				"elements":
-				[
-					{
-						"id":5,
-						"lua":false,
-						"waitForResponse":false,
-						"caption":"PIN碼4：",
-						"name":"Label5",
+						"caption":"Update PIN",
+						"name":"Button21",
+						"empty":false,
+							"msg":"local password = \"0000\"    --填寫PIN碼
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal lenth = string.len(password)
+							\nlocal getPassword
+							\nlocal label = \"\"
+							\n
+							\nfor i = 1, lenth do
+							\n  getPassword = \",\" .. string.sub(password,i,i)
+							\n  label = label .. getPassword
+							\n  end
+							\n  
+							\nfibaro:call( selfId, \"setProperty\", \"ui.Label2.value\", label )
+							\nfibaro:debug(label)
+							\n",
+						"buttonIcon":0,
 						"favourite":false,
 						"main":false
 					}
