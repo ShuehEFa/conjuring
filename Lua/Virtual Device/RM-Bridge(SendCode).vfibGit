@@ -1,0 +1,61 @@
+{
+	"name":"RM-Bridge(SendCode)",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author Lala
+			\n  @date   105.1.14
+			\n  @brief  Send Code api(Send the code data to the specified RM device)
+			\n  @note   (1)填寫ipAddr，port預設為7474
+			\n          (2)分隔線\"--_--_--_--_--_--_--\"以上的欄位必須填寫才能使用該button
+			\n--]]",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Send by Data",
+						"name":"Button11",
+						"empty":false,
+							"msg":"local data = \"EnterIRdata\"  --Code data
+							\nlocal macAddr = 'b4:43:0d:aa:8e:92'
+							\n--_--_--_--_--_--_--
+							\n
+							\nlocal body = '{\"api_id\":1004,\"mac\": \"'.. macAddr .. '\",\"data\":\"' .. data .. '\"}'
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal ipAddr = fibaro:get(selfId, \"IPAddress\")
+							\nlocal port = fibaro:get(selfId, \"TCPPort\")
+							\nlocal url = '/'
+							\nlocal body = '{\"api_id\":1004,\"mac\": \"'.. macAddr .. '\",\"data\":\"' .. data .. '\"}'
+							\n
+							\nsocket = Net.FHttp( ipAddr, port )
+							\nresponse, status, errorCode = socket:POST( url, body )
+							\nfibaro:debug(response)
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}

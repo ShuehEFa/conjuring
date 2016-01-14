@@ -1,0 +1,153 @@
+{
+	"name":"RM-Bridge(GetCode)",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author Lala
+			\n  @date   105.1.14
+			\n  @brief  RM-Bridge Get Code
+			\n  @note   (1)將收到的data存到global value，並在下次update時清空
+			\n          (2)建立global value \"RM_getCode\"
+			\n          (3)自動update功能預設為關閉，需手動打開   
+			\n          (4)填寫Update Button分隔線以上內容
+			\n          (5)填寫ipAddr，port預設為7474
+			\n--]]
+			\n
+			\nlocal updateTime = 500  --update間隔時間
+			\n
+			\nlocal selfId = fibaro:getSelfId()
+			\n
+			\nlocal isNil
+			\n--local status = fibaro:getValue(selfId, \"ui.Label1.value\")
+			\nif (isNil == nil) then
+			\n  fibaro:debug(\"nil\")
+			\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \"OFF\")
+			\n  isNil = 0
+			\nend
+			\n
+			\nwhile 1 do
+			\n  status = fibaro:getValue(selfId, \"ui.Label1.value\")
+			\n  if (status == \"ON\")  then
+			\n    fibaro:call(selfId, \"pressButton\", \"3\")
+			\n    fibaro:sleep(updateTime)
+			\n    fibaro:debug(\"ok\")
+			\n  end
+			\nend
+			\nfibaro:debug(\"breakWhile\")
+			\n",
+		"ui.Label1.value":"OFF",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Status：",
+						"name":"Label1",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"ON/OFF",
+						"name":"Button21",
+						"empty":false,
+							"msg":"--_--_--_--_--_--_--
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal status = fibaro:getValue(selfId, \"ui.Label1.value\")
+							\n
+							\nif (status == \"ON\") then
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \"OFF\")
+							\nelseif (status == \"OFF\") then
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \"ON\")
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Update",
+						"name":"Button11",
+						"empty":false,
+							"msg":"local macAddr = 'b4:43:0d:aa:8e:92'
+							\nlocal name = \"\"  --Store named code shortcut on bridge(選填)
+							\n--_--_--_--_--_--_--
+							\n
+							\nlocal gGetCode = \"RM_getCode\"
+							\nlocal body = '{\"api_id\":1003,\"mac\": \"'.. macAddr .. '\",\"name\": \"' .. name .. '\"}'
+							\n--local body = '{\"api_id\":1003,\"mac\": \"'.. macAddr .. '\"}'
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal ipAddr = fibaro:get(selfId, \"IPAddress\")
+							\nlocal port = fibaro:get(selfId, \"TCPPort\")
+							\nlocal url = '/'
+							\n
+							\nsocket = Net.FHttp( ipAddr, port )
+							\nresponse, status, errorCode = socket:POST( url, body )
+							\nlocal tResponse = json.decode(response)
+							\nlocal errorCode = tResponse.code
+							\nlocal data = \"\"
+							\n
+							\n
+							\nif (errorCode == 0) then
+							\n  data = tResponse.data
+							\n  fibaro:setGlobal(gGetCode, data)
+							\n  fibaro:debug(data)
+							\nelse
+							\n  fibaro:setGlobal(gGetCode, \"\") 
+							\n  fibaro:debug(errorCode)
+							\nend
+							\n
+							\n--fibaro:setGlobal(gGetCode, \" \")
+							\n
+							\n------------------
+							\n
+							\nlocal body2 = '{\"api_id\":1002,\"mac\": \"'.. macAddr .. '\"}'
+							\n
+							\nsocket2 = Net.FHttp( ipAddr, port )
+							\nresponse2, status2, errorCode2 = socket2:POST( url, body2 )
+							\n--fibaro:debug(response)
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}

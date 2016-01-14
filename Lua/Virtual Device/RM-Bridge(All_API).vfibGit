@@ -1,0 +1,322 @@
+{
+	"name":"RM-Bridge(All API)",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author Lala
+			\n  @date   105.1.13
+			\n  @brief  RM-Bridge所有api(1000~1007)範例
+			\n  @note   (1)填寫ipAddr，port預設為7474
+			\n          (2)分隔線\"--_--_--_--_--_--_--\"以上的欄位必須填寫才能使用該button
+			\n--]]
+			\n
+			\n--[[ API原文說明
+			\nregistered_devices   Returns a list of currently registered devices on the bridge.
+			\nprobe_devices        Updates the list of registered devices of the bridge.
+			\nlearn_code           Sets the RM device into learning mode.
+			\nget_code             Retrieves a learned code from the RM device.
+			\nsend_code            Sends a code to the RM device.
+			\ndelete_code          Deletes a stored code shortcut from the bridge.
+			\nlist_codes           Retrieves the listed of code shortcuts.
+			\nadd_coddes           Adds new code shortcuts to the list of shortcuts.
+			\n--]]",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"registered_devices",
+						"name":"Button31",
+						"empty":false,
+							"msg":"--_--_--_--_--_--_--
+							\n
+							\nlocal body = '{\"api_id\":1000}'
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal ipAddr = fibaro:get(selfId, \"IPAddress\")
+							\nlocal port = fibaro:get(selfId, \"TCPPort\")
+							\nlocal url = '/'
+							\n
+							\nsocket = Net.FHttp( ipAddr, port )
+							\nresponse, status, errorCode = socket:POST( url, body )
+							\nfibaro:debug(response)
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"probe_devices",
+						"name":"Button41",
+						"empty":false,
+							"msg":"--_--_--_--_--_--_--
+							\n
+							\nlocal body = '{\"api_id\":1001}'
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal ipAddr = fibaro:get(selfId, \"IPAddress\")
+							\nlocal port = fibaro:get(selfId, \"TCPPort\")
+							\nlocal url = '/'
+							\n
+							\nsocket = Net.FHttp( ipAddr, port )
+							\nresponse, status, errorCode = socket:POST( url, body )
+							\nfibaro:debug(response)
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"learn_code",
+						"name":"Button51",
+						"empty":false,
+							"msg":"local macAddr = 'b4:43:0d:aa:8e:92'
+							\n--_--_--_--_--_--_--
+							\n
+							\nlocal body = '{\"api_id\":1002,\"mac\": \"'.. macAddr .. '\"}'
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal ipAddr = fibaro:get(selfId, \"IPAddress\")
+							\nlocal port = fibaro:get(selfId, \"TCPPort\")
+							\nlocal url = '/'
+							\n
+							\nsocket = Net.FHttp( ipAddr, port )
+							\nresponse, status, errorCode = socket:POST( url, body )
+							\nfibaro:debug(response)
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"get_code",
+						"name":"Button61",
+						"empty":false,
+							"msg":"local macAddr = 'b4:43:0d:aa:8e:92'
+							\nlocal name = \"\"  --Store named code shortcut on bridge (optional)
+							\n--_--_--_--_--_--_--
+							\n
+							\n--local body = '{\"api_id\":1003,\"mac\": \"'.. macAddr .. '\",\"name\": \"' .. name .. '\"}'
+							\nlocal body = '{\"api_id\":1003,\"mac\": \"'.. macAddr .. '\"}'
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal ipAddr = fibaro:get(selfId, \"IPAddress\")
+							\nlocal port = fibaro:get(selfId, \"TCPPort\")
+							\nlocal url = '/'
+							\n
+							\nsocket = Net.FHttp( ipAddr, port )
+							\nresponse, status, errorCode = socket:POST( url, body )
+							\nfibaro:debug(response)
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":5,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"send_code 1",
+						"name":"Button71",
+						"empty":false,
+							"msg":"local data = \"eeee\"  --Code data
+							\nlocal macAddr = 'b4:43:0d:aa:8e:92'
+							\n--_--_--_--_--_--_--
+							\n
+							\nlocal body = '{\"api_id\":1004,\"mac\": \"'.. macAddr .. '\",\"data\":\"' .. data .. '\"}'
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal ipAddr = fibaro:get(selfId, \"IPAddress\")
+							\nlocal port = fibaro:get(selfId, \"TCPPort\")
+							\nlocal url = '/'
+							\nlocal body = '{\"api_id\":1004,\"mac\": \"'.. macAddr .. '\",\"data\":\"' .. data .. '\"}'
+							\n
+							\nsocket = Net.FHttp( ipAddr, port )
+							\nresponse, status, errorCode = socket:POST( url, body )
+							\nfibaro:debug(response)
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":6,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"send_code 2",
+						"name":"Button81",
+						"empty":false,
+							"msg":"local name = \"flh\"  --Code shortcut stored on bridge
+							\n--_--_--_--_--_--_--
+							\n
+							\nlocal body = '{\"api_id\":1004,\"name\": \"' .. name .. '\"}'
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal ipAddr = fibaro:get(selfId, \"IPAddress\")
+							\nlocal port = fibaro:get(selfId, \"TCPPort\")
+							\nlocal url = '/'
+							\n
+							\nsocket = Net.FHttp( ipAddr, port )
+							\nresponse, status, errorCode = socket:POST( url, body )
+							\nfibaro:debug(response)
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":7,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"delete_code ",
+						"name":"Button91",
+						"empty":false,
+							"msg":"local name = \"test\"
+							\n--_--_--_--_--_--_--
+							\n
+							\nlocal body = '{\"api_id\":1005,\"name\": \"' .. name .. '\"}'
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal ipAddr = fibaro:get(selfId, \"IPAddress\")
+							\nlocal port = fibaro:get(selfId, \"TCPPort\")
+							\nlocal url = '/'
+							\n
+							\nsocket = Net.FHttp( ipAddr, port )
+							\nresponse, status, errorCode = socket:POST( url, body )
+							\nfibaro:debug(response)
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":8,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"list_codes",
+						"name":"Button101",
+						"empty":false,
+							"msg":"--_--_--_--_--_--_--
+							\n
+							\nlocal body = '{\"api_id\":1006}'
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal ipAddr = fibaro:get(selfId, \"IPAddress\")
+							\nlocal port = fibaro:get(selfId, \"TCPPort\")
+							\nlocal url = '/'
+							\n
+							\nsocket = Net.FHttp( ipAddr, port )
+							\nresponse, status, errorCode = socket:POST( url, body )
+							\nfibaro:debug(response)
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":9,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"add_coddes",
+						"name":"Button111",
+						"empty":false,
+							"msg":"--此範例寫法一次只能加入一筆code
+							\nlocal macAddr = \"b4:43:0d:aa:8e:92\"
+							\nlocal name = \"flh\"
+							\nlocal data = \"\"
+							\n--_--_--_--_--_--_--
+							\n
+							\nlocal body = '{\"api_id\":1007,\"list\": [{\"data\":\"'..data..'\",\"mac\": \"'..macAddr..'\",\"name\": \"'..name..'\"}]}'
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal ipAddr = fibaro:get(selfId, \"IPAddress\")
+							\nlocal port = fibaro:get(selfId, \"TCPPort\")
+							\nlocal url = '/'
+							\n
+							\nsocket = Net.FHttp( ipAddr, port )
+							\nresponse, status, errorCode = socket:POST( url, body )
+							\nfibaro:debug(response)
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}
