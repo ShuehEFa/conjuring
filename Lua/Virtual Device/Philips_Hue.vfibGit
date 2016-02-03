@@ -1,0 +1,731 @@
+{
+	"name":"Philips Hue",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":1015,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"------------------------------------取得ID、IP、Port、username
+			\nlocal id=fibaro:getSelfId()
+			\nlocal User = fibaro:getGlobalValue(\"hueuser\");
+			\nlocal IP = fibaro:getValue(id, \"IPAddress\");
+			\nlocal Port = fibaro:getValue(id, \"TCPPort\");
+			\n------------------------------------設定總hue數、hue實際id
+			\n\tlocal hueCon = Net.FHttp(IP,Port)
+			\n\tresponse ,status, errorCode = hueCon:GET('/api/'..User..'/lights/');
+			\n  \tlocal data=json.decode(response)
+			\n\tlocal hue ={};
+			\n\tlocal i=1;
+			\n\tlocal tableLength = 0 ;
+			\n\tfor key , value in pairs( data ) do  ----將table資料中成對的資料抓出來
+			\n  \thue[i]=key;
+			\n  \ti=i+1;
+			\n  \ttableLength = tableLength + 1      ----每抓一筆 資料數+1
+			\n\tend
+			\n\tnum=tableLength 
+			\n\tfibaro:setGlobal(\"hue_num\",num)\t   ----設定全域變數:hue總數
+			\n----------------------------------------------------------------動態更新Status、On、RGB
+			\n\tlocal light=fibaro:getValue(id, \"ui.Label1.value\");---Lable ID
+			\n\tlocal sect=tonumber(light)
+			\n\tif(light==\"all lamp\")then
+			\n    \tlocal state=\"----\"
+			\n  \t\tlocal on=\"----\";
+			\n    \tlocal r=50
+			\n    \tlocal g=50
+			\n    \tlocal b=50
+			\n\t\tfibaro:call(id, \"setProperty\", \"ui.Label2.value\", state)
+			\n  \t\tfibaro:call(id, \"setProperty\", \"ui.Label3.value\", on)
+			\n\telse \t\t
+			\n\t\thueCon = Net.FHttp(IP,Port)
+			\n  \t\tresponse ,status, errorCode = hueCon:GET('/api/'..User..'/lights/'..hue[sect]);
+			\n\t\tdata=json.decode(response)
+			\n\t\tstatus=tonumber(status)
+			\n  \t\t---------------------------------------------------------------status
+			\n\t\tif status < 300 and status > 199 then\t\t\t
+			\n  \t\t\tif data.state.reachable==true then
+			\n   \t\t\tstate=\"Online\"
+			\n      \t\t\tif data.state.on==true then
+			\n        \t\ton=\"True\"
+			\n        \t\telse
+			\n        \t\ton=\"False\"
+			\n        \t\tend
+			\n \t\t\telse
+			\n   \t\t\tstate=\"Offline\"
+			\n   \t\t   \ton=\"----\"
+			\n    \t  \tend
+			\n  \t \telse
+			\n  \t\t  \tstate=\"Offline\"
+			\n  \t\t\ton=\"----\";
+			\n \t\tend
+			\n  \t\tfibaro:call(id, \"setProperty\", \"ui.Label2.value\", state)\t\t
+			\n  \t\tfibaro:call(id, \"setProperty\", \"ui.Label3.value\", on)
+			\n\t\t---------------------------------------------------------------RGB   
+			\n  \t\tlocal h=data.state.hue
+			\n\t\tlocal s=data.state.sat
+			\n\t\tlocal v=data.state.bri
+			\n
+			\n\t\th=h/65535
+			\n\t\ts=s/255
+			\n\t\tv=v/255
+			\n\t\ti = math.floor(h * 6);
+			\n\t\tf = h * 6 - i;
+			\n\t\tp = v * (1 - s);
+			\n\t\tq = v * (1 - f * s);
+			\n\t\tt = v * (1 - (1 - f) * s);
+			\n
+			\n\t\ti = i % 6
+			\n
+			\n\t\tif i == 0 then r, g, b = v, t, p
+			\n\t\telseif i == 1 then r, g, b = q, v, p
+			\n\t\telseif i == 2 then r, g, b = p, v, t
+			\n\t\telseif i == 3 then r, g, b = p, q, v
+			\n\t\telseif i == 4 then r, g, b = t, p, v
+			\n\t\telseif i == 5 then r, g, b = v, p, q
+			\n\t\tend
+			\n
+			\n\t\tr=math.floor(r*100)
+			\n\t\tg=math.floor(g*100)
+			\n\t\tb=math.floor(b*100)
+			\n  \t\t  \t\t \t\t
+			\n  \t\tfibaro:call(id, \"setProperty\", \"ui.R.value\", r)
+			\n\t\tfibaro:call(id, \"setProperty\", \"ui.G.value\", g)
+			\n\t\tfibaro:call(id, \"setProperty\", \"ui.B.value\", b)
+			\n  \t\t
+			\n  \t\tr=tonumber(r)
+			\n  \t\tg=tonumber(g)
+			\n  \t\tb=tonumber(b)
+			\n  \t\t\t\t
+			\n\t\tfibaro:call(id, \"setSlider\", \"R\", r)
+			\n\t\tfibaro:call(id, \"setSlider\", \"G\", g)
+			\n\t\tfibaro:call(id, \"setSlider\", \"B\", b)
+			\n
+			\n\tend
+			\n
+			\n",
+		"ui.B.value":22,
+		"ui.G.value":0,
+		"ui.Label1.value":"16",
+		"ui.Label2.value":"",
+		"ui.Label3.value":"",
+		"ui.R.value":0,
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"ON",
+						"name":"Button11",
+						"empty":false,
+							"msg":"------------------------------------取得ID、IP、Port、username
+							\nid=fibaro:getSelfId()
+							\nUser = fibaro:getGlobalValue(\"hueuser\");
+							\nIP = fibaro:getValue(id, \"IPAddress\");
+							\nPort = fibaro:getValue(id, \"TCPPort\");
+							\n------------------------------------設定總hue數、hue實際id
+							\n\thueCon = Net.FHttp(IP,Port)
+							\n\tresponse ,status, errorCode = hueCon:GET('/api/'..User..'/lights/');
+							\n  \tdata=json.decode(response)
+							\n\thue ={16};
+							\n\ti=1;
+							\n\tnum = 0 ;
+							\n\tfor key , value in pairs( data ) do  ----將table資料中成對的資料抓出來
+							\n  \thue[i]=key;
+							\n  \ti=i+1;
+							\n  \tnum = num + 1      ----每抓一筆 資料數+1
+							\n\tend 
+							\n\t
+							\n\tlight=fibaro:getValue(id, \"ui.Label1.value\");-----取得Light ID值
+							\n\tsect=tonumber(light)
+							\n\thuelighton = \"true\"
+							\n
+							\nif(light==\"all lamp\")then
+							\n\tresponse ,status, errorCode = hueCon:PUT('/api/'..User..'/groups/0/action', '{\"on\":'..huelighton..'}')
+							\nelse \t\t
+							\n\t--response ,status, errorCode = hueCon:PUT('/api/'..User..'/lights/'..hue[sect]..'/state', '{\"on\":'..huelighton..'}')
+							\n    response ,status, errorCode = hueCon:PUT('/api/'..User..'/lights/'.. light ..'/state', '{\"on\":'..huelighton..'}')
+							\nend
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					},
+					{
+						"id":2,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"OFF",
+						"name":"Button12",
+						"empty":false,
+							"msg":"------------------------------------取得ID、IP、Port、username
+							\nid=fibaro:getSelfId()
+							\nUser = fibaro:getGlobalValue(\"hueuser\");
+							\n--User = \"newdeveloper\"
+							\n
+							\nIP = fibaro:getValue(id, \"IPAddress\");
+							\nPort = fibaro:getValue(id, \"TCPPort\");
+							\n------------------------------------設定總hue數、hue實際id
+							\n\thueCon = Net.FHttp(IP,Port)
+							\n\tresponse ,status, errorCode = hueCon:GET('/api/'..User..'/lights/');
+							\n  \tdata=json.decode(response)
+							\n\thue ={};
+							\n\ti=1;
+							\n\tnum = 0 ;
+							\n\tfor key , value in pairs( data ) do  ----將table資料中成對的資料抓出來
+							\n  \thue[i]=key;
+							\n  \ti=i+1;
+							\n  \tnum = num + 1      ----每抓一筆 資料數+1
+							\n\tend 
+							\n\t
+							\n\tlight=fibaro:getValue(id, \"ui.Label1.value\");
+							\n\tsect=tonumber(light)
+							\n\thuelighton = \"false\"
+							\n
+							\nif(light==\"all lamp\")then
+							\n\tresponse ,status, errorCode = hueCon:PUT('/api/'..User..'/groups/0/action', '{\"on\":'..huelighton..'}')
+							\nelse \t\t
+							\n\t--response ,status, errorCode = hueCon:PUT('/api/'..User..'/lights/'..hue[sect]..'/state', '{\"on\":'..huelighton..'}')
+							\n    response ,status, errorCode = hueCon:PUT('/api/'..User..'/lights/'.. light ..'/state', '{\"on\":'..huelighton..'}')
+							\nend
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Lights ID",
+						"name":"Label1",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"-",
+						"name":"Button21",
+						"empty":false,
+							"msg":"local id=fibaro:getSelfId()
+							\nlocal val=fibaro:getValue(id, \"ui.Label1.value\")
+							\nif (val==\"\" or val==\"1\" or val==\"all lamp\") then   
+							\n  \tval=\"all lamp\"
+							\n  \tfibaro:call(id, \"setProperty\", \"ui.R.value\", 50)
+							\n\tfibaro:call(id, \"setProperty\", \"ui.G.value\", 50)
+							\n\tfibaro:call(id, \"setProperty\", \"ui.B.value\", 50)
+							\n\tfibaro:call(id, \"setSlider\", \"R\", 50)
+							\n\tfibaro:call(id, \"setSlider\", \"G\", 50)
+							\n\tfibaro:call(id, \"setSlider\", \"B\", 50)
+							\nelse 
+							\n  val=val-1
+							\nend
+							\nfibaro:call(id, \"setProperty\", \"ui.Label1.value\", val)",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":5,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"+",
+						"name":"Button22",
+						"empty":false,
+							"msg":"local id=fibaro:getSelfId()
+							\nlocal val=fibaro:getValue(id, \"ui.Label1.value\")
+							\nlocal hue_num = fibaro:getGlobalValue(\"hue_num\")
+							\nif (val==\"\") then
+							\n  \tval=\"all lamp\"
+							\nelseif (val==hue_num) then      
+							\n  \tval=hue_num
+							\nelseif (val==\"all lamp\") then
+							\n  \tval=1
+							\nelse 
+							\n  \tval=val+1
+							\nend
+							\nfibaro:call(id, \"setProperty\", \"ui.Label1.value\", val)",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"slider",
+				"elements":
+				[
+					{
+						"id":6,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"R",
+						"name":"R",
+							"msg":"------------------------------------取得ID、IP、Port、username
+							\nid=fibaro:getSelfId()
+							\nUser = fibaro:getGlobalValue(\"hueuser\");
+							\nIP = fibaro:getValue(id, \"IPAddress\");
+							\nPort = fibaro:getValue(id, \"TCPPort\");
+							\n------------------------------------設定總hue數、hue實際id
+							\n\tCon = Net.FHttp(IP,Port)
+							\n\tresponse ,status, errorCode = Con:GET('/api/'..User..'/lights/');
+							\n  \tdata=json.decode(response)
+							\n\trgb ={};
+							\n\ti=1;
+							\n\tnum = 0 ;
+							\n\tfor key , value in pairs( data ) do  ----將table資料中成對的資料抓出來
+							\n  \trgb[i]=key;
+							\n  \ti=i+1;
+							\n  \tnum = num + 1      ----每抓一筆 資料數+1
+							\n\tend 
+							\n
+							\n-----------------------------------------------
+							\nlights=fibaro:getValue(id, \"ui.Label1.value\");
+							\nsect=tonumber(lights)
+							\nhuelighton = \"true\"
+							\n
+							\nr = (fibaro:getValue(id, \"ui.R.value\"))*0.01
+							\ng = (fibaro:getValue(id, \"ui.G.value\"))*0.01
+							\nb = (fibaro:getValue(id, \"ui.B.value\"))*0.01
+							\n
+							\nmax = math.max(r, g, b)
+							\nmin = math.min(r, g, b)
+							\n
+							\nlocal h, s, v
+							\nv = max
+							\n
+							\nlocal d = max - min
+							\nif max == 0 then 
+							\n   s = 0 
+							\nelse 
+							\n  s = d / max 
+							\nend
+							\n
+							\nif max == min then
+							\n    h = 0 -- achromatic
+							\nelse
+							\n    if max == r then
+							\n    \th = (g - b) / d
+							\n    \tif g < b then
+							\n      \th = h + 6 
+							\n    \tend
+							\n    elseif max == g then
+							\n    \th = (b - r) / d + 2
+							\n    elseif max == b then 
+							\n    \th = (r - g) / d + 4
+							\n    end
+							\n    h = h / 6
+							\nend
+							\nh=math.floor(h*65535)
+							\ns=math.floor(s*255)
+							\nv=math.floor(v*255)
+							\n
+							\nif(lights==\"all lamp\")then
+							\n    response ,status, errorCode = Con:PUT('/api/'..User..'/groups/0/action', '{\"on\":'..huelighton..',\"hue\":'..h..',\"sat\":'..s..',\"bri\":'..v..'}')
+							\nelse \t
+							\n  \t--response ,status, errorCode = Con:PUT('/api/'..User..'/lights/'..rgb[sect]..'/state', '{\"on\":'..huelighton..',\"hue\":'..h..',\"sat\":'..s..',\"bri\":'..v..'}')
+							\n    response ,status, errorCode = Con:PUT('/api/'..User..'/lights/'.. lights ..'/state', '{\"on\":'..huelighton..',\"hue\":'..h..',\"sat\":'..s..',\"bri\":'..v..'}')
+							\nend
+							\n",
+						"buttonIcon":0,
+						"value":76,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"slider",
+				"elements":
+				[
+					{
+						"id":7,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"G",
+						"name":"G",
+							"msg":"------------------------------------取得ID、IP、Port、username
+							\nid=fibaro:getSelfId()
+							\nUser = fibaro:getGlobalValue(\"hueuser\");
+							\nIP = fibaro:getValue(id, \"IPAddress\");
+							\nPort = fibaro:getValue(id, \"TCPPort\");
+							\n------------------------------------設定總hue數、hue實際id
+							\n\tCon = Net.FHttp(IP,Port)
+							\n\tresponse ,status, errorCode = Con:GET('/api/'..User..'/lights/');
+							\n  \tdata=json.decode(response)
+							\n\trgb ={};
+							\n\ti=1;
+							\n\tnum = 0 ;
+							\n\tfor key , value in pairs( data ) do  ----將table資料中成對的資料抓出來
+							\n  \trgb[i]=key;
+							\n  \ti=i+1;
+							\n  \tnum = num + 1      ----每抓一筆 資料數+1
+							\n\tend 
+							\n
+							\n-----------------------------------------------
+							\nlights=fibaro:getValue(id, \"ui.Label1.value\");
+							\nsect=tonumber(lights)
+							\nhuelighton = \"true\"
+							\n
+							\nr = (fibaro:getValue(id, \"ui.R.value\"))*0.01
+							\ng = (fibaro:getValue(id, \"ui.G.value\"))*0.01
+							\nb = (fibaro:getValue(id, \"ui.B.value\"))*0.01
+							\n
+							\nmax = math.max(r, g, b)
+							\nmin = math.min(r, g, b)
+							\n
+							\nlocal h, s, v
+							\nv = max
+							\n
+							\nlocal d = max - min
+							\nif max == 0 then 
+							\n   s = 0 
+							\nelse 
+							\n  s = d / max 
+							\nend
+							\n
+							\nif max == min then
+							\n    h = 0 -- achromatic
+							\nelse
+							\n    if max == r then
+							\n    \th = (g - b) / d
+							\n    \tif g < b then
+							\n      \th = h + 6 
+							\n    \tend
+							\n    elseif max == g then
+							\n    \th = (b - r) / d + 2
+							\n    elseif max == b then 
+							\n    \th = (r - g) / d + 4
+							\n    end
+							\n    h = h / 6
+							\nend
+							\nh=math.floor(h*65535)
+							\ns=math.floor(s*255)
+							\nv=math.floor(v*255)
+							\n
+							\nif(lights==\"all lamp\")then
+							\n    response ,status, errorCode = Con:PUT('/api/'..User..'/groups/0/action', '{\"on\":'..huelighton..',\"hue\":'..h..',\"sat\":'..s..',\"bri\":'..v..'}')
+							\nelse \t
+							\n  \t--response ,status, errorCode = Con:PUT('/api/'..User..'/lights/'..rgb[sect]..'/state', '{\"on\":'..huelighton..',\"hue\":'..h..',\"sat\":'..s..',\"bri\":'..v..'}')
+							\n    response ,status, errorCode = Con:PUT('/api/'..User..'/lights/'..lights..'/state', '{\"on\":'..huelighton..',\"hue\":'..h..',\"sat\":'..s..',\"bri\":'..v..'}')
+							\nend
+							\n",
+						"buttonIcon":0,
+						"value":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"slider",
+				"elements":
+				[
+					{
+						"id":8,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"B",
+						"name":"B",
+							"msg":"------------------------------------取得ID、IP、Port、username
+							\nid=fibaro:getSelfId()
+							\nUser = fibaro:getGlobalValue(\"hueuser\");
+							\nIP = fibaro:getValue(id, \"IPAddress\");
+							\nPort = fibaro:getValue(id, \"TCPPort\");
+							\n------------------------------------設定總hue數、hue實際id
+							\n\tCon = Net.FHttp(IP,Port)
+							\n\tresponse ,status, errorCode = Con:GET('/api/'..User..'/lights/');
+							\n  \tdata=json.decode(response)
+							\n\trgb ={};
+							\n\ti=1;
+							\n\tnum = 0 ;
+							\n\tfor key , value in pairs( data ) do  ----將table資料中成對的資料抓出來
+							\n  \trgb[i]=key;
+							\n  \ti=i+1;
+							\n  \tnum = num + 1      ----每抓一筆 資料數+1
+							\n\tend 
+							\n
+							\n-----------------------------------------------
+							\nlights=fibaro:getValue(id, \"ui.Label1.value\");
+							\nsect=tonumber(lights)
+							\nhuelighton = \"true\"
+							\n
+							\nr = (fibaro:getValue(id, \"ui.R.value\"))*0.01
+							\ng = (fibaro:getValue(id, \"ui.G.value\"))*0.01
+							\nb = (fibaro:getValue(id, \"ui.B.value\"))*0.01
+							\n
+							\nmax = math.max(r, g, b)
+							\nmin = math.min(r, g, b)
+							\n
+							\nlocal h, s, v
+							\nv = max
+							\n
+							\nlocal d = max - min
+							\nif max == 0 then 
+							\n   s = 0 
+							\nelse 
+							\n  s = d / max 
+							\nend
+							\n
+							\nif max == min then
+							\n    h = 0 -- achromatic
+							\nelse
+							\n    if max == r then
+							\n    \th = (g - b) / d
+							\n    \tif g < b then
+							\n      \th = h + 6 
+							\n    \tend
+							\n    elseif max == g then
+							\n    \th = (b - r) / d + 2
+							\n    elseif max == b then 
+							\n    \th = (r - g) / d + 4
+							\n    end
+							\n    h = h / 6
+							\nend
+							\nh=math.floor(h*65535)
+							\ns=math.floor(s*255)
+							\nv=math.floor(v*255)
+							\n
+							\nif(lights==\"all lamp\")then
+							\n    response ,status, errorCode = Con:PUT('/api/'..User..'/groups/0/action', '{\"on\":'..huelighton..',\"hue\":'..h..',\"sat\":'..s..',\"bri\":'..v..'}')
+							\nelse \t
+							\n  \t--response ,status, errorCode = Con:PUT('/api/'..User..'/lights/'..rgb[sect]..'/state', '{\"on\":'..huelighton..',\"hue\":'..h..',\"sat\":'..s..',\"bri\":'..v..'}')
+							\n    response ,status, errorCode = Con:PUT('/api/'..User..'/lights/'..lights..'/state', '{\"on\":'..huelighton..',\"hue\":'..h..',\"sat\":'..s..',\"bri\":'..v..'}')
+							\nend
+							\n",
+						"buttonIcon":0,
+						"value":22,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":9,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Colorloop",
+						"name":"Button31",
+						"empty":false,
+							"msg":"------------------------------------取得ID、IP、Port、username
+							\nid=fibaro:getSelfId()
+							\nUser = fibaro:getGlobalValue(\"hueuser\");
+							\nIP = fibaro:getValue(id, \"IPAddress\");
+							\nPort = fibaro:getValue(id, \"TCPPort\");
+							\n------------------------------------設定總hue數、hue實際id
+							\n\thueCon = Net.FHttp(IP,Port)
+							\n\tresponse ,status, errorCode = hueCon:GET('/api/'..User..'/lights/');
+							\n  \tdata=json.decode(response)
+							\n\thue ={};
+							\n\ti=1;
+							\n\tnum = 0 ;
+							\n\tfor key , value in pairs( data ) do  ----將table資料中成對的資料抓出來
+							\n  \thue[i]=key;
+							\n  \ti=i+1;
+							\n  \tnum = num + 1      ----每抓一筆 資料數+1
+							\n\tend 
+							\n
+							\n\tlight=fibaro:getValue(id, \"ui.Label1.value\");
+							\n\tsect=tonumber(light)
+							\n\thuelighton = \"true\"
+							\n
+							\nif(light==\"all lamp\")then
+							\n\tresponse ,status, errorCode = hueCon:PUT('/api/'..User..'/groups/0/action', '{\"effect\":\"colorloop\"}')
+							\nelse \t\t
+							\n  --response ,status, errorCode = hueCon:PUT('/api/'..User..'/lights/'..hue[sect]..'/state', '{\"effect\":\"colorloop\"}')
+							\n  response ,status, errorCode = hueCon:PUT('/api/'..User..'/lights/'..light..'/state', '{\"effect\":\"colorloop\"}')
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":10,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Stop",
+						"name":"Button32",
+						"empty":false,
+							"msg":"------------------------------------取得ID、IP、Port、username
+							\nid=fibaro:getSelfId()
+							\nUser = fibaro:getGlobalValue(\"hueuser\");
+							\nIP = fibaro:getValue(id, \"IPAddress\");
+							\nPort = fibaro:getValue(id, \"TCPPort\");
+							\n------------------------------------設定總hue數、hue實際id
+							\n\thueCon = Net.FHttp(IP,Port)
+							\n\tresponse ,status, errorCode = hueCon:GET('/api/'..User..'/lights/');
+							\n  \tdata=json.decode(response)
+							\n\thue ={};
+							\n\ti=1;
+							\n\tnum = 0 ;
+							\n\tfor key , value in pairs( data ) do  ----將table資料中成對的資料抓出來
+							\n  \thue[i]=key;
+							\n  \ti=i+1;
+							\n  \tnum = num + 1      ----每抓一筆 資料數+1
+							\n\tend 
+							\n\t
+							\n\tlight=fibaro:getValue(id, \"ui.Label1.value\");
+							\n\tsect=tonumber(light)
+							\n\thuelighton = \"true\"
+							\n
+							\nif(light==\"all lamp\")then
+							\n\tresponse ,status, errorCode = hueCon:PUT('/api/'..User..'/groups/0/action', '{\"effect\":\"none\"}')
+							\nelse \t\t
+							\n\t--response ,status, errorCode = hueCon:PUT('/api/'..User..'/lights/'..hue[sect]..'/state', '{\"effect\":\"none\"}')
+							\n    response ,status, errorCode = hueCon:PUT('/api/'..User..'/lights/'..light..'/state', '{\"effect\":\"none\"}')
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":11,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Alert once",
+						"name":"Button41",
+						"empty":false,
+							"msg":"------------------------------------取得ID、IP、Port、username
+							\nid=fibaro:getSelfId()
+							\nUser = fibaro:getGlobalValue(\"hueuser\");
+							\nIP = fibaro:getValue(id, \"IPAddress\");
+							\nPort = fibaro:getValue(id, \"TCPPort\");
+							\n------------------------------------設定總hue數、hue實際id
+							\n\thueCon = Net.FHttp(IP,Port)
+							\n\tresponse ,status, errorCode = hueCon:GET('/api/'..User..'/lights/');
+							\n  \tdata=json.decode(response)
+							\n\thue ={};
+							\n\ti=1;
+							\n\tnum = 0 ;
+							\n\tfor key , value in pairs( data ) do  ----將table資料中成對的資料抓出來
+							\n  \thue[i]=key;
+							\n  \ti=i+1;
+							\n  \tnum = num + 1      ----每抓一筆 資料數+1
+							\n\tend 
+							\n
+							\n\tlight=fibaro:getValue(id, \"ui.Label1.value\");
+							\n\tsect=tonumber(light)
+							\n\thuelighton = \"true\"
+							\n
+							\nif(light==\"all lamp\")then
+							\n  \tresponse ,status, errorCode = hueCon:PUT('/api/'..User..'/groups/0/action', '{\"alert\":\"select\"}')
+							\nelse \t\t
+							\n\t--response ,status, errorCode = hueCon:PUT('/api/'..User..'/lights/'..hue[sect]..'/state', '{\"alert\":\"select\"}')
+							\n    response ,status, errorCode = hueCon:PUT('/api/'..User..'/lights/'..light..'/state', '{\"alert\":\"select\"}')
+							\nend
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":12,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Alert 15 sec",
+						"name":"Button42",
+						"empty":false,
+							"msg":"------------------------------------取得ID、IP、Port、username
+							\nid=fibaro:getSelfId()
+							\nUser = fibaro:getGlobalValue(\"hueuser\");
+							\nIP = fibaro:getValue(id, \"IPAddress\");
+							\nPort = fibaro:getValue(id, \"TCPPort\");
+							\n------------------------------------設定總hue數、hue實際id
+							\n\thueCon = Net.FHttp(IP,Port)
+							\n\tresponse ,status, errorCode = hueCon:GET('/api/'..User..'/lights/');
+							\n  \tdata=json.decode(response)
+							\n\thue ={};
+							\n\ti=1;
+							\n\tnum = 0 ;
+							\n\tfor key , value in pairs( data ) do  ----將table資料中成對的資料抓出來
+							\n  \thue[i]=key;
+							\n  \ti=i+1;
+							\n  \tnum = num + 1      ----每抓一筆 資料數+1
+							\n\tend 
+							\n
+							\n\tlight=fibaro:getValue(id, \"ui.Label1.value\");
+							\n\tsect=tonumber(light)
+							\n\thuelighton = \"true\"
+							\n
+							\nif(light==\"all lamp\")then
+							\n  \tresponse ,status, errorCode = hueCon:PUT('/api/'..User..'/groups/0/action', '{\"alert\":\"lselect\"}')
+							\nelse \t\t
+							\n\t--response ,status, errorCode = hueCon:PUT('/api/'..User..'/lights/'..hue[sect]..'/state', '{\"alert\":\"lselect\"}')
+							\n    response ,status, errorCode = hueCon:PUT('/api/'..User..'/lights/'..light..'/state', '{\"alert\":\"lselect\"}')
+							\nend
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":13,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Lamp status",
+						"name":"Label2",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":14,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Lamp On",
+						"name":"Label3",
+						"favourite":false,
+						"main":false
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}
