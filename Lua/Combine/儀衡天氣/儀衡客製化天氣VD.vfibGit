@@ -1,0 +1,1307 @@
+{
+	"name":" 儀衡客製化天氣VD",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author Lala
+			\n  @date   105.2.4
+			\n  @brief  配合天氣情境使用
+			\n  @note
+			\n    (1) 僅供情境配合及debug用，請勿顯示於一般用戶介面上      
+			\n\t(2) IP Address填寫SONOS IP，TCP Port為1400
+			\n\t(3) 需建5個Global value紀錄日/夜，預設為EH_City1 ~ EH_City5，可自訂名稱但須符合格式：[自訂名稱]1~[自訂名稱]5
+			\n    (4) RGBW需設定progarm，並於燈光顏色情境內填寫對應編號
+			\n\t(5) button填寫說明：
+			\n\t  - Choose City     選擇城市用； 正確填寫City名稱及對應RGBW Id
+			\n\t  - Get Weather     從open weather map網站取得氣象資料； 填寫City數量
+			\n\t  - Sunshine Check  紀錄日/夜； 填寫City數量，填寫Global value自訂名稱(不含數字，例：EH_City)
+			\n\t  - Rain            播放網芳上的下雨音效； mURL填寫正確路徑及檔名
+			\n\t  - Snow            播放網芳上的下雪音效； mURL填寫正確路徑及檔名
+			\n\t  - Ray             播放網芳上的打雷音效； mURL填寫正確路徑及檔名
+			\n\t  - Other           播放網芳上的晴、雲、其他天氣音效； mURL填寫正確路徑及檔名
+			\n\t  - Stop Sound      停止天氣音效； 無須填寫
+			\n\t  - City 5 test     City5填寫假資料測試用； 欲使用此功能main loop需更改debug值\t
+			\n\t(6) Choose City button填寫完需手動按
+			\n--]]
+			\n
+			\n
+			\nlocal debug = 0         --平常請設0，欲使用假資料進行debug時設1
+			\nlocal updateTime = 20   --氣象資料及日夜狀態更新間隔(秒)
+			\n
+			\n--_--_--_--_--
+			\nlocal selfId = fibaro:getSelfId()
+			\n
+			\nwhile 1 do
+			\n  if (debug == 0) then
+			\n    fibaro:call(selfId, \"pressButton\", \"12\")  --取得氣象資料
+			\n  end
+			\n    
+			\n  fibaro:call(selfId, \"pressButton\", \"13\")  --更新日夜狀態
+			\n  fibaro:sleep(updateTime*1000)
+			\nend",
+		"ui.Label1a.value":"damascus，708",
+		"ui.Label1b.value":"
+		{
+			\"sunrise\":1454646503,
+			\"sunset\":1454684978,
+			\"temp\":10,
+			\"weather\":\"Clear\"
+		}",
+		"ui.Label2a.value":"newyork，708",
+		"ui.Label2b.value":"
+		{
+			\"sunrise\":1454673728,
+			\"sunset\":1454710707,
+			\"temp\":5.0400000000000000,
+			\"weather\":\"Rain\"
+		}",
+		"ui.Label3a.value":"taipei，708",
+		"ui.Label3b.value":"
+		{
+			\"sunrise\":1454625297,
+			\"sunset\":1454665261,
+			\"temp\":13.940000000000000,
+			\"weather\":\"Rain\"
+		}",
+		"ui.Label4a.value":"houston，708",
+		"ui.Label4b.value":"
+		{
+			\"sunrise\":1454677733,
+			\"sunset\":1454716941,
+			\"temp\":3.5499999999999998,
+			\"weather\":\"Clear\"
+		}",
+		"ui.Label5a.value":"beijing，708",
+		"ui.Label5b.value":"
+		{
+			\"sunrise\":1454627969,
+			\"sunset\":1454665063,
+			\"temp\":2,
+			\"weather\":\"Clear\"
+		}",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"City 1:",
+						"name":"Label1a",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Condition:",
+						"name":"Label1b",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"City 2:",
+						"name":"Label2a",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Condition:",
+						"name":"Label2b",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":5,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"City 3:",
+						"name":"Label3a",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":6,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Condition:",
+						"name":"Label3b",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":7,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"City 4:",
+						"name":"Label4a",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":8,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Condition:",
+						"name":"Label4b",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":9,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"City 5:",
+						"name":"Label5a",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":10,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Condition:",
+						"name":"Label5b",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":11,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Choose City",
+						"name":"Button00",
+						"empty":false,
+							"msg":"local city = 
+							\n{ 
+							\n  {name = \"damascus\", light = \"708\"},
+							\n  {name = \"newyork\", light = \"708\"},
+							\n  {name = \"taipei\", light = \"708\"},
+							\n  {name = \"houston\", light = \"708\"},
+							\n  {name = \"beijing\", light = \"708\"}
+							\n}
+							\n
+							\n--_--_--_--_--
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nfor i = 1, 5 do
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label\" .. i ..\"a.value\" , city[i].name .. \"，\" .. city[i].light)
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":12,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Get Weather",
+						"name":"Button01",
+						"empty":false,
+							"msg":"local cityAmount = 5    --City數量
+							\n
+							\n--_--_--_--_--
+							\nlocal ipAddr = \"api.openweathermap.org\"
+							\nlocal appid = \"3b1d9fd2d3f4b8013e22a3f61848a8c6\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nlocal city = {}
+							\nlocal name = {}
+							\nlocal condition = {}
+							\nlocal weather = {}
+							\nlocal temp = {}
+							\nlocal sunrise = {}
+							\nlocal sunset = {}
+							\n
+							\nlocal time = os.time()
+							\nfibaro:debug(time)
+							\n
+							\nfor i = 1, cityAmount do
+							\n  city[i] = fibaro:getValue(selfId, \"ui.Label\" .. i .. \"a.value\" )
+							\n  name[i] = string.match(city[i], \"(.+)，\")
+							\n  
+							\n  url = \"/data/2.5/weather?q=\" .. name[i] .. \"&units=metric&appid=\" .. appid
+							\n  socket = Net.FHttp( ipAddr )
+							\n  response, status, errorCode = socket:GET( url )
+							\n  
+							\n  tResponse = json.decode(response)
+							\n  
+							\n  weather[i] = tResponse.weather[1].main 
+							\n  temp[i] = tResponse.main.temp
+							\n  sunrise[i] = tResponse.sys.sunrise
+							\n  sunset[i] = tResponse.sys.sunset
+							\n  
+							\n  condition[i] = { weather = weather[i], temp = temp[i], sunrise = sunrise[i], sunset = sunset[i] }
+							\n  
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label\" .. i .. \"b.value\", json.encode(condition[i]))
+							\n  
+							\n  fibaro:debug(name[i])
+							\n--  fibaro:debug(json.encode(condition[i]))
+							\n  
+							\n--  fibaro:debug( \"weather\" .. i .. \"= \" .. weather[i] )
+							\n--  fibaro:debug( \"temp\" .. i .. \"= \" .. temp[i] )
+							\n--  fibaro:debug( \"sunrise\" .. i .. \"= \" .. sunrise[i] )
+							\n--  fibaro:debug( \"sunset\" .. i .. \"= \" .. sunset[i] )
+							\n  
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":13,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Sunshine Check",
+						"name":"Button91",
+						"empty":false,
+							"msg":"--[[
+							\n確認日/夜
+							\n--]]
+							\n
+							\nlocal cityAmount = 5       --City數量
+							\nlocal gGlobal = \"EH_City\"  --Global命名
+							\n
+							\nselfId = fibaro:getSelfId()
+							\n
+							\nlocal currentTime = os.time()
+							\n
+							\nfor i = 1, cityAmount do
+							\n  condition = fibaro:getValue(selfId, \"ui.Label\" .. i .. \"b.value\")    --取得天氣狀況  
+							\n  tCondition = json.decode(condition) 
+							\n  sunriseTime = tCondition.sunrise
+							\n  sunsetTime = tCondition.sunset
+							\n  
+							\n  if (sunriseTime < sunsetTime) then
+							\n    if (os.time() > sunriseTime) and (os.time() < sunsetTime) then
+							\n      fibaro:setGlobal(gGlobal .. i , \"rise\")
+							\n      fibaro:debug(\"現在是白天，\" .. i .. \" rise\")
+							\n    else
+							\n      fibaro:setGlobal(gGlobal .. i , \"set\")
+							\n      fibaro:debug(\"現在是夜間，\" .. i .. \" set\")
+							\n    end
+							\n
+							\n  elseif (sunriseTime > sunsetTime ) then 
+							\n    if (os.time() > sunsetTime) and (os.time() < sunriseTime) then
+							\n      fibaro:setGlobal(gGlobal .. i , \"set\")
+							\n\t  fibaro:debug(\"現在是夜間，\" .. i .. \" set\")
+							\n    else
+							\n      fibaro:setGlobal(gGlobal .. i , \"rise\")
+							\n      fibaro:debug(\"現在是白天，\" .. i .. \" rise\")
+							\n    end
+							\n  end 
+							\n
+							\nend
+							\n 
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":14,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Rain",
+						"name":"Button511",
+						"empty":false,
+							"msg":"-- 語音位置
+							\nlocal mURL = \"LALA-SURFACE/Users/lalatest/rain.mp3\"
+							\n--local mURL = \"flh-temppi/share/playlist.m3u\"
+							\n-- 音量
+							\nlocal mVol = 20
+							\n
+							\nlocal mId = fibaro:getSelfId()
+							\nlocal mIp = fibaro:get( mId , \"IPAddress\" )
+							\nlocal mPort = fibaro:get( mId , \"TCPPort\" )
+							\n
+							\nfunction ReponseCallback( _fnc , _args )
+							\n  if _fnc == nil then
+							\n    return nil
+							\n  end
+							\n  return _fnc( _args )
+							\nend
+							\n
+							\nfunction CreateSocket()
+							\n    -- Check IP and PORT before
+							\n  if ( mIp == nil or mPort == nil) then
+							\n    fibaro:debug( \"You must configure IPAddress and TCPPort first\" )
+							\n    return
+							\n  end
+							\n  local socket
+							\n  local status , err = pcall(
+							\n    function() 
+							\n      socket = Net.FTcpSocket( mIp , mPort )
+							\n      socket:setReadTimeout( 5000 )
+							\n    end )  
+							\n  if status ~= nil and status ~= true then
+							\n    fibaro:debug( \"socket status: \" .. tostring( status or \"\" ) )
+							\n  end  
+							\n  if err ~= nil then
+							\n    fibaro:debug( \"socket err: \" .. tostring( err or \"\" ) )
+							\n    return;
+							\n  end
+							\n  return socket
+							\nend
+							\n
+							\nfunction DisposeSocket( _socket )
+							\n  if _socket ~= nil then
+							\n    _socket:disconnect()
+							\n    _socket = nil
+							\n    return true
+							\n  end
+							\n  return false
+							\nend
+							\n
+							\nfunction SendSoapMessage( _url , _service , _action , _args , _callback , _retry )
+							\n  local socket = CreateSocket()
+							\n  if socket == nil then
+							\n    return
+							\n  end
+							\n  retry = retry or 0
+							\n  -- prepare data
+							\n  local url = \"POST \" .. _url .. \" HTTP/1.1\"
+							\n  local soapaction = \"SOAPACTION: \\\"\" .. _service .. \"#\" .. _action.name .. \"\\\"\"
+							\n  local body = string.format( \"<u:%s xmlns:u=\\\"%s\\\">%s</u:%s>\" , _action.name , _action.service , tostring( _args or \"\" ) , _action.name )
+							\n  local envelope = \"<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\"?><s:Envelope xmlns:s=\\\"http://schemas.xmlsoap.org/soap/envelope/\\\" s:encodingStyle=\\\"http://schemas.xmlsoap.org/soap/encoding/\\\"><s:Body>\" .. body .. \"</s:Body></s:Envelope>\"
+							\n  local ctl = \"Content-Length: \" .. string.len( envelope )
+							\n  local payload = url .. \"\\r\
+							\n\" .. ctl .. \"\\r\
+							\n\" .. soapaction .. \"\\r\
+							\n\" .. \"\\r\
+							\n\" .. envelope
+							\n  -- write data
+							\n  local bytes , errorcode = socket:write( payload )
+							\n  if errorcode == 0 then
+							\n    local state , errorcode = socket:read()
+							\n    if errorcode == 0 then
+							\n      if string.len( state or \"\" ) > 0 then
+							\n        -- callback
+							\n        if _callback ~= nil then
+							\n          ReponseCallback( _callback , state )
+							\n        end
+							\n        -- dispose ...
+							\n        DisposeSocket( socket )
+							\n        return true
+							\n      else
+							\n        fibaro:debug( \"Error: Invalid response. response length: \" .. string.len( state or \"\" ) )
+							\n      end
+							\n    else      
+							\n      if _retry < 5 then
+							\n        fibaro:debug( \"retry #\" .. _retry .. \" action: \" .. _action.name )
+							\n        return SendSoapMessage( _url , _service , _action , _args , _callback, _retry + 1 )
+							\n      else
+							\n        fibaro:debug( \"Error: Code returned \" .. tostring( errorcode or \"\" ) )
+							\n      end
+							\n    end
+							\n  elseif errorcode == 2 then
+							\n    fibaro:debug( \"Error: You must check your IP and PORT settings.\" )
+							\n  else
+							\n    if _retry < 5 then
+							\n      fibaro:debug( \"retry #\" .. retry .. \" action: \" .. action.name )
+							\n      return SendSoapMessage( _url , _service , _action , _args , _callback , _retry + 1 )
+							\n    else
+							\n      fibaro:debug( \"Error: Code returned \" .. tostring( errorcode or \"\" ) )
+							\n    end
+							\n  end  
+							\n  -- dispose ...
+							\n  DisposeSocket(socket)
+							\n  -- default response
+							\n  return false
+							\nend
+							\n
+							\nfunction UnMute()
+							\n  return SendSoapMessage(
+							\n    -- control url
+							\n    \"/MediaRenderer/RenderingControl/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:RenderingControl:1\" ,
+							\n    -- action
+							\n    { name = \"SetMute\" , service = \"urn:schemas-upnp-org:service:RenderingControl:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID><Channel>Master</Channel><DesiredMute>0</DesiredMute>\" ,
+							\n      -- callback (options)
+							\n    function( response )
+							\n      fibaro:debug( \"unMute sent\" )
+							\n    end ) 
+							\nend
+							\n
+							\nfunction Play()
+							\n  return SendSoapMessage(
+							\n    -- control url
+							\n    \"/MediaRenderer/AVTransport/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:AVTransport:1\" ,
+							\n    -- action
+							\n    { name = \"Play\" , service = \"urn:schemas-upnp-org:service:AVTransport:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID><Speed>1</Speed>\" ,
+							\n      -- callback (options)
+							\n    function( response )   
+							\n      fibaro:debug( \"Play\" )
+							\n    end )
+							\nend
+							\n
+							\nfunction SetVolume( _vol )
+							\n  return SendSoapMessage(
+							\n    -- control url
+							\n    \"/MediaRenderer/RenderingControl/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:RenderingControl:1\" ,
+							\n    -- action
+							\n    { name = \"SetVolume\" , service = \"urn:schemas-upnp-org:service:RenderingControl:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID><Channel>Master</Channel><DesiredVolume>\" .. tostring( _vol ) .. \"</DesiredVolume>\" ,
+							\n    -- callback (options)
+							\n    function( response )      
+							\n      fibaro:debug( \"Volume set: \" .. _vol )
+							\n    end )
+							\nend
+							\n
+							\nfunction PlayMusic( _url , _vol )
+							\n  return SendSoapMessage(  
+							\n    -- control url
+							\n    \"/MediaRenderer/AVTransport/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:AVTransport:1\" ,
+							\n    -- action
+							\n    { name = \"SetAVTransportURI\" , service = \"urn:schemas-upnp-org:service:AVTransport:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID>,<CurrentURI>x-file-cifs://\" .. _url .. \"</CurrentURI>,<CurrentURIMetaData></CurrentURIMetaData>\" ,
+							\n    -- callback (options)
+							\n    function( response )
+							\n      UnMute()
+							\n      SetVolume( _vol )
+							\n      Play()
+							\n
+							\n    end )
+							\nend
+							\n
+							\nPlayMusic( mURL , mVol )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":15,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Snow",
+						"name":"Button521",
+						"empty":false,
+							"msg":"-- 語音位置
+							\nlocal mURL = \"LALA-SURFACE/Users/lalatest/snow.mp3\"
+							\n--local mURL = \"flh-temppi/share/playlist.m3u\"
+							\n-- 音量
+							\nlocal mVol = 20
+							\n
+							\nlocal mId = fibaro:getSelfId()
+							\nlocal mIp = fibaro:get( mId , \"IPAddress\" )
+							\nlocal mPort = fibaro:get( mId , \"TCPPort\" )
+							\n
+							\nfunction ReponseCallback( _fnc , _args )
+							\n  if _fnc == nil then
+							\n    return nil
+							\n  end
+							\n  return _fnc( _args )
+							\nend
+							\n
+							\nfunction CreateSocket()
+							\n    -- Check IP and PORT before
+							\n  if ( mIp == nil or mPort == nil) then
+							\n    fibaro:debug( \"You must configure IPAddress and TCPPort first\" )
+							\n    return
+							\n  end
+							\n  local socket
+							\n  local status , err = pcall(
+							\n    function() 
+							\n      socket = Net.FTcpSocket( mIp , mPort )
+							\n      socket:setReadTimeout( 5000 )
+							\n    end )  
+							\n  if status ~= nil and status ~= true then
+							\n    fibaro:debug( \"socket status: \" .. tostring( status or \"\" ) )
+							\n  end  
+							\n  if err ~= nil then
+							\n    fibaro:debug( \"socket err: \" .. tostring( err or \"\" ) )
+							\n    return;
+							\n  end
+							\n  return socket
+							\nend
+							\n
+							\nfunction DisposeSocket( _socket )
+							\n  if _socket ~= nil then
+							\n    _socket:disconnect()
+							\n    _socket = nil
+							\n    return true
+							\n  end
+							\n  return false
+							\nend
+							\n
+							\nfunction SendSoapMessage( _url , _service , _action , _args , _callback , _retry )
+							\n  local socket = CreateSocket()
+							\n  if socket == nil then
+							\n    return
+							\n  end
+							\n  retry = retry or 0
+							\n  -- prepare data
+							\n  local url = \"POST \" .. _url .. \" HTTP/1.1\"
+							\n  local soapaction = \"SOAPACTION: \\\"\" .. _service .. \"#\" .. _action.name .. \"\\\"\"
+							\n  local body = string.format( \"<u:%s xmlns:u=\\\"%s\\\">%s</u:%s>\" , _action.name , _action.service , tostring( _args or \"\" ) , _action.name )
+							\n  local envelope = \"<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\"?><s:Envelope xmlns:s=\\\"http://schemas.xmlsoap.org/soap/envelope/\\\" s:encodingStyle=\\\"http://schemas.xmlsoap.org/soap/encoding/\\\"><s:Body>\" .. body .. \"</s:Body></s:Envelope>\"
+							\n  local ctl = \"Content-Length: \" .. string.len( envelope )
+							\n  local payload = url .. \"\\r\
+							\n\" .. ctl .. \"\\r\
+							\n\" .. soapaction .. \"\\r\
+							\n\" .. \"\\r\
+							\n\" .. envelope
+							\n  -- write data
+							\n  local bytes , errorcode = socket:write( payload )
+							\n  if errorcode == 0 then
+							\n    local state , errorcode = socket:read()
+							\n    if errorcode == 0 then
+							\n      if string.len( state or \"\" ) > 0 then
+							\n        -- callback
+							\n        if _callback ~= nil then
+							\n          ReponseCallback( _callback , state )
+							\n        end
+							\n        -- dispose ...
+							\n        DisposeSocket( socket )
+							\n        return true
+							\n      else
+							\n        fibaro:debug( \"Error: Invalid response. response length: \" .. string.len( state or \"\" ) )
+							\n      end
+							\n    else      
+							\n      if _retry < 5 then
+							\n        fibaro:debug( \"retry #\" .. _retry .. \" action: \" .. _action.name )
+							\n        return SendSoapMessage( _url , _service , _action , _args , _callback, _retry + 1 )
+							\n      else
+							\n        fibaro:debug( \"Error: Code returned \" .. tostring( errorcode or \"\" ) )
+							\n      end
+							\n    end
+							\n  elseif errorcode == 2 then
+							\n    fibaro:debug( \"Error: You must check your IP and PORT settings.\" )
+							\n  else
+							\n    if _retry < 5 then
+							\n      fibaro:debug( \"retry #\" .. retry .. \" action: \" .. action.name )
+							\n      return SendSoapMessage( _url , _service , _action , _args , _callback , _retry + 1 )
+							\n    else
+							\n      fibaro:debug( \"Error: Code returned \" .. tostring( errorcode or \"\" ) )
+							\n    end
+							\n  end  
+							\n  -- dispose ...
+							\n  DisposeSocket(socket)
+							\n  -- default response
+							\n  return false
+							\nend
+							\n
+							\nfunction UnMute()
+							\n  return SendSoapMessage(
+							\n    -- control url
+							\n    \"/MediaRenderer/RenderingControl/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:RenderingControl:1\" ,
+							\n    -- action
+							\n    { name = \"SetMute\" , service = \"urn:schemas-upnp-org:service:RenderingControl:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID><Channel>Master</Channel><DesiredMute>0</DesiredMute>\" ,
+							\n      -- callback (options)
+							\n    function( response )
+							\n      fibaro:debug( \"unMute sent\" )
+							\n    end ) 
+							\nend
+							\n
+							\nfunction Play()
+							\n  return SendSoapMessage(
+							\n    -- control url
+							\n    \"/MediaRenderer/AVTransport/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:AVTransport:1\" ,
+							\n    -- action
+							\n    { name = \"Play\" , service = \"urn:schemas-upnp-org:service:AVTransport:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID><Speed>1</Speed>\" ,
+							\n      -- callback (options)
+							\n    function( response )   
+							\n      fibaro:debug( \"Play\" )
+							\n    end )
+							\nend
+							\n
+							\nfunction SetVolume( _vol )
+							\n  return SendSoapMessage(
+							\n    -- control url
+							\n    \"/MediaRenderer/RenderingControl/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:RenderingControl:1\" ,
+							\n    -- action
+							\n    { name = \"SetVolume\" , service = \"urn:schemas-upnp-org:service:RenderingControl:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID><Channel>Master</Channel><DesiredVolume>\" .. tostring( _vol ) .. \"</DesiredVolume>\" ,
+							\n    -- callback (options)
+							\n    function( response )      
+							\n      fibaro:debug( \"Volume set: \" .. _vol )
+							\n    end )
+							\nend
+							\n
+							\nfunction PlayMusic( _url , _vol )
+							\n  return SendSoapMessage(  
+							\n    -- control url
+							\n    \"/MediaRenderer/AVTransport/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:AVTransport:1\" ,
+							\n    -- action
+							\n    { name = \"SetAVTransportURI\" , service = \"urn:schemas-upnp-org:service:AVTransport:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID>,<CurrentURI>x-file-cifs://\" .. _url .. \"</CurrentURI>,<CurrentURIMetaData></CurrentURIMetaData>\" ,
+							\n    -- callback (options)
+							\n    function( response )
+							\n      UnMute()
+							\n      SetVolume( _vol )
+							\n      Play()
+							\n
+							\n    end )
+							\nend
+							\n
+							\nPlayMusic( mURL , mVol )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":16,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Ray",
+						"name":"Button531",
+						"empty":false,
+							"msg":"-- 語音位置
+							\nlocal mURL = \"LALA-SURFACE/Users/lalatest/thunder.mp3\"
+							\n--local mURL = \"flh-temppi/share/playlist.m3u\"
+							\n-- 音量
+							\nlocal mVol = 20
+							\n
+							\nlocal mId = fibaro:getSelfId()
+							\nlocal mIp = fibaro:get( mId , \"IPAddress\" )
+							\nlocal mPort = fibaro:get( mId , \"TCPPort\" )
+							\n
+							\nfunction ReponseCallback( _fnc , _args )
+							\n  if _fnc == nil then
+							\n    return nil
+							\n  end
+							\n  return _fnc( _args )
+							\nend
+							\n
+							\nfunction CreateSocket()
+							\n    -- Check IP and PORT before
+							\n  if ( mIp == nil or mPort == nil) then
+							\n    fibaro:debug( \"You must configure IPAddress and TCPPort first\" )
+							\n    return
+							\n  end
+							\n  local socket
+							\n  local status , err = pcall(
+							\n    function() 
+							\n      socket = Net.FTcpSocket( mIp , mPort )
+							\n      socket:setReadTimeout( 5000 )
+							\n    end )  
+							\n  if status ~= nil and status ~= true then
+							\n    fibaro:debug( \"socket status: \" .. tostring( status or \"\" ) )
+							\n  end  
+							\n  if err ~= nil then
+							\n    fibaro:debug( \"socket err: \" .. tostring( err or \"\" ) )
+							\n    return;
+							\n  end
+							\n  return socket
+							\nend
+							\n
+							\nfunction DisposeSocket( _socket )
+							\n  if _socket ~= nil then
+							\n    _socket:disconnect()
+							\n    _socket = nil
+							\n    return true
+							\n  end
+							\n  return false
+							\nend
+							\n
+							\nfunction SendSoapMessage( _url , _service , _action , _args , _callback , _retry )
+							\n  local socket = CreateSocket()
+							\n  if socket == nil then
+							\n    return
+							\n  end
+							\n  retry = retry or 0
+							\n  -- prepare data
+							\n  local url = \"POST \" .. _url .. \" HTTP/1.1\"
+							\n  local soapaction = \"SOAPACTION: \\\"\" .. _service .. \"#\" .. _action.name .. \"\\\"\"
+							\n  local body = string.format( \"<u:%s xmlns:u=\\\"%s\\\">%s</u:%s>\" , _action.name , _action.service , tostring( _args or \"\" ) , _action.name )
+							\n  local envelope = \"<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\"?><s:Envelope xmlns:s=\\\"http://schemas.xmlsoap.org/soap/envelope/\\\" s:encodingStyle=\\\"http://schemas.xmlsoap.org/soap/encoding/\\\"><s:Body>\" .. body .. \"</s:Body></s:Envelope>\"
+							\n  local ctl = \"Content-Length: \" .. string.len( envelope )
+							\n  local payload = url .. \"\\r\
+							\n\" .. ctl .. \"\\r\
+							\n\" .. soapaction .. \"\\r\
+							\n\" .. \"\\r\
+							\n\" .. envelope
+							\n  -- write data
+							\n  local bytes , errorcode = socket:write( payload )
+							\n  if errorcode == 0 then
+							\n    local state , errorcode = socket:read()
+							\n    if errorcode == 0 then
+							\n      if string.len( state or \"\" ) > 0 then
+							\n        -- callback
+							\n        if _callback ~= nil then
+							\n          ReponseCallback( _callback , state )
+							\n        end
+							\n        -- dispose ...
+							\n        DisposeSocket( socket )
+							\n        return true
+							\n      else
+							\n        fibaro:debug( \"Error: Invalid response. response length: \" .. string.len( state or \"\" ) )
+							\n      end
+							\n    else      
+							\n      if _retry < 5 then
+							\n        fibaro:debug( \"retry #\" .. _retry .. \" action: \" .. _action.name )
+							\n        return SendSoapMessage( _url , _service , _action , _args , _callback, _retry + 1 )
+							\n      else
+							\n        fibaro:debug( \"Error: Code returned \" .. tostring( errorcode or \"\" ) )
+							\n      end
+							\n    end
+							\n  elseif errorcode == 2 then
+							\n    fibaro:debug( \"Error: You must check your IP and PORT settings.\" )
+							\n  else
+							\n    if _retry < 5 then
+							\n      fibaro:debug( \"retry #\" .. retry .. \" action: \" .. action.name )
+							\n      return SendSoapMessage( _url , _service , _action , _args , _callback , _retry + 1 )
+							\n    else
+							\n      fibaro:debug( \"Error: Code returned \" .. tostring( errorcode or \"\" ) )
+							\n    end
+							\n  end  
+							\n  -- dispose ...
+							\n  DisposeSocket(socket)
+							\n  -- default response
+							\n  return false
+							\nend
+							\n
+							\nfunction UnMute()
+							\n  return SendSoapMessage(
+							\n    -- control url
+							\n    \"/MediaRenderer/RenderingControl/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:RenderingControl:1\" ,
+							\n    -- action
+							\n    { name = \"SetMute\" , service = \"urn:schemas-upnp-org:service:RenderingControl:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID><Channel>Master</Channel><DesiredMute>0</DesiredMute>\" ,
+							\n      -- callback (options)
+							\n    function( response )
+							\n      fibaro:debug( \"unMute sent\" )
+							\n    end ) 
+							\nend
+							\n
+							\nfunction Play()
+							\n  return SendSoapMessage(
+							\n    -- control url
+							\n    \"/MediaRenderer/AVTransport/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:AVTransport:1\" ,
+							\n    -- action
+							\n    { name = \"Play\" , service = \"urn:schemas-upnp-org:service:AVTransport:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID><Speed>1</Speed>\" ,
+							\n      -- callback (options)
+							\n    function( response )   
+							\n      fibaro:debug( \"Play\" )
+							\n    end )
+							\nend
+							\n
+							\nfunction SetVolume( _vol )
+							\n  return SendSoapMessage(
+							\n    -- control url
+							\n    \"/MediaRenderer/RenderingControl/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:RenderingControl:1\" ,
+							\n    -- action
+							\n    { name = \"SetVolume\" , service = \"urn:schemas-upnp-org:service:RenderingControl:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID><Channel>Master</Channel><DesiredVolume>\" .. tostring( _vol ) .. \"</DesiredVolume>\" ,
+							\n    -- callback (options)
+							\n    function( response )      
+							\n      fibaro:debug( \"Volume set: \" .. _vol )
+							\n    end )
+							\nend
+							\n
+							\nfunction PlayMusic( _url , _vol )
+							\n  return SendSoapMessage(  
+							\n    -- control url
+							\n    \"/MediaRenderer/AVTransport/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:AVTransport:1\" ,
+							\n    -- action
+							\n    { name = \"SetAVTransportURI\" , service = \"urn:schemas-upnp-org:service:AVTransport:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID>,<CurrentURI>x-file-cifs://\" .. _url .. \"</CurrentURI>,<CurrentURIMetaData></CurrentURIMetaData>\" ,
+							\n    -- callback (options)
+							\n    function( response )
+							\n      UnMute()
+							\n      SetVolume( _vol )
+							\n      Play()
+							\n
+							\n    end )
+							\nend
+							\n
+							\nPlayMusic( mURL , mVol )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":17,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Other",
+						"name":"Button541",
+						"empty":false,
+							"msg":"-- 語音位置
+							\nlocal mURL = \"LALA-SURFACE/Users/lalatest/clear.mp3\"
+							\n--local mURL = \"flh-temppi/share/playlist.m3u\"
+							\n-- 音量
+							\nlocal mVol = 20
+							\n
+							\nlocal mId = fibaro:getSelfId()
+							\nlocal mIp = fibaro:get( mId , \"IPAddress\" )
+							\nlocal mPort = fibaro:get( mId , \"TCPPort\" )
+							\n
+							\nfunction ReponseCallback( _fnc , _args )
+							\n  if _fnc == nil then
+							\n    return nil
+							\n  end
+							\n  return _fnc( _args )
+							\nend
+							\n
+							\nfunction CreateSocket()
+							\n    -- Check IP and PORT before
+							\n  if ( mIp == nil or mPort == nil) then
+							\n    fibaro:debug( \"You must configure IPAddress and TCPPort first\" )
+							\n    return
+							\n  end
+							\n  local socket
+							\n  local status , err = pcall(
+							\n    function() 
+							\n      socket = Net.FTcpSocket( mIp , mPort )
+							\n      socket:setReadTimeout( 5000 )
+							\n    end )  
+							\n  if status ~= nil and status ~= true then
+							\n    fibaro:debug( \"socket status: \" .. tostring( status or \"\" ) )
+							\n  end  
+							\n  if err ~= nil then
+							\n    fibaro:debug( \"socket err: \" .. tostring( err or \"\" ) )
+							\n    return;
+							\n  end
+							\n  return socket
+							\nend
+							\n
+							\nfunction DisposeSocket( _socket )
+							\n  if _socket ~= nil then
+							\n    _socket:disconnect()
+							\n    _socket = nil
+							\n    return true
+							\n  end
+							\n  return false
+							\nend
+							\n
+							\nfunction SendSoapMessage( _url , _service , _action , _args , _callback , _retry )
+							\n  local socket = CreateSocket()
+							\n  if socket == nil then
+							\n    return
+							\n  end
+							\n  retry = retry or 0
+							\n  -- prepare data
+							\n  local url = \"POST \" .. _url .. \" HTTP/1.1\"
+							\n  local soapaction = \"SOAPACTION: \\\"\" .. _service .. \"#\" .. _action.name .. \"\\\"\"
+							\n  local body = string.format( \"<u:%s xmlns:u=\\\"%s\\\">%s</u:%s>\" , _action.name , _action.service , tostring( _args or \"\" ) , _action.name )
+							\n  local envelope = \"<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\"?><s:Envelope xmlns:s=\\\"http://schemas.xmlsoap.org/soap/envelope/\\\" s:encodingStyle=\\\"http://schemas.xmlsoap.org/soap/encoding/\\\"><s:Body>\" .. body .. \"</s:Body></s:Envelope>\"
+							\n  local ctl = \"Content-Length: \" .. string.len( envelope )
+							\n  local payload = url .. \"\\r\
+							\n\" .. ctl .. \"\\r\
+							\n\" .. soapaction .. \"\\r\
+							\n\" .. \"\\r\
+							\n\" .. envelope
+							\n  -- write data
+							\n  local bytes , errorcode = socket:write( payload )
+							\n  if errorcode == 0 then
+							\n    local state , errorcode = socket:read()
+							\n    if errorcode == 0 then
+							\n      if string.len( state or \"\" ) > 0 then
+							\n        -- callback
+							\n        if _callback ~= nil then
+							\n          ReponseCallback( _callback , state )
+							\n        end
+							\n        -- dispose ...
+							\n        DisposeSocket( socket )
+							\n        return true
+							\n      else
+							\n        fibaro:debug( \"Error: Invalid response. response length: \" .. string.len( state or \"\" ) )
+							\n      end
+							\n    else      
+							\n      if _retry < 5 then
+							\n        fibaro:debug( \"retry #\" .. _retry .. \" action: \" .. _action.name )
+							\n        return SendSoapMessage( _url , _service , _action , _args , _callback, _retry + 1 )
+							\n      else
+							\n        fibaro:debug( \"Error: Code returned \" .. tostring( errorcode or \"\" ) )
+							\n      end
+							\n    end
+							\n  elseif errorcode == 2 then
+							\n    fibaro:debug( \"Error: You must check your IP and PORT settings.\" )
+							\n  else
+							\n    if _retry < 5 then
+							\n      fibaro:debug( \"retry #\" .. retry .. \" action: \" .. action.name )
+							\n      return SendSoapMessage( _url , _service , _action , _args , _callback , _retry + 1 )
+							\n    else
+							\n      fibaro:debug( \"Error: Code returned \" .. tostring( errorcode or \"\" ) )
+							\n    end
+							\n  end  
+							\n  -- dispose ...
+							\n  DisposeSocket(socket)
+							\n  -- default response
+							\n  return false
+							\nend
+							\n
+							\nfunction UnMute()
+							\n  return SendSoapMessage(
+							\n    -- control url
+							\n    \"/MediaRenderer/RenderingControl/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:RenderingControl:1\" ,
+							\n    -- action
+							\n    { name = \"SetMute\" , service = \"urn:schemas-upnp-org:service:RenderingControl:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID><Channel>Master</Channel><DesiredMute>0</DesiredMute>\" ,
+							\n      -- callback (options)
+							\n    function( response )
+							\n      fibaro:debug( \"unMute sent\" )
+							\n    end ) 
+							\nend
+							\n
+							\nfunction Play()
+							\n  return SendSoapMessage(
+							\n    -- control url
+							\n    \"/MediaRenderer/AVTransport/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:AVTransport:1\" ,
+							\n    -- action
+							\n    { name = \"Play\" , service = \"urn:schemas-upnp-org:service:AVTransport:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID><Speed>1</Speed>\" ,
+							\n      -- callback (options)
+							\n    function( response )   
+							\n      fibaro:debug( \"Play\" )
+							\n    end )
+							\nend
+							\n
+							\nfunction SetVolume( _vol )
+							\n  return SendSoapMessage(
+							\n    -- control url
+							\n    \"/MediaRenderer/RenderingControl/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:RenderingControl:1\" ,
+							\n    -- action
+							\n    { name = \"SetVolume\" , service = \"urn:schemas-upnp-org:service:RenderingControl:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID><Channel>Master</Channel><DesiredVolume>\" .. tostring( _vol ) .. \"</DesiredVolume>\" ,
+							\n    -- callback (options)
+							\n    function( response )      
+							\n      fibaro:debug( \"Volume set: \" .. _vol )
+							\n    end )
+							\nend
+							\n
+							\nfunction PlayMusic( _url , _vol )
+							\n  return SendSoapMessage(  
+							\n    -- control url
+							\n    \"/MediaRenderer/AVTransport/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:AVTransport:1\" ,
+							\n    -- action
+							\n    { name = \"SetAVTransportURI\" , service = \"urn:schemas-upnp-org:service:AVTransport:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID>,<CurrentURI>x-file-cifs://\" .. _url .. \"</CurrentURI>,<CurrentURIMetaData></CurrentURIMetaData>\" ,
+							\n    -- callback (options)
+							\n    function( response )
+							\n      UnMute()
+							\n      SetVolume( _vol )
+							\n      Play()
+							\n
+							\n    end )
+							\nend
+							\n
+							\nPlayMusic( mURL , mVol )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":18,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Stop Sound",
+						"name":"Button61",
+						"empty":false,
+							"msg":"local mId = fibaro:getSelfId()
+							\nlocal mIp = fibaro:get( mId , \"IPAddress\" )
+							\nlocal mPort = fibaro:get( mId , \"TCPPort\" )
+							\n
+							\nfunction ReponseCallback( _fnc , _args )
+							\n  if _fnc == nil then
+							\n    return nil
+							\n  end
+							\n  return _fnc( _args )
+							\nend
+							\n
+							\nfunction CreateSocket()
+							\n    -- Check IP and PORT before
+							\n  if ( mIp == nil or mPort == nil) then
+							\n    fibaro:debug( \"You must configure IPAddress and TCPPort first\" )
+							\n    return
+							\n  end
+							\n  local socket
+							\n  local status , err = pcall(
+							\n    function() 
+							\n      socket = Net.FTcpSocket( mIp , mPort )
+							\n      socket:setReadTimeout( 5000 )
+							\n    end )  
+							\n  if status ~= nil and status ~= true then
+							\n    fibaro:debug( \"socket status: \" .. tostring( status or \"\" ) )
+							\n  end  
+							\n  if err ~= nil then
+							\n    fibaro:debug( \"socket err: \" .. tostring( err or \"\" ) )
+							\n    return;
+							\n  end
+							\n  return socket
+							\nend
+							\n
+							\nfunction DisposeSocket( _socket )
+							\n  if _socket ~= nil then
+							\n    _socket:disconnect()
+							\n    _socket = nil
+							\n    return true
+							\n  end
+							\n  return false
+							\nend
+							\n
+							\nfunction SendSoapMessage( _url , _service , _action , _args , _callback , _retry )
+							\n  local socket = CreateSocket()
+							\n  if socket == nil then
+							\n    return
+							\n  end
+							\n  retry = retry or 0
+							\n  -- prepare data
+							\n  local url = \"POST \" .. _url .. \" HTTP/1.1\"
+							\n  local soapaction = \"SOAPACTION: \\\"\" .. _service .. \"#\" .. _action.name .. \"\\\"\"
+							\n  local body = string.format( \"<u:%s xmlns:u=\\\"%s\\\">%s</u:%s>\" , _action.name , _action.service , tostring( _args or \"\" ) , _action.name )
+							\n  local envelope = \"<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\"?><s:Envelope xmlns:s=\\\"http://schemas.xmlsoap.org/soap/envelope/\\\" s:encodingStyle=\\\"http://schemas.xmlsoap.org/soap/encoding/\\\"><s:Body>\" .. body .. \"</s:Body></s:Envelope>\"
+							\n  local ctl = \"Content-Length: \" .. string.len( envelope )
+							\n  local payload = url .. \"\\r\
+							\n\" .. ctl .. \"\\r\
+							\n\" .. soapaction .. \"\\r\
+							\n\" .. \"\\r\
+							\n\" .. envelope
+							\n  -- write data
+							\n  local bytes , errorcode = socket:write( payload )
+							\n  if errorcode == 0 then
+							\n    local state , errorcode = socket:read()
+							\n    if errorcode == 0 then
+							\n      if string.len( state or \"\" ) > 0 then
+							\n        -- callback
+							\n        if _callback ~= nil then
+							\n          ReponseCallback( _callback , state )
+							\n        end
+							\n        -- dispose ...
+							\n        DisposeSocket( socket )
+							\n        return true
+							\n      else
+							\n        fibaro:debug( \"Error: Invalid response. response length: \" .. string.len( state or \"\" ) )
+							\n      end
+							\n    else      
+							\n      if _retry < 5 then
+							\n        fibaro:debug( \"retry #\" .. _retry .. \" action: \" .. _action.name )
+							\n        return SendSoapMessage( _url , _service , _action , _args , _callback, _retry + 1 )
+							\n      else
+							\n        fibaro:debug( \"Error: Code returned \" .. tostring( errorcode or \"\" ) )
+							\n      end
+							\n    end
+							\n  elseif errorcode == 2 then
+							\n    fibaro:debug( \"Error: You must check your IP and PORT settings.\" )
+							\n  else
+							\n    if _retry < 5 then
+							\n      fibaro:debug( \"retry #\" .. retry .. \" action: \" .. action.name )
+							\n      return SendSoapMessage( _url , _service , _action , _args , _callback , _retry + 1 )
+							\n    else
+							\n      fibaro:debug( \"Error: Code returned \" .. tostring( errorcode or \"\" ) )
+							\n    end
+							\n  end  
+							\n  -- dispose ...
+							\n  DisposeSocket(socket)
+							\n  -- default response
+							\n  return false
+							\nend
+							\n
+							\nfunction Stop()
+							\n  return SendSoapMessage(
+							\n    -- control url
+							\n    \"/MediaRenderer/AVTransport/Control\" ,
+							\n    -- service type
+							\n    \"urn:schemas-upnp-org:service:AVTransport:1\" ,
+							\n    -- action
+							\n    { name = \"Stop\" , service = \"urn:schemas-upnp-org:service:AVTransport:1\" } ,
+							\n    -- soap body data (options)
+							\n    \"<InstanceID>0</InstanceID><Speed>1</Speed>\" ,
+							\n      -- callback (options)
+							\n    function( response )
+							\n      fibaro:debug( \"stop sent\" )
+							\n    end )
+							\nend
+							\n
+							\nStop()",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":19,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"City 5 test",
+						"name":"Button51",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\nlocal time = os.time()
+							\nfibaro:debug(time)
+							\n
+							\ntData = 
+							\n{
+							\n  sunrise = time - 3600*2,         
+							\n  sunset =  time + 3600*5,         
+							\n  temp = 99,
+							\n  weather = \"Rain\"
+							\n}
+							\n
+							\ndata = json.encode(tData)
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label5b.value\", data)",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}
