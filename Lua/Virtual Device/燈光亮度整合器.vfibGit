@@ -1,0 +1,79 @@
+{
+	"name":"燈光亮度整合器",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author Lala
+			\n  @date   105.02.17
+			\n  @brief  控制系統指定Relay、Dimmer、RGBW的亮度值
+			\n  @note   update button須按照格式填寫
+			\n
+			\n  填寫格式範例：
+			\n  device = {{id = 667, deviceType = 1 },{id = 671, deviceType = 2, percent = 50}}
+			\n
+			\n  補充說明：
+			\n  (1)id為Dimmer/RGBW/Relay的ID
+			\n  (2)deviceType 1為Dimmer/RGBW，2為Relay
+			\n  (3)若deviceType為Relay，則須填寫percent值，slider值大於此值時開燈，否則關
+			\n--]]
+			\n",
+		"ui.Slider1.value":0,
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"slider",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"燈光亮度百分比",
+						"name":"Slider1",
+							"msg":"local device = 
+							\n{
+							\n  {id = 768, deviceType = 1 }
+							\n}  
+							\n-- 填寫範例見Main loop說明
+							\n  --{id = 768, deviceType = 2, percent = 50}
+							\n
+							\n--_--_--_--_--
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal sliderValue = tonumber(fibaro:getValue(selfId, \"ui.Slider1.value\"))
+							\n
+							\nfibaro:debug(device[1].id)
+							\nfibaro:debug(sliderValue)
+							\n
+							\nfor i = 1, #device do
+							\n  if (device[i].deviceType == 1) then
+							\n    fibaro:call(device[i].id, \"setValue\", sliderValue)
+							\n  elseif (device[i].deviceType == 2) then
+							\n    if (sliderValue >= device[i].percent ) then      
+							\n      fibaro:call(device[i].id, \"turnOn\")
+							\n\telse
+							\n\t  fibaro:call(device[i].id, \"turnOff\")
+							\n    end
+							\n  end
+							\nend",
+						"buttonIcon":0,
+						"value":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}

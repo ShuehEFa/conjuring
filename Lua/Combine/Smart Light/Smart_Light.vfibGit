@@ -1,0 +1,1134 @@
+{
+	"name":"Smart Light",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author Lala
+			\n  @date   105.02.17
+			\n  @brief  根據時段調整燈光
+			\n  @note   
+			\n    - 本VD需與情境、情境實體開關、密碼管理VD搭配使用
+			\n    - 需建立2個Global Value: smartLight、smartLight2
+			\n    - Main loop 填寫開關Id
+			\n    - Button On、Off 填寫開關Id
+			\n    - Button Reset 填寫燈光初始值，設定完成方能正常使用(存檔後需手動按)
+			\n    - Button Check_Time 填寫密碼管理VD的Id
+			\n  @待更新
+			\n    - 手動切換以後等狀態有改變再自動切換
+			\n    - 調整時間顯示方式，增加調整值暫存欄位
+			\n--]]
+			\n
+			\n--[[  
+			\n說明：按On為自動模式，直接選擇時段為手動模式(需在開關關閉的情況下按)
+			\n--]]
+			\n
+			\n
+			\nlocal switchId = 671 --實體開關Id
+			\nlocal sleepTime = 20 --自動更新時間(秒)
+			\n
+			\n--__--__--__--__--
+			\nlocal checkTime = \"23\"
+			\nlocal gLightValue = \"smartLight\"
+			\n
+			\nlocal selfId = fibaro:getSelfId()
+			\n
+			\nlocal deviceValue = fibaro:getGlobal(gLightValue)
+			\nlocal tDeviceValue = json.decode(deviceValue)
+			\nlocal lightLabel = \"ui.Label1.value\"
+			\nlocal valueLabel = \"ui.Label2.value\"
+			\nlocal item = fibaro:getValue(selfId, lightLabel)
+			\n
+			\nwhile 1 do
+			\n  switch = tonumber(fibaro:getValue(switchId, \"value\"))
+			\n  fibaro:debug(switch)
+			\n
+			\n  if (switch > 0) then
+			\n    fibaro:call(selfId, \"pressButton\", checkTime)
+			\n  end
+			\n  
+			\n  for i = 1, #tDeviceValue do
+			\n    if (item == tDeviceValue[i].name) then
+			\n      fibaro:call(selfId, \"setProperty\", lightLabel, tDeviceValue[i].name)
+			\n      lightness = fibaro:getValue(tDeviceValue[i].id, \"value\")
+			\n      if (lightness == \"\") then
+			\n        lightness = \"未知\"
+			\n\t  end      
+			\n\tend
+			\n  end
+			\n  fibaro:call(selfId, \"setProperty\", valueLabel, lightness)
+			\n
+			\n  fibaro:sleep(sleepTime*1000)
+			\nend
+			\n
+			\n",
+		"ui.Label1.value":"燈光3",
+		"ui.Label2.value":"99",
+		"ui.Label3.value":"16:00",
+		"ui.Label4.value":"10:30",
+		"ui.Label5.value":"睡覺時間 小時",
+		"ui.Label7.value":"睡眠",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"On",
+						"name":"Button91",
+						"empty":false,
+							"msg":"local switchId = 671  --實體開關Id
+							\n
+							\n--__--__--__--__--
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nfibaro:call(switchId, \"turnOn\")",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":2,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Off",
+						"name":"Button92",
+						"empty":false,
+							"msg":"local switchId = 671  --實體開關Id
+							\n
+							\n--__--__--__--__--
+							\nlocal gLightValue = \"smartLight\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal deviceValue = fibaro:getGlobal(gLightValue)
+							\nlocal tDeviceValue = json.decode(deviceValue)
+							\n
+							\nfibaro:call(switchId, \"turnOff\")
+							\n
+							\nfor i = 1, #tDeviceValue do
+							\n  fibaro:call(tDeviceValue[i].id, \"turnOff\")
+							\nend
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \"未選擇\")
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", \"未選擇\")
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"時段：",
+						"name":"Label7",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"晴天",
+						"name":"Button31",
+						"empty":false,
+							"msg":"local updateButton = \"24\"
+							\n
+							\nlocal gLightValue = \"smartLight\"
+							\nlocal gTime = \"smartLight2\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal deviceValue = fibaro:getGlobal(gLightValue)
+							\nlocal tDeviceValue = json.decode(deviceValue)
+							\nlocal lightLabel = \"ui.Label1.value\"
+							\nlocal valueLabel = \"ui.Label2.value\"
+							\nlocal timeLabel = \"ui.Label7.value\"
+							\nlocal item = fibaro:getValue(selfId, lightLabel)
+							\n
+							\n
+							\nfibaro:call(selfId, \"setProperty\", timeLabel, \"晴天\")
+							\n
+							\n
+							\nfor i = 1, #tDeviceValue do
+							\n  if (item == tDeviceValue[i].name) then    
+							\n    fibaro:call(selfId, \"setProperty\", valueLabel, tDeviceValue[i].sunny)
+							\n  end
+							\nend
+							\n
+							\nfibaro:call(selfId, \"pressButton\", updateButton)
+							\nfibaro:setGlobal(gTime, \"晴天\")
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":5,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"陰天",
+						"name":"Button32",
+						"empty":false,
+							"msg":"local updateButton = \"24\"
+							\n
+							\nlocal gLightValue = \"smartLight\"
+							\nlocal gTime = \"smartLight2\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal deviceValue = fibaro:getGlobal(gLightValue)
+							\nlocal tDeviceValue = json.decode(deviceValue)
+							\nlocal lightLabel = \"ui.Label1.value\"
+							\nlocal valueLabel = \"ui.Label2.value\"
+							\nlocal timeLabel = \"ui.Label7.value\"
+							\nlocal item = fibaro:getValue(selfId, lightLabel)
+							\n
+							\n
+							\nfibaro:call(selfId, \"setProperty\", timeLabel, \"陰天\")
+							\n
+							\n
+							\nfor i = 1, #tDeviceValue do
+							\n  if (item == tDeviceValue[i].name) then    
+							\n    fibaro:call(selfId, \"setProperty\", valueLabel, tDeviceValue[i].cloudy)
+							\n  end
+							\nend
+							\n
+							\nfibaro:call(selfId, \"pressButton\", updateButton)
+							\nfibaro:setGlobal(gTime, \"陰天\")",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":6,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"夜間",
+						"name":"Button33",
+						"empty":false,
+							"msg":"local updateButton = \"24\"
+							\n
+							\nlocal gLightValue = \"smartLight\"
+							\nlocal gTime = \"smartLight2\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal deviceValue = fibaro:getGlobal(gLightValue)
+							\nlocal tDeviceValue = json.decode(deviceValue)
+							\nlocal lightLabel = \"ui.Label1.value\"
+							\nlocal valueLabel = \"ui.Label2.value\"
+							\nlocal timeLabel = \"ui.Label7.value\"
+							\nlocal item = fibaro:getValue(selfId, lightLabel)
+							\n
+							\n
+							\nfibaro:call(selfId, \"setProperty\", timeLabel, \"夜間\")
+							\n
+							\nfor i = 1, #tDeviceValue do
+							\n  if (item == tDeviceValue[i].name) then    
+							\n    fibaro:call(selfId, \"setProperty\", valueLabel, tDeviceValue[i].night)
+							\n  end
+							\nend
+							\n
+							\nfibaro:call(selfId, \"pressButton\", updateButton)
+							\nfibaro:setGlobal(gTime, \"夜間\")",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":7,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"睡前",
+						"name":"Button41",
+						"empty":false,
+							"msg":"local updateButton = \"24\"
+							\n
+							\nlocal gLightValue = \"smartLight\"
+							\nlocal gTime = \"smartLight2\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal deviceValue = fibaro:getGlobal(gLightValue)
+							\nlocal tDeviceValue = json.decode(deviceValue)
+							\nlocal lightLabel = \"ui.Label1.value\"
+							\nlocal valueLabel = \"ui.Label2.value\"
+							\nlocal timeLabel = \"ui.Label7.value\"
+							\nlocal item = fibaro:getValue(selfId, lightLabel)
+							\n
+							\n
+							\nfibaro:call(selfId, \"setProperty\", timeLabel, \"睡前\")
+							\n
+							\nfor i = 1, #tDeviceValue do
+							\n  if (item == tDeviceValue[i].name) then    
+							\n    fibaro:call(selfId, \"setProperty\", valueLabel, tDeviceValue[i].beforeSleep)
+							\n  end
+							\nend
+							\n
+							\nfibaro:call(selfId, \"pressButton\", updateButton)
+							\nfibaro:setGlobal(gTime, \"睡前\")",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":8,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"睡眠",
+						"name":"Button42",
+						"empty":false,
+							"msg":"local updateButton = \"24\"
+							\n
+							\nlocal gLightValue = \"smartLight\"
+							\nlocal gTime = \"smartLight2\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal deviceValue = fibaro:getGlobal(gLightValue)
+							\nlocal tDeviceValue = json.decode(deviceValue)
+							\nlocal lightLabel = \"ui.Label1.value\"
+							\nlocal valueLabel = \"ui.Label2.value\"
+							\nlocal timeLabel = \"ui.Label7.value\"
+							\nlocal item = fibaro:getValue(selfId, lightLabel)
+							\n
+							\n
+							\nfibaro:call(selfId, \"setProperty\", timeLabel, \"睡眠\")
+							\n
+							\nfor i = 1, #tDeviceValue do
+							\n  if (item == tDeviceValue[i].name) then    
+							\n    fibaro:call(selfId, \"setProperty\", valueLabel, tDeviceValue[i].sleep)
+							\n  end
+							\nend
+							\n
+							\nfibaro:call(selfId, \"pressButton\", updateButton)
+							\nfibaro:setGlobal(gTime, \"睡眠\")",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":9,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"晨醒",
+						"name":"Button43",
+						"empty":false,
+							"msg":"local updateButton = \"24\"
+							\n
+							\nlocal gLightValue = \"smartLight\"
+							\nlocal gTime = \"smartLight2\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal deviceValue = fibaro:getGlobal(gLightValue)
+							\nlocal tDeviceValue = json.decode(deviceValue)
+							\nlocal lightLabel = \"ui.Label1.value\"
+							\nlocal valueLabel = \"ui.Label2.value\"
+							\nlocal timeLabel = \"ui.Label7.value\"
+							\nlocal item = fibaro:getValue(selfId, lightLabel)
+							\n
+							\n
+							\nfibaro:call(selfId, \"setProperty\", timeLabel, \"晨醒\")
+							\n
+							\nfor i = 1, #tDeviceValue do
+							\n  if (item == tDeviceValue[i].name) then    
+							\n    fibaro:call(selfId, \"setProperty\", valueLabel, tDeviceValue[i].wake)
+							\n  end
+							\nend
+							\n
+							\nfibaro:call(selfId, \"pressButton\", updateButton)
+							\nfibaro:setGlobal(gTime, \"晨醒\")",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":10,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"選擇燈光：",
+						"name":"Label1",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":11,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"亮度：",
+						"name":"Label2",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":12,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"＋",
+						"name":"Button11",
+						"empty":false,
+							"msg":"local gLightValue = \"smartLight\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal deviceValue = fibaro:getGlobal(gLightValue)
+							\nlocal tDeviceValue = json.decode(deviceValue)
+							\nlocal lightLabel = \"ui.Label1.value\"
+							\nlocal valueLabel = \"ui.Label2.value\"
+							\nlocal timeLabel = \"ui.Label7.value\"
+							\nlocal item = fibaro:getValue(selfId, lightLabel)
+							\nlocal value = tonumber(fibaro:getValue(selfId, valueLabel))
+							\n
+							\n
+							\nfor i = 1, #tDeviceValue do
+							\n  if (item == tDeviceValue[i].name) then     --判斷燈光編號
+							\n    lightNumber = i
+							\n    if (tDeviceValue[i].type == 1) then      --若該燈光為dimmer/rgbw
+							\n      if (value < 100 ) then
+							\n        value = value + 1
+							\n      else
+							\n        value = value
+							\n\t  end
+							\n   
+							\n    elseif (tDeviceValue[i].type == 2) then  --若該燈光為relay
+							\n\t  value = 100       
+							\n    end\t
+							\n    break                                    --找到正確編號跳離迴圈
+							\n  end
+							\nend 
+							\n 
+							\nfibaro:call(selfId, \"setProperty\", valueLabel, value)
+							\nfibaro:call(tDeviceValue[lightNumber].id, \"setValue\", value )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					},
+					{
+						"id":13,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"－",
+						"name":"Button12",
+						"empty":false,
+							"msg":"--[[ – ]]--
+							\n
+							\nlocal gLightValue = \"smartLight\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal deviceValue = fibaro:getGlobal(gLightValue)
+							\nlocal tDeviceValue = json.decode(deviceValue)
+							\nlocal lightLabel = \"ui.Label1.value\"
+							\nlocal valueLabel = \"ui.Label2.value\"
+							\nlocal timeLabel = \"ui.Label7.value\"
+							\nlocal item = fibaro:getValue(selfId, lightLabel)
+							\nlocal value = tonumber(fibaro:getValue(selfId, valueLabel))
+							\nlocal lightNumber
+							\n
+							\nfibaro:debug(item)
+							\n
+							\nfor i = 1, #tDeviceValue do
+							\n  if (item == tDeviceValue[i].name) then     --判斷燈光編號
+							\n    lightNumber = i
+							\n    if (tDeviceValue[i].type == 1) then      --若該燈光為dimmer/rgbw
+							\n      if (value > 0 ) then
+							\n        value = value - 1
+							\n      else
+							\n        value = value
+							\n\t  end
+							\n
+							\n    elseif (tDeviceValue[i].type == 2) then  --若該燈光為relay
+							\n\t  value = 0       
+							\n    end\t
+							\n    break                                    --找到正確編號跳離迴圈
+							\n  end
+							\nend 
+							\n 
+							\nfibaro:call(selfId, \"setProperty\", valueLabel, value)
+							\nfibaro:call(tDeviceValue[lightNumber].id, \"setValue\", value )",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":14,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Next",
+						"name":"Button13",
+						"empty":false,
+							"msg":"--[[ Next版本2 ]]
+							\n
+							\nlocal gLightValue = \"smartLight\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal deviceValue = fibaro:getGlobal(gLightValue)
+							\nlocal tDeviceValue = json.decode(deviceValue)
+							\nlocal lightLabel = \"ui.Label1.value\"
+							\nlocal valueLabel = \"ui.Label2.value\"
+							\nlocal item = fibaro:getValue(selfId, lightLabel)
+							\nlocal lightness
+							\n
+							\n
+							\nif (item == \"未選擇\") then
+							\n  fibaro:call(selfId, \"setProperty\", lightLabel, tDeviceValue[1].name)  
+							\n  lightness = fibaro:getValue(tDeviceValue[1].id, \"value\")
+							\n  if (lightness == \"\") then
+							\n    lightness = \"未知\"
+							\n  end\t
+							\n  fibaro:call(selfId, \"setProperty\", valueLabel, lightness)
+							\n    
+							\nelse
+							\n  for i = 1, #tDeviceValue - 1  do
+							\n    if (item == tDeviceValue[i].name) then
+							\n      fibaro:call(selfId, \"setProperty\", lightLabel, tDeviceValue[i+1].name)
+							\n      lightness = fibaro:getValue(tDeviceValue[i+1].id, \"value\")
+							\n      if (lightness == \"\") then
+							\n        lightness = \"未知\"
+							\n      end\t  
+							\n      fibaro:call(selfId, \"setProperty\", valueLabel, lightness)\t  \t  
+							\n\t  break
+							\n    end
+							\n  end
+							\n  if (item == tDeviceValue[#tDeviceValue].name) then
+							\n    fibaro:call(selfId, \"setProperty\", lightLabel, tDeviceValue[1].name)
+							\n\tlightness = fibaro:getValue(tDeviceValue[1].id, \"value\")
+							\n    if (lightness == \"\") then
+							\n      lightness = \"未知\"
+							\n    end
+							\n    fibaro:call(selfId, \"setProperty\", valueLabel, lightness)
+							\n  end
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":15,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Save",
+						"name":"Button14",
+						"empty":false,
+							"msg":"--[[ Save ]]--
+							\n
+							\nlocal gLightValue = \"smartLight\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal deviceValue = fibaro:getGlobal(gLightValue)
+							\nlocal tDeviceValue = json.decode(deviceValue)
+							\nlocal lightLabel = \"ui.Label1.value\"
+							\nlocal valueLabel = \"ui.Label2.value\"
+							\nlocal timeLabel = \"ui.Label7.value\"
+							\nlocal item = fibaro:getValue(selfId, lightLabel)
+							\nlocal timeSelect = fibaro:getValue(selfId, timeLabel)
+							\nlocal value = tonumber(fibaro:getValue(selfId, valueLabel))
+							\nlocal lightNumber
+							\n
+							\n--判斷選擇時段
+							\nif (timeSelect == \"晴天\") then
+							\n  for i = 1, #tDeviceValue do
+							\n    if (item == tDeviceValue[i].name) then
+							\n      lightNumber = i                                 --目前選取燈光編號
+							\n\t  break
+							\n    end
+							\n  end
+							\n  for i = 1, #tDeviceValue do                         --該燈光時段更改成value值，其他照舊
+							\n    if (i == lightNumber) then  
+							\n\t  tDeviceValue[i] = 
+							\n        {
+							\n\t\t  name = tDeviceValue[i].name, id = tDeviceValue[i].id, type = tDeviceValue[i].type, 
+							\n\t      cloudy = tDeviceValue[i].cloudy, beforeSleep = tDeviceValue[i].beforeSleep, sleep = tDeviceValue[i].sleep, 
+							\n\t\t  night = tDeviceValue[i].night, sunny = value, wake = tDeviceValue[i].wake 
+							\n\t\t}
+							\n    else
+							\n      tDeviceValue[i] = 
+							\n        {
+							\n\t\t  name = tDeviceValue[i].name, id = tDeviceValue[i].id, type = tDeviceValue[i].type, 
+							\n\t      cloudy = tDeviceValue[i].cloudy, beforeSleep = tDeviceValue[i].beforeSleep, sleep = tDeviceValue[i].sleep, 
+							\n\t\t  night = tDeviceValue[i].night, sunny = tDeviceValue[i].sunny, wake = tDeviceValue[i].wake 
+							\n\t\t}
+							\n    end  
+							\n  end\t
+							\n   
+							\nelseif (timeSelect == \"陰天\") then
+							\n  for i = 1, #tDeviceValue do
+							\n    if (item == tDeviceValue[i].name) then
+							\n      lightNumber = i                                 --目前選取燈光編號
+							\n\t  break
+							\n    end
+							\n  end
+							\n  for i = 1, #tDeviceValue do                         --該燈光時段更改成value值，其他照舊
+							\n    if (i == lightNumber) then  
+							\n\t  tDeviceValue[i] = 
+							\n        {
+							\n\t\t  name = tDeviceValue[i].name, id = tDeviceValue[i].id, type = tDeviceValue[i].type, 
+							\n\t      cloudy = value, beforeSleep = tDeviceValue[i].beforeSleep, sleep = tDeviceValue[i].sleep, 
+							\n\t\t  night = tDeviceValue[i].night, sunny = tDeviceValue[i].sunny, wake = tDeviceValue[i].wake 
+							\n\t\t}
+							\n    else
+							\n      tDeviceValue[i] = 
+							\n        {
+							\n\t\t  name = tDeviceValue[i].name, id = tDeviceValue[i].id, type = tDeviceValue[i].type, 
+							\n\t      cloudy = tDeviceValue[i].cloudy, beforeSleep = tDeviceValue[i].beforeSleep, sleep = tDeviceValue[i].sleep, 
+							\n\t\t  night = tDeviceValue[i].night, sunny = tDeviceValue[i].sunny, wake = tDeviceValue[i].wake 
+							\n\t\t}
+							\n    end  
+							\n  end
+							\n
+							\nelseif (timeSelect == \"夜間\") then
+							\n  for i = 1, #tDeviceValue do
+							\n    if (item == tDeviceValue[i].name) then
+							\n      lightNumber = i                                 --目前選取燈光編號
+							\n\t  break
+							\n    end
+							\n  end
+							\n  for i = 1, #tDeviceValue do                         --該燈光時段更改成value值，其他照舊
+							\n    if (i == lightNumber) then  
+							\n\t  tDeviceValue[i] = 
+							\n        {
+							\n\t\t  name = tDeviceValue[i].name, id = tDeviceValue[i].id, type = tDeviceValue[i].type, 
+							\n\t      cloudy = tDeviceValue[i].cloudy, beforeSleep = tDeviceValue[i].beforeSleep, sleep = tDeviceValue[i].sleep, 
+							\n\t\t  night = value, sunny = tDeviceValue[i].sunny, wake = tDeviceValue[i].wake 
+							\n\t\t}
+							\n    else
+							\n      tDeviceValue[i] = 
+							\n        {
+							\n\t\t  name = tDeviceValue[i].name, id = tDeviceValue[i].id, type = tDeviceValue[i].type, 
+							\n\t      cloudy = tDeviceValue[i].cloudy, beforeSleep = tDeviceValue[i].beforeSleep, sleep = tDeviceValue[i].sleep, 
+							\n\t\t  night = tDeviceValue[i].night, sunny = tDeviceValue[i].sunny, wake = tDeviceValue[i].wake 
+							\n\t\t}
+							\n    end  
+							\n  end
+							\n  
+							\nelseif (timeSelect == \"睡前\") then
+							\n  for i = 1, #tDeviceValue do
+							\n    if (item == tDeviceValue[i].name) then
+							\n      lightNumber = i                                 --目前選取燈光編號
+							\n\t  break
+							\n    end
+							\n  end
+							\n  for i = 1, #tDeviceValue do                         --該燈光時段更改成value值，其他照舊
+							\n    if (i == lightNumber) then  
+							\n\t  tDeviceValue[i] = 
+							\n        {
+							\n\t\t  name = tDeviceValue[i].name, id = tDeviceValue[i].id, type = tDeviceValue[i].type, 
+							\n\t      cloudy = tDeviceValue[i].cloudy, beforeSleep = value, sleep = tDeviceValue[i].sleep, 
+							\n\t\t  night = tDeviceValue[i].night, sunny = tDeviceValue[i].sunny, wake = tDeviceValue[i].wake 
+							\n\t\t}
+							\n    else
+							\n      tDeviceValue[i] = 
+							\n        {
+							\n\t\t  name = tDeviceValue[i].name, id = tDeviceValue[i].id, type = tDeviceValue[i].type, 
+							\n\t      cloudy = tDeviceValue[i].cloudy, beforeSleep = tDeviceValue[i].beforeSleep, sleep = tDeviceValue[i].sleep, 
+							\n\t\t  night = tDeviceValue[i].night, sunny = tDeviceValue[i].sunny, wake = tDeviceValue[i].wake 
+							\n\t\t}
+							\n    end  
+							\n  end
+							\n  
+							\nelseif (timeSelect == \"睡眠\") then
+							\n  for i = 1, #tDeviceValue do
+							\n    if (item == tDeviceValue[i].name) then
+							\n      lightNumber = i                                 --目前選取燈光編號
+							\n\t  break
+							\n    end
+							\n  end
+							\n  for i = 1, #tDeviceValue do                         --該燈光時段更改成value值，其他照舊
+							\n    if (i == lightNumber) then  
+							\n\t  tDeviceValue[i] = 
+							\n        {
+							\n\t\t  name = tDeviceValue[i].name, id = tDeviceValue[i].id, type = tDeviceValue[i].type, 
+							\n\t      cloudy = tDeviceValue[i].cloudy, beforeSleep = tDeviceValue[i].beforeSleep, sleep = value, 
+							\n\t\t  night = tDeviceValue[i].night, sunny = tDeviceValue[i].sunny, wake = tDeviceValue[i].wake 
+							\n\t\t}
+							\n    else
+							\n      tDeviceValue[i] = 
+							\n        {
+							\n\t\t  name = tDeviceValue[i].name, id = tDeviceValue[i].id, type = tDeviceValue[i].type, 
+							\n\t      cloudy = tDeviceValue[i].cloudy, beforeSleep = tDeviceValue[i].beforeSleep, sleep = tDeviceValue[i].sleep, 
+							\n\t\t  night = tDeviceValue[i].night, sunny = tDeviceValue[i].sunny, wake = tDeviceValue[i].wake 
+							\n\t\t}
+							\n    end  
+							\n  end
+							\n  
+							\nelseif (timeSelect == \"晨醒\") then
+							\n  for i = 1, #tDeviceValue do
+							\n    if (item == tDeviceValue[i].name) then
+							\n      lightNumber = i                                 --目前選取燈光編號
+							\n\t  break
+							\n    end
+							\n  end
+							\n  for i = 1, #tDeviceValue do                         --該燈光時段更改成value值，其他照舊
+							\n    if (i == lightNumber) then  
+							\n\t  tDeviceValue[i] = 
+							\n        {
+							\n\t\t  name = tDeviceValue[i].name, id = tDeviceValue[i].id, type = tDeviceValue[i].type, 
+							\n\t      cloudy = tDeviceValue[i].cloudy, beforeSleep = tDeviceValue[i].beforeSleep, sleep = tDeviceValue[i].sleep, 
+							\n\t\t  night = tDeviceValue[i].night, sunny = tDeviceValue[i].sunny, wake = value 
+							\n\t\t}
+							\n    else
+							\n      tDeviceValue[i] = 
+							\n        {
+							\n\t\t  name = tDeviceValue[i].name, id = tDeviceValue[i].id, type = tDeviceValue[i].type, 
+							\n\t      cloudy = tDeviceValue[i].cloudy, beforeSleep = tDeviceValue[i].beforeSleep, sleep = tDeviceValue[i].sleep, 
+							\n\t\t  night = tDeviceValue[i].night, sunny = tDeviceValue[i].sunny, wake = tDeviceValue[i].wake 
+							\n\t\t}
+							\n    end  
+							\n  end
+							\n  
+							\nend
+							\n
+							\nfibaro:debug(json.encode(tDeviceValue))
+							\nfibaro:setGlobal(gLightValue, json.encode(tDeviceValue))
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":16,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"起床時間：",
+						"name":"Label3",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":17,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"睡覺時間：",
+						"name":"Label4",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":18,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"設定項目：",
+						"name":"Label5",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":19,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"︿",
+						"name":"Button21",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\nlocal wakeTime = fibaro:getValue(selfId, \"ui.Label3.value\")
+							\nlocal sleepTime = fibaro:getValue(selfId, \"ui.Label4.value\")
+							\n
+							\nlocal item = fibaro:getValue(selfId, \"ui.Label5.value\")
+							\n
+							\nlocal wakeHr = tonumber(string.match(wakeTime, \"(.+):\"))
+							\nlocal wakeMin = tonumber(string.match(wakeTime, \":(.+)\"))
+							\nlocal sleepHr = tonumber(string.match(sleepTime, \"(.+):\"))
+							\nlocal sleepMin = tonumber(string.match(sleepTime, \":(.+)\"))
+							\n
+							\n\t
+							\nif (item == \"起床時間 小時\") then
+							\n  wakeMin = string.format(\"%02d\", wakeMin % 60)
+							\n  wakeHr = string.format(\"%02d\", (wakeHr + 1) % 24)
+							\n  wakeTime = wakeHr ..\":\" .. wakeMin
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label3.value\", wakeTime)
+							\nelseif (item == \"起床時間 分鐘\") then
+							\n  wakeMin = string.format(\"%02d\", (wakeMin + 1) % 60)
+							\n  wakeHr = string.format(\"%02d\", wakeHr % 24)
+							\n  local wakeTime = wakeHr ..\":\" .. wakeMin
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label3.value\", wakeTime)
+							\n  
+							\nelseif (item == \"睡覺時間 小時\") then
+							\n  sleepMin = string.format(\"%02d\", sleepMin % 60)
+							\n  sleepHr = string.format(\"%02d\", (sleepHr + 1) % 24)
+							\n  sleepTime = sleepHr ..\":\" .. sleepMin
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label4.value\", sleepTime)
+							\nelseif (item == \"睡覺時間 分鐘\") then
+							\n  sleepMin = string.format(\"%02d\", (sleepMin + 1) % 60)
+							\n  sleepHr = string.format(\"%02d\", sleepHr % 24)
+							\n  sleepTime = sleepHr ..\":\" .. sleepMin
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label4.value\", sleepTime)
+							\n  
+							\nend
+							\n  ",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":20,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"﹀",
+						"name":"Button22",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\nlocal wakeTime = fibaro:getValue(selfId, \"ui.Label3.value\")
+							\nlocal sleepTime = fibaro:getValue(selfId, \"ui.Label4.value\")
+							\n
+							\nlocal item = fibaro:getValue(selfId, \"ui.Label5.value\")
+							\n
+							\nlocal wakeHr = tonumber(string.match(wakeTime, \"(.+):\"))
+							\nlocal wakeMin = tonumber(string.match(wakeTime, \":(.+)\"))
+							\nlocal sleepHr = tonumber(string.match(sleepTime, \"(.+):\"))
+							\nlocal sleepMin = tonumber(string.match(sleepTime, \":(.+)\"))
+							\n
+							\n\t
+							\nif (item == \"起床時間 小時\") then
+							\n  wakeMin = string.format(\"%02d\", wakeMin % 60)
+							\n  wakeHr = string.format(\"%02d\", (wakeHr - 1) % 24)
+							\n  wakeTime = wakeHr ..\":\" .. wakeMin
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label3.value\", wakeTime)
+							\nelseif (item == \"起床時間 分鐘\") then
+							\n  wakeMin = string.format(\"%02d\", (wakeMin - 1) % 60)
+							\n  wakeHr = string.format(\"%02d\", wakeHr % 24)
+							\n  local wakeTime = wakeHr ..\":\" .. wakeMin
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label3.value\", wakeTime)
+							\n  
+							\nelseif (item == \"睡覺時間 小時\") then
+							\n  sleepMin = string.format(\"%02d\", sleepMin % 60)
+							\n  sleepHr = string.format(\"%02d\", (sleepHr - 1) % 24)
+							\n  sleepTime = sleepHr ..\":\" .. sleepMin
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label4.value\", sleepTime)
+							\nelseif (item == \"睡覺時間 分鐘\") then
+							\n  sleepMin = string.format(\"%02d\", (sleepMin - 1) % 60)
+							\n  sleepHr = string.format(\"%02d\", sleepHr % 24)
+							\n  sleepTime = sleepHr ..\":\" .. sleepMin
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label4.value\", sleepTime)
+							\n  
+							\nend
+							\n  ",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":21,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Set",
+						"name":"Button23",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\nlocal item = fibaro:getValue(selfId, \"ui.Label5.value\")
+							\nif (item == \"起床時間 小時\") then
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label5.value\",\"起床時間 分鐘\")  
+							\nelseif (item == \"起床時間 分鐘\") then
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label5.value\",\"睡覺時間 小時\")
+							\nelseif (item == \"睡覺時間 小時\") then
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label5.value\",\"睡覺時間 分鐘\")  
+							\nelseif (item == \"睡覺時間 分鐘\") then
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label5.value\",\"起床時間 小時\")
+							\nelse
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label5.value\",\"起床時間 小時\")
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":22,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Reset",
+						"name":"Button51",
+						"empty":false,
+							"msg":"--[[
+							\n設定各燈光初始值，填寫項目：
+							\n{name = 燈光命名 ,id = deviceId ,type = 燈光類型(1為dimmer/rgbw,2為relay), 
+							\n cloudy = 陰天亮度, beforeSleep = 睡前亮度,sleep = 睡眠亮度, night = 夜間亮度, sunny = 晴天亮度, wake = 晨醒亮度} 
+							\n--]]
+							\nlocal tPresetValue = 
+							\n{
+							\n  {name = \"燈光1\", id = 723, type = 1, cloudy = 60, beforeSleep = 30, sleep = 0, night = 80, sunny = 40, wake = 95 },
+							\n  {name = \"燈光2\", id = 000, type = 2, cloudy = 100, beforeSleep = 0, sleep = 0, night = 100, sunny = 0, wake = 100 },
+							\n  {name = \"燈光3\", id = 768, type = 1, cloudy = 59, beforeSleep = 20, sleep =2, night = 79, sunny = 39, wake = 94 }
+							\n}
+							\n
+							\n
+							\n--__--__--__--__--
+							\nlocal updateButton = \"24\"
+							\n
+							\nlocal gLightValue = \"smartLight\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label3.value\", \"08:00\")
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label4.value\", \"23:30\")
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \"未選擇\")
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", \"未選擇\")
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label7.value\", \"未選擇\")
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label0.value\", \"自動\")
+							\n
+							\nfibaro:setGlobal(gLightValue, json.encode(tPresetValue))
+							\n
+							\n--fibaro:call(selfId, \"pressButton\", updateButton)",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":23,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Check Time",
+						"name":"Button61",
+						"empty":false,
+							"msg":"local passwordVD = 592    --VD-\"admin密碼管理\"
+							\n
+							\n--__--__--__--__--
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nlocal wakeLabel = \"ui.Label3.value\"
+							\nlocal sleepLabel = \"ui.Label4.value\"
+							\nlocal timeLabel = \"ui.Label7.value\"
+							\n
+							\nlocal gTime = \"smartLight2\"    --紀錄時段用
+							\n
+							\n
+							\n---取得主機密碼---
+							\nlocal labelId = 1         --1為admin密碼，2為PIN碼
+							\nlocal getVDPassword = fibaro:getValue(passwordVD, \"ui.Label\" .. labelId .. \".value\")
+							\nlocal truePassword = \"\"
+							\nlocal getChar
+							\n
+							\nfor i = 2, 50, 2 do
+							\n  getChar = string.sub(getVDPassword, i, i)
+							\n  truePassword = truePassword .. getChar
+							\nend
+							\n------------------
+							\n
+							\n---取得目前天氣---
+							\nHC2 = Net.FHttp( \"127.0.0.1\" ) 
+							\nHC2:setBasicAuthentication( \"admin\" , truePassword )
+							\nresponse, status, errorCode = HC2:GET(\"/api/weather\")
+							\ntResponse = json.decode( response )
+							\nweatherCondition = tResponse.WeatherConditionConverted     
+							\n------------------
+							\n
+							\nlocal nowTime = tonumber(os.date(\"%H%M\"))                       --取得系統時間
+							\nlocal wakeTime = fibaro:getValue(selfId, wakeLabel)             --取得起床時間
+							\nlocal wakeHr = string.match(wakeTime, \"(.+):\")
+							\nlocal wakeMin = string.match(wakeTime, \":(.+)\")
+							\nlocal wakeTime = wakeHr .. wakeMin
+							\nlocal sleepTime = fibaro:getValue(selfId, sleepLabel)           --取得睡覺時間
+							\nlocal sleepHr = string.match(sleepTime, \"(.+):\")
+							\nlocal sleepMin = string.match(sleepTime, \":(.+)\")
+							\nlocal sleepTime = sleepHr .. sleepMin 
+							\n--local previous  = fibaro:getGlobal(gTime)
+							\n  
+							\nif (((nowTime - tonumber(wakeTime) ) <= 100) and ((nowTime - tonumber(wakeTime) ) >= 0) ) then        --判斷晨醒時段
+							\n -- if (previous ~= \"晨醒\") then
+							\n    fibaro:call(selfId, \"setProperty\", timeLabel, \"晨醒\")
+							\n    fibaro:setGlobal(gTime, \"晨醒\")
+							\n -- end
+							\nelseif (((tonumber(sleepTime) - nowTime) <= 100) and ((tonumber(sleepTime) - nowTime) >= 0)) then     --判斷睡前時段
+							\n -- if (previous ~= \"睡前\") then
+							\n    fibaro:call(selfId, \"setProperty\", timeLabel, \"睡前\")
+							\n    fibaro:setGlobal(gTime, \"睡前\")  
+							\n -- end
+							\nelseif ((tonumber(sleepTime) > tonumber(wakeTime)) and ((nowTime > tonumber(sleepTime)) or (nowTime < tonumber(wakeTime))) ) then
+							\n -- if (previous ~= \"睡眠\") then
+							\n    fibaro:call(selfId, \"setProperty\", timeLabel, \"睡眠\")
+							\n    fibaro:setGlobal(gTime, \"睡眠\")
+							\nelseif((tonumber(sleepTime) < tonumber(wakeTime)) and  ((nowTime > tonumber(sleepTime)) and (nowTime < tonumber(wakeTime))) ) then
+							\n    fibaro:call(selfId, \"setProperty\", timeLabel, \"睡眠\")
+							\n    fibaro:setGlobal(gTime, \"睡眠\")
+							\n -- end
+							\nelseif ((nowTime >= 0600) and (nowTime < 1800)) then\t 
+							\n  if (weatherCondition == \"clear\") then
+							\n    fibaro:call(selfId, \"setProperty\", timeLabel, \"晴天\")
+							\n    fibaro:setGlobal(gTime, \"晴天\")
+							\n  else
+							\n --   if (previous ~= \"陰天\") then
+							\n  \t  fibaro:call(selfId, \"setProperty\", timeLabel, \"陰天\")
+							\n\t  fibaro:setGlobal(gTime, \"陰天\")
+							\n --\tend
+							\n  end  
+							\n\t  
+							\nelseif ((nowTime >= 1800) or (nowTime < 0600)) then
+							\n -- if (previous ~= \"夜間\") then
+							\n    fibaro:call(selfId, \"setProperty\", timeLabel, \"夜間\")
+							\n    fibaro:setGlobal(gTime, \"夜間\")
+							\n -- end
+							\nend  
+							\n  ",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":24,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Update",
+						"name":"Button81",
+						"empty":false,
+							"msg":"--[[ Update版本2 ]]--
+							\n
+							\nlocal gLightValue = \"smartLight\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\nlocal deviceValue = fibaro:getGlobal(gLightValue)
+							\nlocal tDeviceValue = json.decode(deviceValue)
+							\nlocal lightLabel = \"ui.Label1.value\"
+							\nlocal valueLabel = \"ui.Label2.value\"
+							\nlocal timeLabel = \"ui.Label7.value\"
+							\nlocal item = fibaro:getValue(selfId, lightLabel)
+							\nlocal timeSelect = fibaro:getValue(selfId, timeLabel)
+							\nlocal value = tonumber(fibaro:getValue(selfId, valueLabel))
+							\nlocal lightness
+							\n
+							\n
+							\n--判斷時段
+							\nif (timeSelect == \"晴天\") then
+							\n  for i = 1, #tDeviceValue do
+							\n    fibaro:call(tDeviceValue[i].id, \"setValue\", tDeviceValue[i].sunny)
+							\n    if (item == tDeviceValue[i].name) then
+							\n      fibaro:call(selfId, \"setProperty\", lightLabel, tDeviceValue[i].name)
+							\n      fibaro:call(selfId, \"setProperty\", valueLabel, tDeviceValue[i].sunny)\t  \t  
+							\n    end
+							\n  end\t
+							\n
+							\nelseif (timeSelect == \"陰天\") then
+							\n  for i = 1, #tDeviceValue do
+							\n    fibaro:call(tDeviceValue[i].id, \"setValue\", tDeviceValue[i].cloudy)
+							\n    if (item == tDeviceValue[i].name) then
+							\n      fibaro:call(selfId, \"setProperty\", lightLabel, tDeviceValue[i].name)
+							\n      fibaro:call(selfId, \"setProperty\", valueLabel, tDeviceValue[i].cloudy)\t  \t  
+							\n    end
+							\n  end
+							\nelseif (timeSelect == \"夜間\") then
+							\n  for i = 1, #tDeviceValue do
+							\n    fibaro:call(tDeviceValue[i].id, \"setValue\", tDeviceValue[i].night)
+							\n    if (item == tDeviceValue[i].name) then
+							\n      fibaro:call(selfId, \"setProperty\", lightLabel, tDeviceValue[i].name)
+							\n      fibaro:call(selfId, \"setProperty\", valueLabel, tDeviceValue[i].night)\t  \t  
+							\n    end
+							\n  end
+							\nelseif (timeSelect == \"睡前\") then
+							\n  for i = 1, #tDeviceValue do
+							\n    fibaro:call(tDeviceValue[i].id, \"setValue\", tDeviceValue[i].beforeSleep)
+							\n    if (item == tDeviceValue[i].name) then
+							\n      fibaro:call(selfId, \"setProperty\", lightLabel, tDeviceValue[i].name)
+							\n      fibaro:call(selfId, \"setProperty\", valueLabel, tDeviceValue[i].beforeSleep)\t  \t  
+							\n    end
+							\n  end
+							\nelseif (timeSelect == \"睡眠\") then
+							\n  for i = 1, #tDeviceValue do
+							\n    fibaro:call(tDeviceValue[i].id, \"setValue\", tDeviceValue[i].sleep)
+							\n    if (item == tDeviceValue[i].name) then
+							\n      fibaro:call(selfId, \"setProperty\", lightLabel, tDeviceValue[i].name)
+							\n      fibaro:call(selfId, \"setProperty\", valueLabel, tDeviceValue[i].sleep)\t  \t  
+							\n    end
+							\n  end
+							\nelseif (timeSelect == \"晨醒\") then
+							\n  for i = 1, #tDeviceValue do
+							\n    fibaro:call(tDeviceValue[i].id, \"setValue\", tDeviceValue[i].wake)
+							\n    if (item == tDeviceValue[i].name) then
+							\n      fibaro:call(selfId, \"setProperty\", lightLabel, tDeviceValue[i].name)
+							\n      fibaro:call(selfId, \"setProperty\", valueLabel, tDeviceValue[i].wake)\t  \t  
+							\n    end
+							\n  end
+							\nend
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}

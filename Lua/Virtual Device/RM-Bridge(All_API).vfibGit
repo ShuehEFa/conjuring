@@ -9,10 +9,19 @@
 		"logTemp":"",
 			"mainLoop":"--[[
 			\n  @author Lala
-			\n  @date   105.1.13
+			\n  @date   105.2.17
 			\n  @brief  RM-Bridge所有api(1000~1007)範例
-			\n  @note   (1)填寫ipAddr，port預設為7474
-			\n          (2)分隔線\"--_--_--_--_--_--_--\"以上的欄位必須填寫才能使用該button
+			\n  @note  
+			\n    - 填寫RM-Bridge ipAddr，port預設為7474
+			\n    - 分隔線\"--_--_--_--_--_--_--\"以上的欄位必須填寫才能使用該button
+			\n    - 若要學習遙控器，步驟如下：
+			\n        (0) 製作VD遙控器按鈕，貼上Button send_code 1的程式碼
+			\n        (1) 建立Global value: getCode
+			\n        (2) 按下Button learn_code，並確認broadlink進入learning mode
+			\n        (3) 按下實體遙控器按鈕
+			\n        (4) 按下Button get_code
+			\n        (5) 打開Panels頁面，複製getCode的內容，即為data值(注意不要複製到多餘字元)
+			\n        (6) 填寫正確data及macAddr
 			\n--]]
 			\n
 			\n--[[ API原文說明
@@ -131,11 +140,12 @@
 						"name":"Button61",
 						"empty":false,
 							"msg":"local macAddr = 'b4:43:0d:aa:8e:92'
-							\nlocal name = \"\"  --Store named code shortcut on bridge (optional)
+							\nlocal name = \"temp\"  --Store named code shortcut on bridge (optional)
 							\n--_--_--_--_--_--_--
 							\n
-							\n--local body = '{\"api_id\":1003,\"mac\": \"'.. macAddr .. '\",\"name\": \"' .. name .. '\"}'
-							\nlocal body = '{\"api_id\":1003,\"mac\": \"'.. macAddr .. '\"}'
+							\nlocal gGetCode = \"getCode\"
+							\nlocal body = '{\"api_id\":1003,\"mac\": \"'.. macAddr .. '\",\"name\": \"' .. name .. '\"}'
+							\n--local body = '{\"api_id\":1003,\"mac\": \"'.. macAddr .. '\"}'
 							\n
 							\nlocal selfId = fibaro:getSelfId()
 							\nlocal ipAddr = fibaro:get(selfId, \"IPAddress\")
@@ -145,7 +155,14 @@
 							\nsocket = Net.FHttp( ipAddr, port )
 							\nresponse, status, errorCode = socket:POST( url, body )
 							\nfibaro:debug(response)
-							\n",
+							\n
+							\ntResp = json.decode(response)
+							\ndata = tResp.data 
+							\n
+							\nfibaro:setGlobal(gGetCode,  data )
+							\n
+							\nfibaro:log(data)
+							\nfibaro:debug(data)",
 						"buttonIcon":0,
 						"favourite":false,
 						"main":false
@@ -163,7 +180,7 @@
 						"caption":"send_code 1",
 						"name":"Button71",
 						"empty":false,
-							"msg":"local data = \"eeee\"  --Code data
+							"msg":"local data = \"2600a8004f13281315122912141414132713151228131611151316121300034c5213261315122912161116112912171129121611151215131500034a52112b1115112912161116122813151229121611161117101600035051122913151229111512161129131511291217111611161115000350511328121512291315121513271215132813161116111711150003514f14271316112912151315112a121513271216131412151216000d05\"  --Code data
 							\nlocal macAddr = 'b4:43:0d:aa:8e:92'
 							\n--_--_--_--_--_--_--
 							\n

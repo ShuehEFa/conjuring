@@ -1,5 +1,5 @@
 {
-	"name":" 儀衡客製化天氣VD",
+	"name":"儀衡天氣",
 	"type":"virtual_device",
 	"properties":
 	{
@@ -47,41 +47,41 @@
 		"ui.Label1a.value":"damascus，708",
 		"ui.Label1b.value":"
 		{
-			\"sunrise\":1454646503,
-			\"sunset\":1454684978,
-			\"temp\":10,
+			\"sunrise\":1455768979,
+			\"sunset\":1455808903,
+			\"temp\":14,
 			\"weather\":\"Clear\"
 		}",
 		"ui.Label2a.value":"newyork，708",
 		"ui.Label2b.value":"
 		{
-			\"sunrise\":1454673728,
-			\"sunset\":1454710707,
-			\"temp\":5.0400000000000000,
-			\"weather\":\"Rain\"
+			\"sunrise\":1455795972,
+			\"sunset\":1455834857,
+			\"temp\":-0.12000000000000000,
+			\"weather\":\"Clouds\"
 		}",
 		"ui.Label3a.value":"taipei，708",
 		"ui.Label3b.value":"
 		{
-			\"sunrise\":1454625297,
-			\"sunset\":1454665261,
-			\"temp\":13.940000000000000,
-			\"weather\":\"Rain\"
+			\"sunrise\":1455747993,
+			\"sunset\":1455788968,
+			\"temp\":18.460000000000001,
+			\"weather\":\"Clouds\"
 		}",
 		"ui.Label4a.value":"houston，708",
 		"ui.Label4b.value":"
 		{
-			\"sunrise\":1454677733,
-			\"sunset\":1454716941,
-			\"temp\":3.5499999999999998,
+			\"sunrise\":1455800304,
+			\"sunset\":1455840762,
+			\"temp\":9.0700000000000003,
 			\"weather\":\"Clear\"
 		}",
 		"ui.Label5a.value":"beijing，708",
 		"ui.Label5b.value":"
 		{
-			\"sunrise\":1454627969,
-			\"sunset\":1454665063,
-			\"temp\":2,
+			\"sunrise\":1455750250,
+			\"sunset\":1455789187,
+			\"temp\":9,
 			\"weather\":\"Clear\"
 		}",
 		"visible":"true",
