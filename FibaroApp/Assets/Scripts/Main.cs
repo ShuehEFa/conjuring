@@ -7,6 +7,8 @@ public class Main : MonoBehaviour
 
 	void Start()
 	{
+		useGUILayout = false ;
+
 		m_firstPage.Approach();
 	}
 }

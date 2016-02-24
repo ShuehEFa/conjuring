@@ -39,6 +39,7 @@ public class Page : MonoBehaviour
 
 	void Start()
 	{
+		useGUILayout = false ;
 		TransformX = -Screen.width ;
 	}
 
@@ -83,6 +84,4 @@ public class Page : MonoBehaviour
 		ButtonEnable = false ;
 		ButtonEnable = false ;
 	}
-
-
 }
