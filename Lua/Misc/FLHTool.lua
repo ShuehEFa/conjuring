@@ -1,7 +1,9 @@
 --[[
   @author eFa
-  @date   104.09.23
+  @date   105.03.04
   @brief  FLH開發基本Lib
+
+  @ date 105.03.04 by eFa . 修正LogTable
 --]]
 if FLH == nil then 
   FLH = 
@@ -33,13 +35,13 @@ if FLH == nil then
       for key , value in pairs( _tTable ) do
         if type( value ) == "table" then
           _self.Log( spaceText .. key .. " : table" , _color )
-          LogTable( value , _color , _space + 1 )
+          _self:LogTable( value , _color , _space + 1 )
         elseif type( value ) == "function" then
           _self.Log( spaceText .. key .. " : function" , _color )
         elseif type( value ) == "userdata" then
           _self.Log( spaceText .. key .. " : userdata" , _color )
         else
-          _self.Log( spaceText .. key .. " : " .. value , _color )
+          _self.Log( spaceText .. key .. " : " .. tostring( value ) , _color )
         end
       end
     end ,
