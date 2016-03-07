@@ -44,46 +44,47 @@
 			\n  fibaro:call(selfId, \"pressButton\", \"13\")  --更新日夜狀態
 			\n  fibaro:sleep(updateTime*1000)
 			\nend",
-		"ui.Label1a.value":"damascus，708",
+		"ui.Label1a.value":"damascus，0",
 		"ui.Label1b.value":"
 		{
-			\"sunrise\":1455768979,
-			\"sunset\":1455808903,
-			\"temp\":14,
+			\"sunrise\":1457322919,
+			\"sunset\":1457364999,
+			\"temp\":5,
 			\"weather\":\"Clear\"
 		}",
-		"ui.Label2a.value":"newyork，708",
+		"ui.Label2a.value":"newyork，0",
 		"ui.Label2b.value":"
 		{
-			\"sunrise\":1455795972,
-			\"sunset\":1455834857,
-			\"temp\":-0.12000000000000000,
+			\"sunrise\":1457349582,
+			\"sunset\":1457391281,
+			\"temp\":2.3500000000000001,
 			\"weather\":\"Clouds\"
 		}",
-		"ui.Label3a.value":"taipei，708",
+		"ui.Label3a.value":"taipei，0",
 		"ui.Label3b.value":"
 		{
-			\"sunrise\":1455747993,
-			\"sunset\":1455788968,
-			\"temp\":18.460000000000001,
-			\"weather\":\"Clouds\"
+			\"sunrise\":1457302256,
+			\"sunset\":1457344745,
+			\"temp\":20.030000000000001,
+			\"weather\":\"Mist\"
 		}",
-		"ui.Label4a.value":"houston，708",
+		"ui.Label4a.value":"houston，0",
 		"ui.Label4b.value":"
 		{
-			\"sunrise\":1455800304,
-			\"sunset\":1455840762,
-			\"temp\":9.0700000000000003,
-			\"weather\":\"Clear\"
+			\"sunrise\":1457354389,
+			\"sunset\":1457396706,
+			\"temp\":18.699999999999999,
+			\"weather\":\"Clouds\"
 		}",
-		"ui.Label5a.value":"beijing，708",
+		"ui.Label5a.value":"beijing，0",
 		"ui.Label5b.value":"
 		{
-			\"sunrise\":1455750250,
-			\"sunset\":1455789187,
-			\"temp\":9,
+			\"sunrise\":1457303907,
+			\"sunset\":1457345573,
+			\"temp\":8,
 			\"weather\":\"Clear\"
 		}",
+		"ui.Slider1.value":9,
 		"visible":"true",
 		"rows":
 		[
@@ -250,11 +251,11 @@
 						"empty":false,
 							"msg":"local city = 
 							\n{ 
-							\n  {name = \"damascus\", light = \"708\"},
-							\n  {name = \"newyork\", light = \"708\"},
-							\n  {name = \"taipei\", light = \"708\"},
-							\n  {name = \"houston\", light = \"708\"},
-							\n  {name = \"beijing\", light = \"708\"}
+							\n  {name = \"damascus\", light = 0},
+							\n  {name = \"newyork\", light = 0},
+							\n  {name = \"taipei\", light = 0},
+							\n  {name = \"houston\", light = 0},
+							\n  {name = \"beijing\", light = 0}
 							\n}
 							\n
 							\n--_--_--_--_--
@@ -1281,9 +1282,9 @@
 							\n
 							\ntData = 
 							\n{
-							\n  sunrise = time - 3600*2,         
-							\n  sunset =  time + 3600*5,         
-							\n  temp = 99,
+							\n  sunrise = time - 3600*5,         
+							\n  sunset =  time + 3600*4,         
+							\n  temp = 30,
 							\n  weather = \"Rain\"
 							\n}
 							\n
@@ -1291,6 +1292,69 @@
 							\n
 							\nfibaro:call(selfId, \"setProperty\", \"ui.Label5b.value\", data)",
 						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"slider",
+				"elements":
+				[
+					{
+						"id":20,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Color test",
+						"name":"Slider1",
+							"msg":"--手動測試不同溫度下燈條顏色
+							\n
+							\nlocal rgb0 = { 227, 233, 255 }      -- 0度RGB
+							\nlocal rgb25 = { 255, 209, 163 }     --25度RGB
+							\nlocal rgb45 = { 255, 137, 18 }      --45度RGB
+							\n
+							\nlocal rgbLightId = 708
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nfunction TempColor(_temp)  --根據溫度(temp)算出對應RGB
+							\n  if (_temp <= 0) then
+							\n    returnR = rgb0[1]
+							\n    returnG = rgb0[2]
+							\n    returnB = rgb0[3]
+							\n  elseif ((_temp > 0) and (_temp <= 25)) then
+							\n    spaceR = ( rgb25[1] - rgb0[1] )/25
+							\n    spaceG = ( rgb25[2] - rgb0[2] )/25
+							\n    spaceB = ( rgb25[3] - rgb0[3] )/25
+							\n
+							\n    returnR =  rgb0[1] + spaceR * _temp 
+							\n    returnG =  rgb0[2] + spaceG * _temp 
+							\n    returnB =  rgb0[3] + spaceB * _temp 
+							\n  elseif ((_temp > 25) and (_temp <= 45 )) then
+							\n    spaceR = ( rgb45[1] - rgb25[1] )/20
+							\n    spaceG = ( rgb45[2] - rgb25[2] )/20
+							\n    spaceB = ( rgb45[3] - rgb25[3] )/20
+							\n
+							\n    returnR =  rgb25[1] + spaceR * ( _temp - 25 )
+							\n    returnG =  rgb25[2] + spaceG * ( _temp - 25 )
+							\n    returnB =  rgb25[3] + spaceB * ( _temp - 25 )  
+							\n  elseif (_temp > 45) then
+							\n    returnR = rgb45[1]
+							\n    returnG = rgb45[2]
+							\n    returnB = rgb45[3]
+							\n  end
+							\n  
+							\n  return returnR, returnG, returnB
+							\nend
+							\n
+							\nlocal temp = tonumber(fibaro:getValue(selfId, \"ui.Slider1.value\"))
+							\nlocal colorR,colorG,colorB = TempColor(temp)
+							\n
+							\nfibaro:debug(colorR ..\",\".. colorG ..\",\".. colorB)
+							\n
+							\nfibaro:call(rgbLightId, \"setColor\", math.floor(colorR), math.floor(colorG), math.floor(colorB), \"0\" )",
+						"buttonIcon":0,
+						"value":60,
 						"favourite":false,
 						"main":false
 					}
