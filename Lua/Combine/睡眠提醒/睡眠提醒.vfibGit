@@ -1,0 +1,330 @@
+{
+	"name":"睡眠提醒",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author Lala
+			\n  @date   105.03.01
+			\n  @brief  超過睡覺時間燈光會逐漸變暗，超過起床時間燈光會逐漸變亮
+			\n  @note   
+			\n   1. 需搭配Scene使用
+			\n   2. 建立兩個Global： sleepLight sleepLight2
+			\n--]]
+			\n
+			\nlocal selfId = fibaro:getSelfId()
+			\nlocal wakeTime = fibaro:getValue( selfId, \"ui.Label1.value\" )
+			\n
+			\nif ( wakeTime == \"\" ) then
+			\n  fibaro:call( selfId, \"setProperty\", \"ui.Label1.value\", \"00:00\")
+			\n  fibaro:call( selfId, \"setProperty\", \"ui.Label2.value\", \"00:00\")
+			\n  fibaro:call( selfId, \"setProperty\", \"ui.Label3.value\", \"00:00\")
+			\n  
+			\n  fibaro:debug(1)  
+			\nend
+			\n
+			\nfibaro:call(selfId, \"pressButton\", \"9\")",
+		"ui.Label1.value":"15:15",
+		"ui.Label2.value":"15:30",
+		"ui.Label3.value":"15:15",
+		"ui.Label4.value":"設定睡覺時間 小時",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"起床時間：",
+						"name":"Label2",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"睡覺時間：",
+						"name":"Label1",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"設定時間：",
+						"name":"Label3",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"提示：",
+						"name":"Label4",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":5,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"︿",
+						"name":"Button51",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\nlocal setLabel = \"ui.Label3.value\"
+							\nlocal itemLabel = \"ui.Label4.value\"
+							\nlocal item = fibaro:getValue(selfId, itemLabel)
+							\n
+							\nlocal setTime = fibaro:getValue(selfId, setLabel)
+							\n--local setValue = string.match(setTime, \"(%d+):\")
+							\n
+							\n  setHr = string.match(setTime, \"(%d+):\")
+							\n  setMin = string.match(setTime, \":(%d+)\")
+							\n\t
+							\nif ((item == \"設定睡覺時間 小時\") or (item == \"設定起床時間 小時\")) then
+							\n
+							\n  setHr = string.format(\"%02d\", (setHr + 1) % 24)    
+							\n  fibaro:call(selfId, \"setProperty\", setLabel, setHr .. \":\" .. setMin)
+							\nelseif ((item == \"設定睡覺時間 分鐘\") or (item == \"設定起床時間 分鐘\")) then
+							\n  setMin = string.format(\"%02d\", (setMin + 1) % 60)
+							\n
+							\n  fibaro:call(selfId, \"setProperty\", setLabel, setHr ..\":\" .. setMin)
+							\nend
+							\n  ",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					},
+					{
+						"id":6,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"﹀",
+						"name":"Button52",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\nlocal setLabel = \"ui.Label3.value\"
+							\nlocal itemLabel = \"ui.Label4.value\"
+							\nlocal item = fibaro:getValue(selfId, itemLabel)
+							\n
+							\nlocal setTime = fibaro:getValue(selfId, setLabel)
+							\n--local setValue = string.match(setTime, \"(%d+):\")
+							\n
+							\n  setHr = string.match(setTime, \"(%d+):\")
+							\n  setMin = string.match(setTime, \":(%d+)\")
+							\n\t
+							\nif ((item == \"設定睡覺時間 小時\") or (item == \"設定起床時間 小時\")) then
+							\n
+							\n  setHr = string.format(\"%02d\", (setHr - 1) % 24)    
+							\n  fibaro:call(selfId, \"setProperty\", setLabel, setHr .. \":\" .. setMin)
+							\nelseif ((item == \"設定睡覺時間 分鐘\") or (item == \"設定起床時間 分鐘\")) then
+							\n  setMin = string.format(\"%02d\", (setMin - 1) % 60)
+							\n
+							\n  fibaro:call(selfId, \"setProperty\", setLabel, setHr ..\":\" .. setMin)
+							\nend
+							\n  ",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":7,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Set",
+						"name":"Button53",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\nlocal itemLabel = \"ui.Label4.value\"
+							\nlocal item = fibaro:getValue(selfId, itemLabel)
+							\nlocal setLabel = \"ui.Label3.value\"
+							\n--local setTime = fibaro:getValue(selfId, setLabel)
+							\nlocal wakeLabel = \"ui.Label2.value\"
+							\nlocal sleepLabel = \"ui.Label1.value\"
+							\n
+							\n
+							\n
+							\nlocal wakeTime = fibaro:getValue(selfId, wakeLabel)
+							\nlocal sleepTime = fibaro:getValue(selfId, sleepLabel)
+							\n
+							\nlocal wakeHr = string.match(wakeTime, \"(.+):\")
+							\nlocal wakeMin = string.match(wakeTime, \":(.+)\")
+							\nlocal sleepHr = string.match(sleepTime, \"(.+):\")
+							\nlocal sleepMin = string.match(sleepTime, \":(.+)\")
+							\n
+							\n
+							\n--  起床小時  >  起床分鐘  >  睡覺小時  >  睡覺分鐘
+							\n--顯示起床         儲存起床+顯示睡覺         儲存睡覺+顯示起床   
+							\n
+							\nif (item == \"設定起床時間 小時\") then
+							\n
+							\n  fibaro:call(selfId, \"setProperty\", itemLabel, \"設定起床時間 分鐘\")    
+							\n  
+							\nelseif (item == \"設定起床時間 分鐘\") then
+							\n
+							\n  setTime = fibaro:getValue(selfId, setLabel)
+							\n  fibaro:call(selfId, \"setProperty\", wakeLabel, setTime)
+							\n  fibaro:call(selfId, \"setProperty\", itemLabel, \"設定睡覺時間 小時\")  
+							\n  fibaro:call(selfId, \"setProperty\", setLabel, sleepHr .. \":\" ..sleepMin )
+							\n  
+							\nelseif (item == \"設定睡覺時間 小時\") then
+							\n
+							\n  fibaro:call(selfId, \"setProperty\", itemLabel, \"設定睡覺時間 分鐘\")
+							\n  
+							\nelseif (item == \"設定睡覺時間 分鐘\") then
+							\n
+							\n  setTime = fibaro:getValue(selfId, setLabel)
+							\n  fibaro:call(selfId, \"setProperty\", sleepLabel, setTime)
+							\n  fibaro:call(selfId, \"setProperty\", itemLabel, \"設定起床時間 小時\")
+							\n  fibaro:call(selfId, \"setProperty\", setLabel, wakeHr .. \":\" .. wakeMin)
+							\n  
+							\nelse 
+							\n
+							\n  fibaro:call(selfId, \"setProperty\", itemLabel, \"設定起床時間 小時\")
+							\n  fibaro:call(selfId, \"setProperty\", setLabel, wakeHr .. \":\" .. wakeMin)
+							\n  
+							\nend
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":8,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"回復亮度",
+						"name":"Button31",
+						"empty":false,
+							"msg":"local sceneId = 90
+							\n
+							\nlocal gLightRecord = \"sleepLight2\"
+							\n
+							\nlocal lightValue = fibaro:getGlobal(gLightRecord)
+							\nlocal tLightValue = json.decode(lightValue)
+							\n
+							\nfibaro:killScenes(sceneId)
+							\n
+							\nfor i = 1, #tLightValue do
+							\n  fibaro:call(tLightValue[i].id, \"setValue\", tLightValue[i].value)
+							\nend
+							\n
+							\n
+							\nfibaro:debug(\"ok\")
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":9,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Check Time",
+						"name":"Button21",
+						"empty":false,
+							"msg":"--__--__--__--__--
+							\nlocal gTime = \"sleepLight\"    --紀錄時段用
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nlocal wakeLabel = \"ui.Label2.value\"
+							\nlocal sleepLabel = \"ui.Label1.value\"
+							\n
+							\n
+							\n--local gTime = \"sleepLight2\"    --紀錄燈光亮度用
+							\n
+							\n------------------
+							\n
+							\nlocal nowTime = tonumber(os.date(\"%H%M\"))                       --取得系統時間
+							\nlocal wakeTime = fibaro:getValue(selfId, wakeLabel)             --取得起床時間
+							\nlocal wakeHr = string.match(wakeTime, \"(.+):\")
+							\nlocal wakeMin = string.match(wakeTime, \":(.+)\")
+							\nlocal wake = tonumber(wakeHr .. wakeMin)
+							\nlocal sleepTime = fibaro:getValue(selfId, sleepLabel)           --取得睡覺時間
+							\nlocal sleepHr = string.match(sleepTime, \"(.+):\")
+							\nlocal sleepMin = string.match(sleepTime, \":(.+)\")
+							\nlocal sleep = tonumber(sleepHr .. sleepMin )
+							\n
+							\nfibaro:debug(wakeTime)
+							\n 
+							\n 
+							\nif (sleep < wake) then
+							\n  if ((sleep < nowTime) and (nowTime < wake)) then
+							\n    fibaro:setGlobal(gTime, \"睡眠\")   
+							\n  else
+							\n    fibaro:setGlobal(gTime, \"起床\")
+							\n  end
+							\nelseif (sleep > wake ) then 
+							\n  if ((sleep < nowTime ) or (nowTime < wake)) then
+							\n    fibaro:setGlobal(gTime, \"睡眠\")
+							\n  else
+							\n    fibaro:setGlobal(gTime, \"起床\")  
+							\n  end
+							\nend 
+							\n 
+							\n 
+							\n ",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}
