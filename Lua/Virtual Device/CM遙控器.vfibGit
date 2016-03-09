@@ -9,12 +9,14 @@
 		"logTemp":"",
 			"mainLoop":"--[[
 			\n  @author eFa
-			\n  @date   105.03.03
+			\n  @date   105.03.09
 			\n  @brief  cool master簡易遙控器
 			\n
 			\n  @note   記得建立Global Value [gDatas]、[gCmds]、[gSync]、[gSyncTime]、[gIsBusy]
 			\n\t\t  記得填寫IP及Port，Port預設80
 			\n\t\t  根據不同CoolMaster型號，支援的模式跟風量功能有所區別，同步修改模式按鍵及風量按鍵的功能id
+			\n
+			\n  @date   105.03.09 by eFa . sync更改為須同步且遙控器閒置幾秒才開始
 			\n--]]
 			\nif mtDatas == nil then
 			\n  
@@ -62,6 +64,9 @@
 			\n  mPowCmd = \" POWER_\"
 			\n  mSetCmd = \" SETTING_\"
 			\n  
+			\n  -- 同步啟動參數
+			\n  mWaitSyncSec = 6
+			\n  
 			\n  -- debug
 			\n  tDebugWeights =
 			\n  {
@@ -73,9 +78,9 @@
 			\n  mDebugWeight = tDebugWeights.baisc 
 			\n  
 			\n  --[[參數設定 結束]]--
-			\n   modeRange = #mModes
-			\n   windRange = #mWinds
-			\n   tempRange = mMaxTemp - mMinTemp + 1
+			\n  modeRange = #mModes
+			\n  windRange = #mWinds
+			\n  tempRange = mMaxTemp - mMinTemp + 1
 			\n
 			\n  function Trace( _text , _weight , _color )
 			\n    _weight = _weight or 0
@@ -133,6 +138,7 @@
 			\n  mtDatas.tempMin = mMinTemp
 			\n  
 			\n  mSelfId = fibaro:getSelfId()
+			\n  mIdleTime = 0
 			\n  
 			\n  -- 顯示設定
 			\n  displayID = deviceCount
@@ -173,6 +179,7 @@
 			\nif not ( isBusy or isUpdate ) then
 			\n  local cmds = fibaro:getGlobal( gCmds )
 			\n  if cmds ~= \"\" then
+			\n    mIdleTime = time
 			\n    if cmds:match( mExitCmd ) ~= null then
 			\n      Trace( cmds , 4 , \"red\" )
 			\n      fibaro:call( mSelfId , \"pressButton\" , mCmdButton )
@@ -189,9 +196,14 @@
 			\n    local lastSyncTimeStamp = fibaro:getGlobalValue( gSyncTime )    
 			\n    local syncTimeStamp = tostring(fibaro:getGlobalModificationTime( gSync ) )
 			\n    if syncTimeStamp ~= lastSyncTimeStamp then
-			\n      fibaro:call( mSelfId , \"pressButton\" , mSyncButton )
+			\n      if time - mIdleTime > mWaitSyncSec  then
+			\n        mIdleTime = time
+			\n        fibaro:call( mSelfId , \"pressButton\" , mSyncButton )
+			\n      end
 			\n    end
 			\n  end
+			\nelse
+			\n  mIdleTime = time
 			\nend
 			\n
 			\nlocal infoTimeStamp = fibaro:getModificationTime( mSelfId , \"ui.Info.value\" )
@@ -200,7 +212,7 @@
 			\nend",
 		"ui.ID.value":"全部",
 		"ui.Info.value":"",
-		"ui.State.value":"冷氣 弱　風 24℃",
+		"ui.State.value":"",
 		"visible":"true",
 		"rows":
 		[
@@ -1265,7 +1277,7 @@
 							\n  baisc = 1 ,
 							\n  none = 0 ,
 							\n}
-							\nlocal mDebugWeight = tDebugWeights.all 
+							\nlocal mDebugWeight = tDebugWeights.baisc 
 							\n
 							\nfunction Trace( _text , _weight , _color )
 							\n  _weight = _weight or 0
