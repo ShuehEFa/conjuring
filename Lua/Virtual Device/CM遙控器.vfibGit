@@ -13,6 +13,8 @@
 			\n  @brief  cool master簡易遙控器
 			\n
 			\n  @note   記得建立Global Value [gDatas]、[gCmds]、[gSync]、[gSyncTime]、[gIsBusy]
+			\n\t\t  記得填寫IP及Port，Port預設80
+			\n\t\t  根據不同CoolMaster型號，支援的模式跟風量功能有所區別，同步修改模式按鍵及風量按鍵的功能id
 			\n--]]
 			\nif mtDatas == nil then
 			\n  
@@ -24,28 +26,29 @@
 			\n  gSync = \"CM_Sync\"
 			\n  gSyncTime = \"CM_SyncTime\"
 			\n  gIsBusy = \"CM_IsBusy\"
+			\n  gIsUpdate = \"CM_IsUpdate\"
 			\n  
 			\n  -- 設備UID（程式會自動加入 控制全部冷氣但ID為0的設備）
 			\n  tSetupDevices = 
 			\n  { 
-			\n    -- uid      面板顯示名稱      支援模式：暖氣/冷氣/除濕/送風
-			\n    { uid = 100 , name = \"冷氣1\" , tModeEnable = { true , true , true , true } } ,
-			\n    { uid = 101 , name = \"冷氣2\" , tModeEnable = { true , true , true , true } } ,
-			\n    { uid = 102 , name = \"冷氣3\" , tModeEnable = { true , true , true , true } } ,
+			\n    -- uid      面板顯示名稱      支援模式：暖氣/冷氣/除濕/送風/自動/其他
+			\n    { uid = 100 , name = \"冷氣1\" , tModeEnable = { true , true , true , true , true , true } } ,
+			\n    { uid = 101 , name = \"冷氣2\" , tModeEnable = { true , true , true , true , true , true } } ,
+			\n    { uid = 102 , name = \"冷氣3\" , tModeEnable = { true , true , true , true , true , true } } ,
 			\n  }
 			\n  
 			\n  -- 功能範圍，目前寫死不能動
-			\n  mModes = { \"暖氣\" , \"冷氣\" , \"除濕\" , \"送風\" }
-			\n  mTempDisplayModes = { true , true , false , false }
+			\n  mModes = { \"暖氣\" , \"冷氣\" , \"除濕\" , \"送風\" , \"自動\" , \"其他\" }
+			\n  mTempDisplayModes = { true , true , false , false , true , false }
 			\n  mDefaultMode = 2
 			\n  
 			\n  -- 風量範圍，目前寫死不能動
-			\n  mWinds = { \"微風\" , \"弱風\" , \"強風\" }
+			\n  mWinds = { \"微　風\" , \"弱　風\" , \"強　風\" , \"超強風\" , \"自動風\" }
 			\n  mDefaultWind = 2
 			\n  
 			\n  -- 溫度範圍
-			\n  mMaxTemp = 25
-			\n  mMinTemp = 21
+			\n  mMaxTemp = 32
+			\n  mMinTemp = 16
 			\n  mDefaultTemp = math.floor( ( mMaxTemp + mMinTemp ) / 2 )
 			\n  
 			\n  -- 更新頻率
@@ -129,8 +132,6 @@
 			\n  mtDatas.tempMax = mMaxTemp
 			\n  mtDatas.tempMin = mMinTemp
 			\n  
-			\n  fibaro:setGlobal( gDatas , json.encode( mtDatas ) )
-			\n  
 			\n  mSelfId = fibaro:getSelfId()
 			\n  
 			\n  -- 顯示設定
@@ -150,9 +151,14 @@
 			\n    Trace( \"modeEnable : \" .. json.encode( tDevices[ i ].modeEnable ) , 1 )
 			\n    Trace( mModes[ tDevices[ i ].mode ] .. \" \" .. mWinds[ tDevices[ i ].wind ] .. \" \" .. tDevices[ i ].temp .. \"℃\" , 1 )
 			\n  end
-			\n  -- first sync
-			\n  fibaro:setGlobal( gIsBusy , \"false\" )
+			\n  
+			\n  fibaro:setGlobal( gDatas , json.encode( mtDatas ) )
+			\n  fibaro:setGlobal( gCmds , \"\" )
 			\n  fibaro:setGlobal( gSyncTime , tostring( fibaro:getGlobalModificationTime( gSync ) ) )
+			\n  fibaro:setGlobal( gIsBusy , \"false\" )
+			\n  fibaro:setGlobal( gIsUpdate , \"false\" )
+			\n  
+			\n  -- first sync
 			\n  fibaro:sleep( 500 )
 			\n  fibaro:call( mSelfId , \"pressButton\" , mSyncButton )
 			\nend
@@ -162,8 +168,9 @@
 			\nlocal time = os.time()
 			\n
 			\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
+			\nlocal isUpdate = fibaro:getGlobalValue( gIsUpdate ) == \"1\"
 			\n
-			\nif not isBusy then
+			\nif not ( isBusy or isUpdate ) then
 			\n  local cmds = fibaro:getGlobal( gCmds )
 			\n  if cmds ~= \"\" then
 			\n    if cmds:match( mExitCmd ) ~= null then
@@ -193,7 +200,7 @@
 			\nend",
 		"ui.ID.value":"全部",
 		"ui.Info.value":"",
-		"ui.State.value":"冷氣 弱風 23℃",
+		"ui.State.value":"冷氣 弱　風 24℃",
 		"visible":"true",
 		"rows":
 		[
@@ -1242,6 +1249,7 @@
 							"msg":"local gDatas = \"CM_Datas\"
 							\nlocal gCmds = \"CM_Cmds\"
 							\nlocal gIsBusy = \"CM_IsBusy\"
+							\nlocal gIsUpdate = \"CM_IsUpdate\"
 							\n
 							\nlocal mSocketTryErrTime = 5
 							\nlocal mSocketRetrySec = 1
@@ -1257,7 +1265,7 @@
 							\n  baisc = 1 ,
 							\n  none = 0 ,
 							\n}
-							\nlocal mDebugWeight = tDebugWeights.detail 
+							\nlocal mDebugWeight = tDebugWeights.all 
 							\n
 							\nfunction Trace( _text , _weight , _color )
 							\n  _weight = _weight or 0
@@ -1297,6 +1305,7 @@
 							\n    return 
 							\n  end
 							\n  local respose , status , errorCode = mSocket:GET( \"/appeng/cmapi/alloff/\" )
+							\n  Trace( \"alloff = \" .. respose , 9 , \"white\" )
 							\n  if CheckSocket( status , errorCode ) == false then 
 							\n    Trace( \"DoTurnOffAll retry\" , 5 , \"yellow\" )
 							\n    fibaro:sleep( 1000 * mSocketRetrySec )
@@ -1310,6 +1319,7 @@
 							\n    return 
 							\n  end
 							\n  local respose , status , errorCode = mSocket:GET( \"/appeng/cmapi/off/?arg=\" .. _idx )
+							\n  Trace( \"off = \" .. respose , 9 , \"white\" )
 							\n  if CheckSocket( status , errorCode ) == false then 
 							\n    Trace( \"DoTurnOff retry\" , 5 , \"yellow\" )
 							\n    fibaro:sleep( 1000 * mSocketRetrySec )
@@ -1323,6 +1333,7 @@
 							\n    return 
 							\n  end
 							\n  local respose , status , errorCode = mSocket:GET( \"/appeng/cmapi/on/?arg=\" .. _idx )
+							\n  Trace( \"on = \" .. respose , 9 , \"white\" )
 							\n  if CheckSocket( status , errorCode ) == false then 
 							\n    Trace( \"DoTurnOn retry\" , 5 , \"yellow\" )
 							\n    fibaro:sleep( 1000 * mSocketRetrySec )
@@ -1336,6 +1347,7 @@
 							\n    return 
 							\n  end
 							\n  local respose , status , errorCode = mSocket:GET( \"/appeng/cmapi/\" .. _mode .. \"/?arg=\" .. _idx )
+							\n  Trace( \"mode = \" .. respose , 9 , \"white\" )
 							\n  if CheckSocket( status , errorCode ) == false then 
 							\n    Trace( \"DoMode retry\" , 5 , \"yellow\" )
 							\n    fibaro:sleep( 1000 * mSocketRetrySec )
@@ -1349,6 +1361,7 @@
 							\n    return 
 							\n  end
 							\n  local respose , status , errorCode = mSocket:GET( \"/appeng/cmapi/fspeed/?arg=\" .. _idx .. \" \" .. _wind )
+							\n  Trace( \"wind = \" .. respose , 9 , \"white\" )
 							\n  if CheckSocket( status , errorCode ) == false then 
 							\n    Trace( \"DoWind retry\" , 5 , \"yellow\" )
 							\n    fibaro:sleep( 1000 * mSocketRetrySec )
@@ -1362,6 +1375,7 @@
 							\n    return 
 							\n  end
 							\n  local respose , status , errorCode = mSocket:GET( \"/appeng/cmapi/temp/?arg=\" .. _idx .. \"\" .. tostring( _temp ) )
+							\n  Trace( \"temp = \" .. respose , 9 , \"white\" )
 							\n  if CheckSocket( status , errorCode ) == false then 
 							\n    Trace( \"DoTemp retry\" , 5 , \"yellow\" )
 							\n    fibaro:sleep( 1000 * mSocketRetrySec )
@@ -1370,34 +1384,42 @@
 							\nend 
 							\n
 							\nfunction DoSetting( _idx )
-							\n  local idx = mDevices[ idx ].deviceID
-							\n  local modeIdx = mDevices[ idx ].mode
-							\n  local mode = \"heat\"
-							\n  if modeIdx == 2 then
+							\n  local idx = mDevices[ _idx ].deviceID
+							\n  local modeIdx = mDevices[ _idx ].mode
+							\n  local mode = \"auto\"
+							\n  if modeIdx == 1 then
+							\n    mode = \"heat\"
+							\n  elseif modeIdx == 2 then
 							\n    mode = \"cool\"
 							\n  elseif modeIdx == 3 then
 							\n    mode = \"dry\"
 							\n  elseif modeIdx == 4 then
 							\n    mode = \"fan\"
+							\n  elseif modeIdx == 5 then
+							\n    mode = \"auto\"
 							\n  end
-							\n  local windIdx = mDevices[ idx ].wind
-							\n  local wind = \"l\"
-							\n  if windIdx == 2 then
+							\n  local windIdx = mDevices[ _idx ].wind
+							\n  local wind = \"a\"
+							\n  if windIdx == 1 then
+							\n    wind = \"l\"
+							\n  elseif windIdx == 2 then
 							\n    wind = \"m\"
 							\n  elseif windIdx == 3 then
+							\n    wind = \"h\"
+							\n  elseif windIdx == 4 then
 							\n    wind = \"t\"
 							\n  end
 							\n  DoTurnOn( idx , 0 )
 							\n  DoMode( idx , mode , 0 )
 							\n  DoWind( idx , wind , 0 )
 							\n  if modeIdx == 1 or modeIdx == 2 then
-							\n    DoTemp( idx , mDevices[ idx ].temp , 0 )
+							\n    DoTemp( idx , mDevices[ _idx ].temp , 0 )
 							\n  end
 							\nend
 							\n
 							\nfunction DoCmds( _cmds )
 							\n  if _cmds == \"\" then 
-							\n    Trace( \"white\" , \"no cmds\" , 9 )
+							\n    Trace( \"no cmds\" , 9 , \"white\" )
 							\n    return 
 							\n  end
 							\n  
@@ -1406,7 +1428,7 @@
 							\n    powCount = powCount + 1
 							\n    idx = tonumber( cmd )
 							\n  end
-							\n  Trace( \"power count = \" .. mPowCmd , 9 , \"white\" )
+							\n  Trace( \"power count = \" .. powCount , 9 , \"white\" )
 							\n  if powCount ~= 0 then
 							\n    if idx ~= nil then
 							\n      Trace( \"idx form power cmd = \" .. idx , 9 , \"white\" )
@@ -1449,9 +1471,11 @@
 							\nend
 							\n
 							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
-							\nif isBusy then
+							\nlocal isUpdate = fibaro:getGlobalValue( gIsUpdate ) == \"1\"
+							\nif isBusy or isUpdate then
 							\n  Trace( \"busing...\" , 1 )
 							\nelse
+							\n  fibaro:setGlobal( gIsUpdate , \"true\" )
 							\n  local cmds = fibaro:getGlobal( gCmds )
 							\n  local begin , head , tail = 1 , 1 , 1
 							\n  while head ~= nil do
@@ -1470,12 +1494,13 @@
 							\n  end
 							\n  
 							\n  local ret = cmds:sub( begin )
-							\n  Trace( \"is empty? \" .. tostring( ret == nil ) .. \" / \" .. tostring( begin == 1 ) .. \" : \" .. begin , 9 , \"purple\" )
+							\n  Trace( \"is empty? \" .. tostring( ret == nil ) .. \" / \" .. begin , 9 , \"purple\" )
 							\n  if ret == nil or begin == 1 then
 							\n    ret = \"\"
 							\n  end
 							\n  Trace( \"return : \" .. ret , 9 , \"purple\" )
 							\n  fibaro:setGlobal( gCmds , ret )
+							\n  fibaro:setGlobal( gIsUpdate , \"false\" )
 							\nend",
 						"buttonIcon":0,
 						"favourite":false,
@@ -1574,42 +1599,52 @@
 							\n          break
 							\n        end
 							\n      end
-							\n
-							\n      local on = stat:match( \"(%a+)\" )
-							\n      if on == \"ON\" then
-							\n      \tdevices[ findIdx ].on = true
-							\n      else
-							\n        devices[ findIdx ].on = false
+							\n      
+							\n      if findIdx ~= 0 then
+							\n        local on = stat:match( \"(%a+)\" )
+							\n        if on == \"ON\" then
+							\n          devices[ findIdx ].on = true
+							\n        else
+							\n          devices[ findIdx ].on = false
+							\n        end
+							\n        
+							\n        local mode = stat:match( \"(%a+)\" , 22 )
+							\n        if mode == \"Heat\" then
+							\n          devices[ findIdx ].mode = 1
+							\n        elseif mode == \"Cool\" then
+							\n          devices[ findIdx ].mode = 2
+							\n        elseif mode == \"Dry\" then
+							\n          devices[ findIdx ].mode = 3
+							\n        elseif mode == \"Fan\" then
+							\n          devices[ findIdx ].mode = 4
+							\n        elseif mode:find( \"Aut\" ) ~= nil then
+							\n          devices[ findIdx ].mode = 5
+							\n        else
+							\n          devices[ findIdx ].mode = 6
+							\n        end
+							\n        
+							\n        local wind = stat:match( \"(%a+)\" , 17 )
+							\n        if wind == \"Low\" then
+							\n          devices[ findIdx ].wind = 1
+							\n        elseif wind == \"Med\" then
+							\n          devices[ findIdx ].wind = 2
+							\n        elseif wind == \"High\" then
+							\n          devices[ findIdx ].wind = 3
+							\n        elseif wind == \"Top\" then
+							\n          devices[ findIdx ].wind = 4
+							\n        else
+							\n          devices[ findIdx ].wind = 5
+							\n        end
+							\n        
+							\n        local temp = stat:match( \"(%d+)\" )
+							\n        devices[ findIdx ].temp = temp
+							\n        
+							\n        Trace( uid .. \" : \" .. on , 9 )
+							\n        Trace( uid .. \" : \" .. mode , 9 )
+							\n        Trace( uid .. \" : \" .. wind  , 9 )
+							\n        Trace( uid .. \" : \" .. temp .. \"℃\" , 9 )
+							\n        Trace( \"-------------------\" , 9 )
 							\n      end
-							\n      
-							\n      local mode = stat:match( \"(%a+)\" , 22 )
-							\n      if mode == \"Heat\" then
-							\n        devices[ findIdx ].mode = 1
-							\n      elseif mode == \"Cool\" then
-							\n        devices[ findIdx ].mode = 2
-							\n      elseif mode == \"Dry\" then
-							\n        devices[ findIdx ].mode = 3
-							\n      else
-							\n        devices[ findIdx ].mode = 4
-							\n      end
-							\n      
-							\n      local wind = stat:match( \"(%a+)\" , 17 )
-							\n      if wind == \"Low\" then
-							\n        devices[ findIdx ].wind = 1
-							\n      elseif wind == \"Med\" then
-							\n        devices[ findIdx ].wind = 2
-							\n      else
-							\n        devices[ findIdx ].wind = 3
-							\n      end
-							\n      
-							\n      local temp = stat:match( \"(%d+)\" )
-							\n      devices[ findIdx ].temp = temp
-							\n      
-							\n      Trace( uid .. \" : \" .. on , 9 )
-							\n      Trace( uid .. \" : \" .. mode , 9 )
-							\n      Trace( uid .. \" : \" .. wind  , 9 )
-							\n      Trace( uid .. \" : \" .. temp .. \"℃\" , 9 )
-							\n      Trace( \"-------------------\" , 9 )
 							\n    end
 							\n    
 							\n    local allSameOn , allSameMode , allSameWind , allSameTemp = true , true , true , true
