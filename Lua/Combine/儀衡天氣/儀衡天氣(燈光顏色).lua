@@ -12,7 +12,7 @@
 --]]
 
 
-local virtualDeviceId = 689         --Virtual Device Id
+local virtualDeviceId = 791         --Virtual Device Id
 local selfId = 87                   --本情境ID   
 local sunsetSceneId = 88            --日落情境
 
@@ -24,15 +24,15 @@ local rgb25 = { 255, 209, 163 }     --25度RGB
 local rgb45 = { 255, 137, 18 }      --45度RGB
 local sunsetColor = { 5, 5, 25 }    --日落固定顏色
 
-local programRain = 1               --雨天效果(RGB program)
-local programSnow = 3               --下雪效果(RGB program)
-local programThunderstorm = 2       --雷雨效果(RGB program)
-local programOther = 5              --晴、雲、其他天氣效果(RGB program)
+local tProgramRain = { 1, 1, 1, 1, 1 }               --雨天效果(RGB program)
+local tProgramSnow = { 2, 2, 2, 2, 2 }               --下雪效果(RGB program)
+local tProgramThunderstorm = { 3, 3, 3, 3, 3 }       --雷雨效果(RGB program)
+local tProgramOther = { 4, 4, 4, 4, 4 }              --晴、雲、其他天氣效果(RGB program)
 
 local intervalTime = 30             --此情境間隔時間(分)
 local changeTime = 3*60*60          --日出至天完全亮的時間(秒)
-local effectTime = 10               --天氣效果持續時間(秒)
-local debugTime = 5                 --debug用，平常請設定為0(秒)
+local effectTime = 0               --天氣效果持續時間(秒)
+local debugTime = 0                 --debug用，平常請設定為0(秒)
 
 local soundCity = 5                 --播放此城市天氣音效
 local rainButton = 14               --VD撥放音效Rain button
@@ -161,16 +161,16 @@ function MainEffect()
     elseif (mSun[i] == "rise") then		
 	  if ((mWeather[i] == "Rain") or (mWeather[i] == "Drizzle")) then         --雨
 	    print("City " .. i .. " ( " .. mCityName[i] .. " ) is Rain")
-        Rain(mCityName[i], mLightId[i])
+        Rain(i,mCityName[i], mLightId[i])
       elseif (mWeather[i] == "Snow") then                                 --雪
 	    print("City " .. i .. " ( " .. mCityName[i] .. " ) is Snow")
-        Snow(mCityName[i], mLightId[i])
+        Snow(i,mCityName[i], mLightId[i])
       elseif (mWeather[i] == "Thunderstorm")  then                        --雷
 	    print("City " .. i .. " ( " .. mCityName[i] .. " ) is Thunderstorm")
-        Thunder(mCityName[i], mLightId[i])	
+        Thunder(i,mCityName[i], mLightId[i])	
       else                                                            --雲、晴、霧、...
 	    print("City " .. i .. " ( " .. mCityName[i] .. " ) is Clouds")
-        Clouds(mCityName[i], mLightId[i])
+        Clouds(i,mCityName[i], mLightId[i])
       end
 	end
     fibaro:sleep(debugTime*1000)	
@@ -179,27 +179,27 @@ function MainEffect()
   fibaro:call(virtualDeviceId, "pressButton", stopButton)  --停止音效
 end
 
-function Rain(_cityName, _lightId)
+function Rain(_cityNumber, _cityName, _lightId)
 
-  fibaro:call(_lightId, "startProgram", programRain )
+  fibaro:call(_lightId, "startProgram", tProgramRain[_cityNumber] )
   
 end
 
-function Snow(_cityName, _lightId)
+function Snow(_cityNumber, _cityName, _lightId)
  -- fibaro:debug(_cityName .. " is Snow")
-  fibaro:call(_lightId, "startProgram", programSnow )
+  fibaro:call(_lightId, "startProgram", tProgramSnow[_cityNumber] )
 
 end
 
-function Thunder(_cityName, _lightId)
+function Thunder(_cityNumber, _cityName, _lightId)
  -- fibaro:debug(_cityName .. " is thunder")
-  fibaro:call(_lightId, "startProgram", programThunderstorm )
+  fibaro:call(_lightId, "startProgram", tProgramThunderstorm[_cityNumber] )
 
 end
 
-function Clouds(_cityName, _lightId)          --多雲/晴/other
+function Clouds(_cityNumber, _cityName, _lightId)          --多雲/晴/other
  -- fibaro:debug(_cityName .. " is clouds")
-  fibaro:call(_lightId, "startProgram", programOther )
+  fibaro:call(_lightId, "startProgram", tProgramOther[_cityNumber] )
 
 end
 
