@@ -56,7 +56,7 @@
 						"name":"Button31",
 						"empty":false,
 							"msg":"local selfID = fibaro:getSelfId()
-							\nlocal stateValue = fibaro:getValue( selfID , 'ui.Label1.value' )
+							\n
 							\nfibaro:call( selfID, \"setProperty\", 'ui.Label1.value', '開' )",
 						"buttonIcon":0,
 						"favourite":false,
@@ -72,7 +72,6 @@
 							"msg":"local lightID = 473
 							\n
 							\nlocal selfID = fibaro:getSelfId()
-							\nlocal stateValue = fibaro:getValue( selfID , 'ui.Label1.value' )
 							\nfibaro:call( selfID, \"setProperty\", 'ui.Label1.value', '關' )
 							\nfibaro:call( selfID, \"setProperty\", 'ui.Label2.value', 0 )
 							\nfibaro:call( lightID , \"turnOff\")",
@@ -88,7 +87,7 @@
 						"name":"Button33",
 						"empty":false,
 							"msg":"local selfID = fibaro:getSelfId()
-							\nlocal stateValue = fibaro:getValue( selfID , 'ui.Label1.value' )
+							\n
 							\nfibaro:call( selfID, \"setProperty\", 'ui.Label1.value', '自動' )",
 						"buttonIcon":0,
 						"favourite":false,
@@ -131,21 +130,26 @@
 							\nlocal lampMin = 10     -- 燈光最小亮度(%)
 							\nlocal luxMax = 1000    -- 當lux高於此值時，調為最小亮度
 							\nlocal luxMin = 100     -- 當lux低於此值時，調為最大亮度
-							\nlocal luxInterval = 20 -- lux數值每間隔多少，調整亮度(一次調1%)
+							\n
+							\nlocal luxInterval = (lampMax - lampMin)/(lampMax - lampMin) -- lux數值每間隔多少，調整亮度(一次調1%)
+							\n
+							\nlocal lamp        --亮度
+							\nlocal lightLevel  --亮度等級
+							\nlocal lux         --照度
 							\n
 							\n
 							\nlocal selfID = fibaro:getSelfId()
 							\nlocal stateValue = fibaro:getValue( selfID , 'ui.Label1.value' )
 							\n
 							\nfunction Update()
-							\n  local lux = tonumber(fibaro:getValue( lightSensorID , \"value\" ))
+							\n  lux = tonumber(fibaro:getValue( lightSensorID , \"value\" ))  
 							\n  
-							\n  if ( lux < luxMin ) then
+							\n  if ( lux < luxMin ) then                                     --小於最小照度
 							\n    lamp = lampMax
-							\n  elseif (( lux > luxMin ) and ( lux < luxMax )) then
-							\n    lightLevel = math.floor( lux / luxInterval )
+							\n  elseif (( lux > luxMin ) and ( lux < luxMax )) then          --大於最小照度，且小於最大照度
+							\n    lightLevel = math.floor( (lux - luxMin) / luxInterval )
 							\n    lamp = lampMax - lightLevel
-							\n  else
+							\n  else                                                         --其他(大於最大照度)
 							\n    lamp = lampMin
 							\n  end
 							\n  fibaro:call( selfID, \"setProperty\", 'ui.Label2.value', lamp )
