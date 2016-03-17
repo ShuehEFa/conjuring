@@ -1,0 +1,587 @@
+{
+	"name":"英數鍵盤",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author Lala
+			\n  @date   105.03.11
+			\n  @brief  輸入英文數字並存到Variables Panel
+			\n  @note   新增Variables Panel:  enter
+			\n--]]
+			\n
+			\nlocal selfId = fibaro:getSelfId()
+			\n
+			\nif start == nil then
+			\n  start = 1
+			\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \">\")
+			\n  fibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", \">\")
+			\nend
+			\n",
+		"ui.Label1.value":">",
+		"ui.Label2.value":">",
+		"ui.Label3.value":"已輸入 gpme",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"輸入：",
+						"name":"Label1",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"選字：",
+						"name":"Label2",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":3,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":" ",
+						"name":"Label3",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":4,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"OK",
+						"name":"Button61",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nlocal text = string.sub(fibaro:getValue(selfId, \"ui.Label1.value\"), 2)
+							\nlocal add = string.sub(fibaro:getValue(selfId, \"ui.Label2.value\"), 2)
+							\n
+							\ntext = text .. add
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \">\" .. text)
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", \">\")
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					},
+					{
+						"id":5,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Enter",
+						"name":"Button62",
+						"empty":false,
+							"msg":"local gEnter = \"enter\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nlocal text = string.sub(fibaro:getValue(selfId, \"ui.Label1.value\"), 2)
+							\nfibaro:setGlobal(gEnter, text)
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label3.value\", \"已輸入 \" .. text)
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":6,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Delete",
+						"name":"Button63",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \">\")
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", \">\")",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":7,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Back",
+						"name":"Button64",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nlocal text = fibaro:getValue(selfId, \"ui.Label1.value\")
+							\n
+							\nif (text == \">\") then
+							\n  text = text
+							\nelse  
+							\n  text = string.sub(fibaro:getValue(selfId, \"ui.Label1.value\"), 1, -2)
+							\nend
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", text)
+							\n--fibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", \">\")",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":8,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"abc1",
+						"name":"Button21",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nlocal text = fibaro:getValue(selfId, \"ui.Label2.value\")
+							\n
+							\nif (text == \">a\") then
+							\n  text = \">b\"
+							\nelseif (text == \">b\") then
+							\n  text = \">c\"
+							\nelseif (text == \">c\") then
+							\n  text = \">1\"
+							\nelseif (text == \">1\") then
+							\n  text = \">a\"  
+							\nelse
+							\n  text = string.sub(fibaro:getValue(selfId, \"ui.Label1.value\"), 2)
+							\n  add = string.sub(fibaro:getValue(selfId, \"ui.Label2.value\"), 2)
+							\n  text = text .. add
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \">\" .. text)
+							\n
+							\n  text = \">a\"
+							\nend
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", text)",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":9,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"def2",
+						"name":"Button22",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nlocal text = fibaro:getValue(selfId, \"ui.Label2.value\")
+							\n
+							\nif (text == \">d\") then
+							\n  text = \">e\"
+							\nelseif (text == \">e\") then
+							\n  text = \">f\"
+							\nelseif (text == \">f\") then
+							\n  text = \">2\"
+							\nelseif (text == \">2\") then
+							\n  text = \">d\"  
+							\nelse
+							\n  text = string.sub(fibaro:getValue(selfId, \"ui.Label1.value\"), 2)
+							\n  add = string.sub(fibaro:getValue(selfId, \"ui.Label2.value\"), 2)
+							\n  text = text .. add
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \">\" .. text)
+							\n  
+							\n  text = \">d\"
+							\nend
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", text)",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":10,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"ghi3",
+						"name":"Button23",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nlocal text = fibaro:getValue(selfId, \"ui.Label2.value\")
+							\n
+							\nif (text == \">g\") then
+							\n  text = \">h\"
+							\nelseif (text == \">h\") then
+							\n  text = \">i\"
+							\nelseif (text == \">i\") then
+							\n  text = \">3\"
+							\nelseif (text == \">3\") then
+							\n  text = \">g\"
+							\nelse
+							\n  text = string.sub(fibaro:getValue(selfId, \"ui.Label1.value\"), 2)
+							\n  add = string.sub(fibaro:getValue(selfId, \"ui.Label2.value\"), 2)
+							\n  text = text .. add
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \">\" .. text)
+							\n
+							\n  text = \">g\"
+							\nend
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", text)",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":11,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"jkl4",
+						"name":"Button31",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nlocal text = fibaro:getValue(selfId, \"ui.Label2.value\")
+							\n
+							\nif (text == \">j\") then
+							\n  text = \">k\"
+							\nelseif (text == \">k\") then
+							\n  text = \">l\"
+							\nelseif (text == \">l\") then
+							\n  text = \">4\"
+							\nelseif (text == \">4\") then
+							\n  text = \">j\"
+							\nelse
+							\n  text = string.sub(fibaro:getValue(selfId, \"ui.Label1.value\"), 2)
+							\n  add = string.sub(fibaro:getValue(selfId, \"ui.Label2.value\"), 2)
+							\n  text = text .. add
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \">\" .. text)
+							\n
+							\n  text = \">j\"
+							\nend
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", text)",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":12,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"mno5",
+						"name":"Button32",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nlocal text = fibaro:getValue(selfId, \"ui.Label2.value\")
+							\n
+							\nif (text == \">m\") then
+							\n  text = \">n\"
+							\nelseif (text == \">n\") then
+							\n  text = \">o\"
+							\nelseif (text == \">o\") then
+							\n  text = \">5\"
+							\nelseif (text == \">5\") then
+							\n  text = \">m\"
+							\nelse
+							\n  text = string.sub(fibaro:getValue(selfId, \"ui.Label1.value\"), 2)
+							\n  add = string.sub(fibaro:getValue(selfId, \"ui.Label2.value\"), 2)
+							\n  text = text .. add
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \">\" .. text)
+							\n
+							\n  text = \">m\"
+							\nend
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", text)",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":13,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"pqr6",
+						"name":"Button33",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nlocal text = fibaro:getValue(selfId, \"ui.Label2.value\")
+							\n
+							\nif (text == \">p\") then
+							\n  text = \">q\"
+							\nelseif (text == \">q\") then
+							\n  text = \">r\"
+							\nelseif (text == \">r\") then
+							\n  text = \">6\"
+							\nelseif (text == \">6\") then
+							\n  text = \">p\"
+							\nelse
+							\n  text = string.sub(fibaro:getValue(selfId, \"ui.Label1.value\"), 2)
+							\n  add = string.sub(fibaro:getValue(selfId, \"ui.Label2.value\"), 2)
+							\n  text = text .. add
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \">\" .. text)
+							\n
+							\n  text = \">p\"
+							\nend
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", text)",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":14,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"tuv7",
+						"name":"Button41",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nlocal text = fibaro:getValue(selfId, \"ui.Label2.value\")
+							\n
+							\nif (text == \">t\") then
+							\n  text = \">u\"
+							\nelseif (text == \">u\") then
+							\n  text = \">v\"
+							\nelseif (text == \">v\") then
+							\n  text = \">7\"
+							\nelseif (text == \">7\") then
+							\n  text = \">t\"
+							\nelse
+							\n  text = string.sub(fibaro:getValue(selfId, \"ui.Label1.value\"), 2)
+							\n  add = string.sub(fibaro:getValue(selfId, \"ui.Label2.value\"), 2)
+							\n  text = text .. add
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \">\" .. text)
+							\n
+							\n  text = \">t\"
+							\nend
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", text)",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":15,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"wxy8",
+						"name":"Button42",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nlocal text = fibaro:getValue(selfId, \"ui.Label2.value\")
+							\n
+							\nif (text == \">w\") then
+							\n  text = \">x\"
+							\nelseif (text == \">x\") then
+							\n  text = \">y\"
+							\nelseif (text == \">y\") then
+							\n  text = \">8\"
+							\nelseif (text == \">8\") then
+							\n  text = \">w\"
+							\nelse
+							\n  text = string.sub(fibaro:getValue(selfId, \"ui.Label1.value\"), 2)
+							\n  add = string.sub(fibaro:getValue(selfId, \"ui.Label2.value\"), 2)
+							\n  text = text .. add
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \">\" .. text)
+							\n
+							\n  text = \">w\"
+							\nend
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", text)",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":16,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"z,
+						'9",
+						"name":"Button43",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nlocal text = fibaro:getValue(selfId, \"ui.Label2.value\")
+							\n
+							\nif (text == \">z\") then
+							\n  text = \">,\"
+							\nelseif (text == \">,\") then
+							\n  text = \">'\"
+							\nelseif (text == \">'\") then
+							\n  text = \">9\"
+							\nelseif (text == \">9\") then
+							\n  text = \">z\"
+							\nelse
+							\n  text = string.sub(fibaro:getValue(selfId, \"ui.Label1.value\"), 2)
+							\n  add = string.sub(fibaro:getValue(selfId, \"ui.Label2.value\"), 2)
+							\n  text = text .. add
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \">\" .. text)
+							\n
+							\n  text = \">z\"
+							\nend
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", text)",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":17,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":":@-0",
+						"name":"Button51",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nlocal text = fibaro:getValue(selfId, \"ui.Label2.value\")
+							\n
+							\nif (text == \">:\") then
+							\n  text = \">@\"
+							\nelseif (text == \">@\") then
+							\n  text = \">-\"
+							\nelseif (text == \">-\") then
+							\n  text = \">0\"
+							\nelseif (text == \">0\") then
+							\n  text = \">:\"
+							\nelse
+							\n  text = string.sub(fibaro:getValue(selfId, \"ui.Label1.value\"), 2)
+							\n  add = string.sub(fibaro:getValue(selfId, \"ui.Label2.value\"), 2)
+							\n  text = text .. add
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \">\" .. text)
+							\n
+							\n  text = \">:\"
+							\nend
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", text)",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":18,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"~_$.",
+						"name":"Button52",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nlocal text = fibaro:getValue(selfId, \"ui.Label2.value\")
+							\n
+							\nif (text == \">~\") then
+							\n  text = \">_\"
+							\nelseif (text == \">_\") then
+							\n  text = \">$\"
+							\nelseif (text == \">$\") then
+							\n  text = \">.\"
+							\nelseif (text == \">.\") then
+							\n  text = \">~\"
+							\nelse
+							\n  text = string.sub(fibaro:getValue(selfId, \"ui.Label1.value\"), 2)
+							\n  add = string.sub(fibaro:getValue(selfId, \"ui.Label2.value\"), 2)
+							\n  text = text .. add
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \">\" .. text)
+							\n
+							\n  text = \">~\"
+							\nend
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", text)",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":19,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"/!()",
+						"name":"Button53",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nlocal text = fibaro:getValue(selfId, \"ui.Label2.value\")
+							\n
+							\nif (text == \">/\") then
+							\n  text = \">!\"
+							\nelseif (text == \">!\") then
+							\n  text = \">(\"
+							\nelseif (text == \">(\") then
+							\n  text = \">)\"
+							\nelseif (text == \">)\") then
+							\n  text = \">/\"
+							\nelse
+							\n  text = string.sub(fibaro:getValue(selfId, \"ui.Label1.value\"), 2)
+							\n  add = string.sub(fibaro:getValue(selfId, \"ui.Label2.value\"), 2)
+							\n  text = text .. add
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \">\" .. text)
+							\n
+							\n  text = \">/\"
+							\nend
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", text)",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}

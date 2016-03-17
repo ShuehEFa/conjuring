@@ -1,0 +1,433 @@
+{
+	"name":"窗簾遙控器",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author LalA
+			\n  @date   105.03.15
+			\n  @brief  窗簾遙控器
+			\n  @note   
+			\n    - 若使用實體遙控器，需讓所有窗簾回復到對應狀態才能正常使用VD遙控器
+			\n    - 填寫窗簾名稱(可自訂)、上下relay Id
+			\n    - 建立兩個Variables Panels: curtainController、curtainController2
+			\n--]]
+			\n
+			\n
+			\nlocal tDevice =   --宣告窗簾命名、relayId(上下各一)、狀態
+			\n  { 
+			\n    {name = \"主臥室窗簾\", up = 199, down = 200, status = \"停\" }, 
+			\n    {name = \"窗簾2\", up = 0, down = 0, status = \"停\" }, 
+			\n    {name = \"窗簾3\", up = 0, down = 0, status = \"停\" },
+			\n    {name = \"窗簾9\", up = 0, down = 0, status = \"停\" }
+			\n  }
+			\n
+			\n--宣告variabal panel命名，該panel將用於存取上面的tDevice
+			\nlocal gCurtainStatus = \"curtainController2\"  
+			\n
+			\n--宣告variabal panel命名，該panel將用於存取指令(按哪個button)
+			\nlocal gCurtainCmd = \"curtainController\"
+			\n
+			\nlocal selfId = fibaro:getSelfId()
+			\nfibaro:setGlobal(gCurtainCmd, \"\")
+			\n
+			\nif isNil == nil then  --在VD存檔時 將tDevice存放到variabal penal，並設定Label初值
+			\n  fibaro:setGlobal(gCurtainStatus, json.encode(tDevice))
+			\n  fibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", \"\")
+			\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \"全選\")
+			\n  isNil = 1
+			\nend",
+		"ui.Label1.value":"全選",
+		"ui.Label2.value":"",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"裝置",
+						"name":"Label1",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"←",
+						"name":"Button21",
+						"empty":false,
+							"msg":"local gCurtainCmd = \"curtainController\"
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nlocal cmd = fibaro:getGlobal(gCurtainCmd)
+							\n
+							\nif (cmd == \"\") then
+							\n
+							\n  fibaro:setGlobal(gCurtainCmd, \"left\")
+							\n  fibaro:call(selfId, \"pressButton\", \"9\")
+							\n  
+							\nelse
+							\n  fibaro:debug(\"wait...\")
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					},
+					{
+						"id":3,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"全選",
+						"name":"Button22",
+						"empty":false,
+							"msg":"local gCurtainCmd = \"curtainController\"
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nlocal cmd = fibaro:getGlobal(gCurtainCmd)
+							\n
+							\nif (cmd == \"\") then
+							\n
+							\n  fibaro:setGlobal(gCurtainCmd, \"all\")
+							\n  fibaro:call(selfId, \"pressButton\", \"9\")
+							\n  
+							\nelse
+							\n  fibaro:debug(\"wait...\")
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":4,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"→",
+						"name":"Button23",
+						"empty":false,
+							"msg":"local gCurtainCmd = \"curtainController\"
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nlocal cmd = fibaro:getGlobal(gCurtainCmd)
+							\n
+							\nif (cmd == \"\") then
+							\n
+							\n  fibaro:setGlobal(gCurtainCmd, \"right\")
+							\n  fibaro:call(selfId, \"pressButton\", \"9\")
+							\n  
+							\nelse
+							\n  fibaro:debug(\"wait...\")
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":5,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"狀態",
+						"name":"Label2",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":6,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"上",
+						"name":"Button211",
+						"empty":false,
+							"msg":"local gCurtainCmd = \"curtainController\"
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nlocal cmd = fibaro:getGlobal(gCurtainCmd)
+							\n
+							\nif (cmd == \"\") then
+							\n
+							\n  fibaro:setGlobal(gCurtainCmd, \"up\")
+							\n  fibaro:call(selfId, \"pressButton\", \"9\")
+							\n  
+							\nelse
+							\n  fibaro:debug(\"wait...\")
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":7,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"停",
+						"name":"Button221",
+						"empty":false,
+							"msg":"local gCurtainCmd = \"curtainController\"
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nlocal cmd = fibaro:getGlobal(gCurtainCmd)
+							\n
+							\nif (cmd == \"\") then
+							\n
+							\n  fibaro:setGlobal(gCurtainCmd, \"stop\")
+							\n  fibaro:call(selfId, \"pressButton\", \"9\")
+							\n  
+							\nelse
+							\n  fibaro:debug(\"wait...\")
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":8,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"下",
+						"name":"Button231",
+						"empty":false,
+							"msg":"local gCurtainCmd = \"curtainController\"
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nlocal cmd = fibaro:getGlobal(gCurtainCmd)
+							\n
+							\nif (cmd == \"\") then
+							\n
+							\n  fibaro:setGlobal(gCurtainCmd, \"down\")
+							\n  fibaro:call(selfId, \"pressButton\", \"9\")
+							\n  
+							\nelse
+							\n  fibaro:debug(\"wait...\")
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":9,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Update",
+						"name":"Button31",
+						"empty":false,
+							"msg":"local gCurtainCmd = \"curtainController\"
+							\nlocal gCurtainStatus = \"curtainController2\"
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nlocal cmd = fibaro:getGlobal(gCurtainCmd)
+							\nlocal device = fibaro:getGlobal(gCurtainStatus)
+							\n--fibaro:debug(device)
+							\n
+							\nlocal tDevice = json.decode(device)
+							\n
+							\n
+							\nlocal item = fibaro:getValue(selfId, \"ui.Label1.value\")
+							\nlocal itemNumber
+							\nlocal sleepTime = 300
+							\n\t
+							\n
+							\nfunction Left(i)
+							\n  fibaro:debug(\"left\")
+							\n  if i == 0 then
+							\n    fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", tDevice[#tDevice].name)
+							\n\tfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", tDevice[#tDevice].status)
+							\n  else  
+							\n    if i > 1 then
+							\n      fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", tDevice[i - 1].name)
+							\n\t  fibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", tDevice[i - 1].status)
+							\n    else
+							\n      fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", tDevice[#tDevice].name)  
+							\n      fibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", tDevice[#tDevice].status)\t  
+							\n    end\t
+							\n  end
+							\n  
+							\nend
+							\n
+							\n
+							\nfunction Right(i)
+							\n  fibaro:debug(\"right\")
+							\n
+							\n  if i == 0 then
+							\n    fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", tDevice[1].name)
+							\n    fibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", tDevice[1].status)
+							\n  else  
+							\n    if i < #tDevice then
+							\n      fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", tDevice[i + 1].name)
+							\n      fibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", tDevice[i + 1].status)\t  
+							\n    else
+							\n      fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", tDevice[1].name)  \t  
+							\n      fibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", tDevice[1].status)  \t  
+							\n\tend\t
+							\n  end
+							\nend
+							\n
+							\n
+							\nfunction All()
+							\n  fibaro:debug(\"all\")
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \"全選\")
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", \"\")
+							\nend
+							\n
+							\n
+							\nfunction Stop(i)
+							\n
+							\n  if i == 0 then    --全選
+							\n    for j = 1, #tDevice do
+							\n  \t  tDevice[j].status = \"停\"
+							\n      if (tDevice[j].status == \"上\") then
+							\n        fibaro:call(tDevice[j].down, \"turnOn\")  --如果狀態是上，開下relay
+							\n\t  elseif (tDevice[j].status == \"下\") then
+							\n        fibaro:call(tDevice[j].up, \"turnOn\")    --如果狀態是下，開上relay
+							\n      end
+							\n\tend  
+							\n    fibaro:sleep( sleepTime )
+							\n    for j = 1, #tDevice do
+							\n      if (tDevice[j].status == \"上\") then
+							\n        fibaro:call(tDevice[j].down, \"turnOff\")  
+							\n\t  elseif (tDevice[j].status == \"下\") then
+							\n        fibaro:call(tDevice[j].up, \"turnOff\")    
+							\n      end
+							\n\tend  
+							\n  else\t           --個別選
+							\n    tDevice[i].status = \"停\"
+							\n\tif (tDevice[i].status == \"上\") then
+							\n\t  fibaro:call(tDevice[i].down, \"turnOn\")    --如果狀態是上，開下relay
+							\n      fibaro:sleep( sleepTime )\t
+							\n\t  fibaro:call(tDevice[i].down, \"turnOff\")
+							\n\telseif (tDevice[i].status == \"下\") then
+							\n\t  fibaro:call(tDevice[i].up, \"turnOn\")      --如果狀態是下，開上relay
+							\n      fibaro:sleep( sleepTime )\t
+							\n\t  fibaro:call(tDevice[i].up, \"turnOff\")
+							\n\tend
+							\n  end
+							\nend
+							\n
+							\n
+							\nfunction Up(i)
+							\n  fibaro:debug(\"up\") 
+							\n  Stop(i)    --先停止
+							\n  
+							\n  if i == 0 then
+							\n    for j = 1, #tDevice do 
+							\n      tDevice[j].status = \"上\"
+							\n\t  fibaro:call(tDevice[j].up, \"turnOn\") \t  
+							\n\tend
+							\n    fibaro:sleep( sleepTime )   
+							\n    for j = 1, #tDevice do 
+							\n      fibaro:call(tDevice[j].up, \"turnOff\")
+							\n    end
+							\n  else 
+							\n    tDevice[i].status = \"上\"
+							\n
+							\n    fibaro:call(tDevice[i].up, \"turnOn\")
+							\n    fibaro:sleep( sleepTime ) 
+							\n    fibaro:call(tDevice[i].up, \"turnOff\")    
+							\n  end  
+							\nend
+							\n
+							\n
+							\nfunction Down(i)
+							\n  fibaro:debug(\"down\")
+							\n  Stop(i)    --先停止
+							\n  
+							\n  if i == 0 then
+							\n    for j = 1, #tDevice do 
+							\n      tDevice[j].status = \"下\"
+							\n\t  fibaro:call(tDevice[j].down, \"turnOn\") \t  
+							\n\tend
+							\n    fibaro:sleep( sleepTime )   
+							\n    for j = 1, #tDevice do 
+							\n      fibaro:call(tDevice[j].down, \"turnOff\")
+							\n    end
+							\n  else 
+							\n    tDevice[i].status = \"下\"
+							\n
+							\n    fibaro:call(tDevice[i].down, \"turnOn\")
+							\n    fibaro:sleep( sleepTime ) 
+							\n    fibaro:call(tDevice[i].down, \"turnOff\")    
+							\n  end   
+							\n
+							\nend
+							\n
+							\n
+							\nif (item == \"全選\") then
+							\n  itemNumber = 0
+							\nelse
+							\n  for i = 1, #tDevice do
+							\n    if ( item == tDevice[i].name ) then
+							\n      itemNumber = i
+							\n      break
+							\n    end
+							\n  end
+							\nend
+							\n
+							\n--fibaro:debug(itemNumber)
+							\nif (cmd == \"left\") then
+							\n  Left(itemNumber)
+							\nelseif (cmd == \"right\") then
+							\n  Right(itemNumber)
+							\nelseif (cmd == \"all\") then
+							\n  All()
+							\nelseif (cmd == \"up\") then
+							\n  Up(itemNumber)
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", \"上\")
+							\nelseif (cmd == \"down\") then
+							\n  Down(itemNumber)
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", \"下\")
+							\nelseif (cmd == \"stop\") then
+							\n  Stop(itemNumber)
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", \"停\")
+							\nend
+							\n
+							\n
+							\nfibaro:setGlobal(gCurtainStatus, json.encode(tDevice))
+							\nfibaro:setGlobal(gCurtainCmd, \"\")
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}
