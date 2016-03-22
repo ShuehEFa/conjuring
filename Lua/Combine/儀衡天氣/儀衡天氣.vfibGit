@@ -9,15 +9,16 @@
 		"logTemp":"",
 			"mainLoop":"--[[
 			\n  @author Lala
-			\n  @date   105.2.4
+			\n  @date   105.3.21
 			\n  @brief  配合天氣情境使用
 			\n  @note
-			\n    (1) 僅供情境配合及debug用，請勿顯示於一般用戶介面上      
+			\n    (1) ！！！僅供情境配合及debug用，請勿顯示於一般用戶介面上！！！      
 			\n\t(2) IP Address填寫SONOS IP，TCP Port為1400
-			\n\t(3) 需建5個Global value紀錄日/夜，預設為EH_City1 ~ EH_City5，可自訂名稱但須符合格式：[自訂名稱]1~[自訂名稱]5
+			\n\t(3) 需建6個Global value：EH_Cities、EH_City1 ~ EH_City5
+			\n          p.s. EH_City1~5可統一自訂名稱但須符合格式：[自訂名稱]1~[自訂名稱]5
 			\n    (4) RGBW需設定progarm，並於燈光顏色情境內填寫對應編號
 			\n\t(5) button填寫說明：
-			\n\t  - Choose City     選擇城市用； 正確填寫City名稱及對應RGBW Id
+			\n\t  - Choose City     選擇城市用； 填寫\"userVD\"的ID、City1~City5對應RGBW Id
 			\n\t  - Get Weather     從open weather map網站取得氣象資料； 填寫City數量
 			\n\t  - Sunshine Check  紀錄日/夜； 填寫City數量，填寫Global value自訂名稱(不含數字，例：EH_City)
 			\n\t  - Rain            播放網芳上的下雨音效； mURL填寫正確路徑及檔名
@@ -26,7 +27,7 @@
 			\n\t  - Other           播放網芳上的晴、雲、其他天氣音效； mURL填寫正確路徑及檔名
 			\n\t  - Stop Sound      停止天氣音效； 無須填寫
 			\n\t  - City 5 test     City5填寫假資料測試用； 欲使用此功能main loop需更改debug值\t
-			\n\t(6) Choose City button填寫完需手動按
+			\n    (6) \"City 5 test\"及\"Color test\"僅供測試使用
 			\n--]]
 			\n
 			\n
@@ -36,6 +37,12 @@
 			\n--_--_--_--_--
 			\nlocal selfId = fibaro:getSelfId()
 			\n
+			\nif (isNil == nil) then
+			\n  fibaro:call(selfId, \"pressButton\", \"11\")  --存檔時自動按\"choose city button\"
+			\n  isNil = 1
+			\nend
+			\n
+			\n
 			\nwhile 1 do
 			\n  if (debug == 0) then
 			\n    fibaro:call(selfId, \"pressButton\", \"12\")  --取得氣象資料
@@ -44,47 +51,47 @@
 			\n  fibaro:call(selfId, \"pressButton\", \"13\")  --更新日夜狀態
 			\n  fibaro:sleep(updateTime*1000)
 			\nend",
-		"ui.Label1a.value":"damascus，0",
+		"ui.Label1a.value":"Ankara，3339",
 		"ui.Label1b.value":"
 		{
-			\"sunrise\":1457322919,
-			\"sunset\":1457364999,
-			\"temp\":5,
+			\"sunrise\":1458618498,
+			\"sunset\":1458662579,
+			\"temp\":0,
 			\"weather\":\"Clear\"
 		}",
-		"ui.Label2a.value":"newyork，0",
+		"ui.Label2a.value":"London，17777",
 		"ui.Label2b.value":"
 		{
-			\"sunrise\":1457349582,
-			\"sunset\":1457391281,
-			\"temp\":2.3500000000000001,
-			\"weather\":\"Clouds\"
-		}",
-		"ui.Label3a.value":"taipei，0",
-		"ui.Label3b.value":"
-		{
-			\"sunrise\":1457302256,
-			\"sunset\":1457344745,
-			\"temp\":20.030000000000001,
+			\"sunrise\":1458626258,
+			\"sunset\":1458670667,
+			\"temp\":2.1699999999999999,
 			\"weather\":\"Mist\"
 		}",
-		"ui.Label4a.value":"houston，0",
-		"ui.Label4b.value":"
+		"ui.Label3a.value":"Manila，6990",
+		"ui.Label3b.value":"
 		{
-			\"sunrise\":1457354389,
-			\"sunset\":1457396706,
-			\"temp\":18.699999999999999,
+			\"sunrise\":1458597524,
+			\"sunset\":1458641231,
+			\"temp\":30,
 			\"weather\":\"Clouds\"
 		}",
-		"ui.Label5a.value":"beijing，0",
+		"ui.Label4a.value":"Tokyo，1775",
+		"ui.Label4b.value":"
+		{
+			\"sunrise\":1458592920,
+			\"sunset\":1458636879,
+			\"temp\":11.600000000000000,
+			\"weather\":\"Clouds\"
+		}",
+		"ui.Label5a.value":"Mexico_City，1252",
 		"ui.Label5b.value":"
 		{
-			\"sunrise\":1457303907,
-			\"sunset\":1457345573,
-			\"temp\":8,
-			\"weather\":\"Clear\"
+			\"sunrise\":1458650298,
+			\"sunset\":1458694093,
+			\"temp\":18.969999999999999,
+			\"weather\":\"Clouds\"
 		}",
-		"ui.Slider1.value":9,
+		"ui.Slider1.value":0,
 		"visible":"true",
 		"rows":
 		[
@@ -249,21 +256,30 @@
 						"caption":"Choose City",
 						"name":"Button00",
 						"empty":false,
-							"msg":"local city = 
-							\n{ 
-							\n  {name = \"damascus\", light = 0},
-							\n  {name = \"newyork\", light = 0},
-							\n  {name = \"taipei\", light = 0},
-							\n  {name = \"houston\", light = 0},
-							\n  {name = \"beijing\", light = 0}
-							\n}
+							"msg":"local userVD = 808  --user VD
+							\nlocal tLight = {3339, 17777, 6990, 1775, 1252}  --City1~City5對應RGBW
 							\n
 							\n--_--_--_--_--
+							\nlocal tName = {}
+							\nfor i = 1, 5 do
+							\n  tName[i] = string.match(fibaro:getValue(userVD, \"ui.Label\" .. i + 3 .. \".value\"), \" (.+)\")
+							\nend  
+							\n
+							\nlocal tCity =
+							\n{ 
+							\n { name = tName[1], light = tLight[1] }, 
+							\n { name = tName[2], light = tLight[2] },
+							\n { name = tName[3], light = tLight[3] },
+							\n { name = tName[4], light = tLight[4] },
+							\n { name = tName[5], light = tLight[5] }, 
+							\n}
+							\n
 							\nlocal selfId = fibaro:getSelfId()
 							\n
 							\nfor i = 1, 5 do
-							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label\" .. i ..\"a.value\" , city[i].name .. \"，\" .. city[i].light)
-							\nend",
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label\" .. i ..\"a.value\" , tCity[i].name .. \"，\" .. tCity[i].light)
+							\nend
+							\n",
 						"buttonIcon":0,
 						"favourite":false,
 						"main":false
@@ -1313,8 +1329,9 @@
 							\nlocal rgb25 = { 255, 209, 163 }     --25度RGB
 							\nlocal rgb45 = { 255, 137, 18 }      --45度RGB
 							\n
-							\nlocal rgbLightId = 708
+							\nlocal rgbLightId = 0  --測試用的RGW
 							\n
+							\n--__--__--__--__--
 							\nlocal selfId = fibaro:getSelfId()
 							\n
 							\nfunction TempColor(_temp)  --根據溫度(temp)算出對應RGB
@@ -1354,7 +1371,7 @@
 							\n
 							\nfibaro:call(rgbLightId, \"setColor\", math.floor(colorR), math.floor(colorG), math.floor(colorB), \"0\" )",
 						"buttonIcon":0,
-						"value":60,
+						"value":0,
 						"favourite":false,
 						"main":false
 					}

@@ -1,0 +1,453 @@
+{
+	"name":"儀衡天氣(user)",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author Lala
+			\n  @date   105.3.21
+			\n  @brief  配合天氣情境使用，此VD供使用者選擇城市
+			\n  @note   Save鍵填寫天氣資訊VD的id
+			\n--]]",
+		"ui.Label1.value":"City5",
+		"ui.Label2.value":"墨西哥城 Mexico_City",
+		"ui.Label4.value":"安卡拉 Ankara",
+		"ui.Label5.value":"倫敦 London",
+		"ui.Label6.value":"馬尼拉 Manila",
+		"ui.Label7.value":"東京 Tokyo",
+		"ui.Label8.value":"墨西哥城 Mexico_City",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"Set City:",
+						"name":"Label1",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"1",
+						"name":"Button11",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \"City1\")",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					},
+					{
+						"id":3,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"2",
+						"name":"Button12",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \"City2\")",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":4,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"3",
+						"name":"Button13",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \"City3\")",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":5,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"4",
+						"name":"Button14",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \"City4\")",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":6,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"5",
+						"name":"Button15",
+						"empty":false,
+							"msg":"local selfId = fibaro:getSelfId()
+							\n
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label1.value\", \"City5\")",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":7,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"City Name: ",
+						"name":"Label2",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":8,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"A~C",
+						"name":"Button21",
+						"empty":false,
+							"msg":"local tCities = 
+							\n{
+							\n\"安曼 Amman\",
+							\n\"安卡拉 Ankara\",
+							\n\"阿斯塔納 Astana\",
+							\n\"巴格達 Baghdad\",
+							\n\"碧瑤 Baguio\",
+							\n\"曼谷 Bangkok\",
+							\n\"貝魯特 Beirut\",
+							\n\"波哥大 Bogota\",
+							\n\"巴西利亞 Brasilia\",
+							\n\"布宜諾斯艾利斯 Buenos_Aires\",
+							\n\"比勒陀利亞 Cape_Town\",
+							\n\"宿霧 Cebu\",
+							\n\"科倫坡 Colombo\"
+							\n}
+							\n
+							\nlocal cities = \"EH_Cities\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nfibaro:setGlobal(cities, json.encode(tCities))
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", tCities[1])
+							\n
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":9,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"D~L",
+						"name":"Button22",
+						"empty":false,
+							"msg":"local tCities = 
+							\n{
+							\n\"達沃 Dabaw\",
+							\n\"達卡 Dhaka\",
+							\n\"多多馬 Dodoma\",
+							\n\"杜拜 Dubai\",
+							\n\"胡志明 Ho_Chi_Minh\",
+							\n\"伊斯蘭堡 Islamabad\",
+							\n\"雅加達 Jakarta\",
+							\n\"基輔 Kiev\",
+							\n\"吉隆坡 Kuala_Lumpur\",
+							\n\"科威特城 Kuwait\",
+							\n\"拉各斯 Lagos\",
+							\n\"利馬 Lima\",
+							\n\"倫敦 London\"
+							\n}
+							\n
+							\nlocal cities = \"EH_Cities\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nfibaro:setGlobal(cities, json.encode(tCities))
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", tCities[1])
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":10,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"M~P",
+						"name":"Button23",
+						"empty":false,
+							"msg":"local tCities = 
+							\n{
+							\n\"馬德里 Madrid\",
+							\n\"馬累 Male\",
+							\n\"麥納麥 Manama\",
+							\n\"馬尼拉 Manila\",
+							\n\"墨西哥城 Mexico_City\",
+							\n\"莫斯科 Moscow\",
+							\n\"馬斯喀特 Muscat\",
+							\n\"內羅畢 Nairobi\",
+							\n\"新德里 New_Delhi\",
+							\n\"紐約 New_York\",
+							\n\"渥太華 Ottawa\",
+							\n\"巴拉望 Palawan\",
+							\n\"金邊 Phnom_Penh\"
+							\n}
+							\n
+							\nlocal cities = \"EH_Cities\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nfibaro:setGlobal(cities, json.encode(tCities))
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", tCities[1])
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":11,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Q~Z",
+						"name":"Button24",
+						"empty":false,
+							"msg":"local tCities = 
+							\n{
+							\n\"基多 Quito\",
+							\n\"利雅得 Riyadh\",
+							\n\"薩那 Sanaa\",
+							\n\"聖地亞哥 Santiago\",
+							\n\"漢城 Seoul\",
+							\n\"新加坡 Singapore\",
+							\n\"雪梨 Sydney\",
+							\n\"德黑蘭 Tehran\",
+							\n\"惠靈頓 Wellington\",
+							\n\"東京 Tokyo\",
+							\n\"仰光 Yangon\"
+							\n}
+							\n
+							\nlocal cities = \"EH_Cities\"
+							\nlocal selfId = fibaro:getSelfId()
+							\nfibaro:setGlobal(cities, json.encode(tCities))
+							\nfibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", tCities[1])
+							\n",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":12,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"←",
+						"name":"Button31",
+						"empty":false,
+							"msg":"local cities = \"EH_Cities\"
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nlocal cityList = fibaro:getGlobal(cities)
+							\nlocal tCities = json.decode(cityList)
+							\nlocal item = fibaro:getValue(selfId, \"ui.Label2.value\")
+							\nfibaro:debug(tCities[1])
+							\nfibaro:debug(item)
+							\n
+							\nif (item == tCities[1]) then
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", tCities[#tCities])
+							\nelse
+							\n  for i = 2, #tCities do
+							\n    if (item == tCities[i]) then
+							\n      fibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", tCities[ i - 1 ])
+							\n    end
+							\n  end
+							\nend  ",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":13,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"→",
+						"name":"Button32",
+						"empty":false,
+							"msg":"local cities = \"EH_Cities\"
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nlocal cityList = fibaro:getGlobal(cities)
+							\nlocal tCities = json.decode(cityList)
+							\nlocal item = fibaro:getValue(selfId, \"ui.Label2.value\")
+							\n--fibaro:debug(tCities[1])
+							\n--fibaro:debug(item)
+							\n
+							\nif (item == tCities[#tCities]) then
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", tCities[1])
+							\nelse
+							\n  for i = 1, #tCities - 1 do
+							\n    if (item == tCities[i]) then
+							\n      fibaro:call(selfId, \"setProperty\", \"ui.Label2.value\", tCities[ i + 1 ])
+							\n    end
+							\n  end
+							\nend  ",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					},
+					{
+						"id":14,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"Save",
+						"name":"Button33",
+						"empty":false,
+							"msg":"local mainVD = 791  --資料取得VD的ID
+							\n
+							\n--__--__--__--__--
+							\nlocal chooseCityButton = \"11\"
+							\n
+							\nlocal selfId = fibaro:getSelfId()
+							\n
+							\nlocal item = fibaro:getValue(selfId, \"ui.Label1.value\")
+							\nlocal city = fibaro:getValue(selfId, \"ui.Label2.value\")
+							\n
+							\n--fibaro:debug(item..city)
+							\n
+							\nif (item == \"City1\") then
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label4.value\", city)
+							\nelseif (item == \"City2\") then
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label5.value\", city)  
+							\nelseif (item == \"City3\") then
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label6.value\", city)  
+							\nelseif (item == \"City4\") then
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label7.value\", city)  
+							\nelseif (item == \"City5\") then
+							\n  fibaro:call(selfId, \"setProperty\", \"ui.Label8.value\", city)    
+							\nend  
+							\n
+							\nfibaro:call(mainVD, \"pressButton\", chooseCityButton)
+							\n  ",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":15,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"City 1:",
+						"name":"Label4",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":16,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"City 2:",
+						"name":"Label5",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":17,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"City 3:",
+						"name":"Label6",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":18,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"City 4:",
+						"name":"Label7",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":19,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"City 5:",
+						"name":"Label8",
+						"favourite":false,
+						"main":false
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}
