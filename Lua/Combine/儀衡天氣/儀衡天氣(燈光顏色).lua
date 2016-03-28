@@ -175,8 +175,8 @@ function MainEffect()
 	end
     fibaro:sleep(debugTime*1000)	
   end
-  fibaro:sleep(effectTime*1000)
-  fibaro:call(virtualDeviceId, "pressButton", stopButton)  --停止音效
+ -- fibaro:sleep(effectTime*1000)
+ -- fibaro:call(virtualDeviceId, "pressButton", stopButton)  --停止音效
 end
 
 function Rain(_cityNumber, _cityName, _lightId)
