@@ -8,10 +8,12 @@
 		"log":"",
 		"logTemp":"",
 			"mainLoop":"--[[
-			\n  @author Lala
-			\n  @date   105.3.21
+			\n  @author Lala eFa
+			\n  @date   105.3.28
 			\n  @brief  配合天氣情境使用，此VD供使用者選擇城市
 			\n  @note   Save鍵填寫天氣資訊VD的id
+			\n
+			\n  @105.03.28\tby eFa\t新增. 台中跟洛杉磯
 			\n--]]",
 		"ui.Label1.value":"City5",
 		"ui.Label2.value":"墨西哥城 Mexico_City",
@@ -189,6 +191,7 @@
 							\n\"拉各斯 Lagos\",
 							\n\"利馬 Lima\",
 							\n\"倫敦 London\"
+							\n\"舊金山 Los_Angeles\"
 							\n}
 							\n
 							\nlocal cities = \"EH_Cities\"
@@ -249,6 +252,7 @@
 							\n\"漢城 Seoul\",
 							\n\"新加坡 Singapore\",
 							\n\"雪梨 Sydney\",
+							\n\"台中 Taichung\"
 							\n\"德黑蘭 Tehran\",
 							\n\"惠靈頓 Wellington\",
 							\n\"東京 Tokyo\",
