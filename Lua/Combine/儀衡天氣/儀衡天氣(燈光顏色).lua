@@ -4,14 +4,16 @@
 --]]
 
 --[[
-  @author Lala
-  @date   105.2.4
+  @author Lala eFa
+  @date   105.3.13
   @brief  RGBW顯示天氣效果及氣溫顏色
   @note   14~40行 參數設定
           VD需填寫完畢並取得資料才能正常執行本情境
+
+  @2016.04.13 by eFa . 新增情境開關
 --]]
 
-
+local mSwitchId = 1                 --自動開關vd id
 local virtualDeviceId = 791         --Virtual Device Id
 local selfId = 87                   --本情境ID   
 local sunsetSceneId = 88            --日落情境
@@ -250,6 +252,10 @@ end
 ---------------------------------------------------------
 ---------------------------------------------------------
 print("start")
+local enable = fibaro:getValue( mSwitchId , "ui.Label1.value" ) == "AUTO"
+if not enable then
+  fibaro:abort()
+end
 
 if fibaro:countScenes() > 2 then
   print("countScenes > 2 ，中斷")

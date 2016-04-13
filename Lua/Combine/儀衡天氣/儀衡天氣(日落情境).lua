@@ -10,13 +10,16 @@ EH_City5
 --]]
 
 --[[
-  @author Lala
-  @date   105.2.4
+  @author Lala eFa
+  @date   105.4.13
   @brief  天氣情境之日落效果
   @note   填寫global trigger及下列參數
           VD需填寫完畢並取得資料才能正常執行本情境
+
+  @2016.04.13 by eFa . 新增情境開關
 --]]
 
+local mSwitchId = 1               -- 功能開關vd id
 local virtualDeviceId = 689       --Virtual Device Id
 local sunsetColor = { 5, 5, 25 }  --日落固定顏色
 local cityAmount = 5              --city數量   
@@ -48,7 +51,10 @@ end
 
 -----------------------------以下開始
 print("start")
-
+local enable = fibaro:getValue( mSwitchId , "ui.Label1.value" ) == "AUTO"
+if not enable then
+  fibaro:abort()
+end
 
 
 if (citySun == "set") then

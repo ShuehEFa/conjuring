@@ -1,0 +1,76 @@
+{
+	"name":"天氣指示燈",
+	"type":"virtual_device",
+	"properties":
+	{
+		"deviceIcon":0,
+		"currentIcon":"0",
+		"log":"",
+		"logTemp":"",
+			"mainLoop":"--[[
+			\n  @author eFa
+			\n  @date   105.4.13
+			\n  @brief  多國氣候指示燈情境開關
+			\n--]]",
+		"ui.Label1.value":"OFF",
+		"visible":"true",
+		"rows":
+		[
+			{
+				"type":"label",
+				"elements":
+				[
+					{
+						"id":1,
+						"lua":false,
+						"waitForResponse":false,
+						"caption":"",
+						"name":"Label1",
+						"favourite":false,
+						"main":false
+					}
+				]
+			},
+			{
+				"type":"button",
+				"elements":
+				[
+					{
+						"id":2,
+						"lua":true,
+						"waitForResponse":false,
+						"caption":"AUTO/OFF",
+						"name":"Button11",
+						"empty":false,
+							"msg":"local mWeatherSceneId = 1\t-- 燈光顏色情境的id
+							\nlocal mSunsetSceneId = 1\t-- 日落顏色情境的id
+							\nlocal tRGBDeviceId = { 1 , 2 }\t-- 所有RGB燈條ID
+							\n
+							\nlocal id = fibaro:getSelfId()
+							\nlocal isAuto = fibaro:getValue( id , \"ui.Label1.value\" ) == \"AUTO\"
+							\nif isAuto then 
+							\n  fibaro:call( id , \"setProperty\" , \"ui.Label1.value\" , \"OFF\" )
+							\n  fibaro:killScenes( mWeatherSceneId )
+							\n  fibaro:killScenes( mSunsetSceneId )
+							\n  for i = 1 , #tRGBDeviceId do
+							\n    fibaro:call( tRGBDeviceId[ i ] , \"turnOff\" )
+							\n  end
+							\nelse
+							\n  fibaro:call( id , \"setProperty\" , \"ui.Label1.value\" , \"AUTO\" )
+							\n  fibaro:startScene( mWeatherSceneId )
+							\nend",
+						"buttonIcon":0,
+						"favourite":false,
+						"main":true
+					}
+				]
+			}
+		]
+	},
+	"actions":
+	{
+		"pressButton":1,
+		"setSlider":2,
+		"setProperty":2
+	}
+}
