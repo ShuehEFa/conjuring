@@ -16,7 +16,9 @@
 			\n\t\t  記得填寫IP及Port，Port預設80
 			\n\t\t  根據不同CoolMaster型號，支援的模式跟風量功能有所區別，同步修改模式按鍵及風量按鍵的功能id
 			\n
-			\n  @date   105.03.09 by eFa . sync更改為須同步且遙控器閒置幾秒才開始
+			\n  @date   105.03.09 by eFa . 更新 sync更改為須同步且遙控器閒置幾秒才開始
+			\n\t\t  105.05.25\tby eFa . 修正 對predefine global value取得值（從index值改為實際string，需配合Fibaro系統版本）
+			\n\t\t\t\t\t\t   . 修正 Update按鈕內最後gCmds的將重新再抓一次值，避免此時外部按鈕增加指令，而被一同清除，造成miss指令
 			\n--]]
 			\nif mtDatas == nil then
 			\n  
@@ -37,7 +39,14 @@
 			\n    { uid = 100 , name = \"冷氣1\" , tModeEnable = { true , true , true , true , true , true } } ,
 			\n    { uid = 101 , name = \"冷氣2\" , tModeEnable = { true , true , true , true , true , true } } ,
 			\n    { uid = 102 , name = \"冷氣3\" , tModeEnable = { true , true , true , true , true , true } } ,
-			\n  }
+			\n    { uid = 103 , name = \"冷氣4\" , tModeEnable = { true , true , true , true , true , true } } ,
+			\n    { uid = 104 , name = \"冷氣5\" , tModeEnable = { true , true , true , true , true , true } } ,
+			\n    { uid = 105 , name = \"冷氣6\" , tModeEnable = { true , true , true , true , true , true } } ,
+			\n    { uid = 106 , name = \"冷氣7\" , tModeEnable = { true , true , true , true , true , true } } ,
+			\n    { uid = 107 , name = \"冷氣8\" , tModeEnable = { true , true , true , true , true , true } } ,
+			\n    { uid = 108 , name = \"冷氣9\" , tModeEnable = { true , true , true , true , true , true } } ,
+			\n    { uid = 109 , name = \"交換機\" , tModeEnable = { true , true , true , true , true , true } } ,
+			\n}
 			\n  
 			\n  -- 功能範圍，目前寫死不能動
 			\n  mModes = { \"暖氣\" , \"冷氣\" , \"除濕\" , \"送風\" , \"自動\" , \"其他\" }
@@ -173,8 +182,8 @@
 			\n
 			\nlocal time = os.time()
 			\n
-			\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
-			\nlocal isUpdate = fibaro:getGlobalValue( gIsUpdate ) == \"1\"
+			\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"true\"
+			\nlocal isUpdate = fibaro:getGlobalValue( gIsUpdate ) == \"true\"
 			\n
 			\nif not ( isBusy or isUpdate ) then
 			\n  local cmds = fibaro:getGlobal( gCmds )
@@ -247,7 +256,7 @@
 							\nlocal gIsBusy = \"CM_IsBusy\"
 							\n
 							\nlocal selfID = fibaro:getSelfId()
-							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
+							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"true\"
 							\nif isBusy then
 							\n  fibaro:call( selfID , \"setProperty\" , \"ui.Info.value\" , \"BUSY...WAIT...\" )
 							\nelse
@@ -304,7 +313,7 @@
 							\nlocal gIsBusy = \"CM_IsBusy\"
 							\n
 							\nlocal selfID = fibaro:getSelfId()
-							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
+							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"true\"
 							\nif isBusy then
 							\n  fibaro:call( selfID , \"setProperty\" , \"ui.Info.value\" , \"BUSY...WAIT...\" )
 							\nelse
@@ -358,7 +367,7 @@
 							\nlocal gIsBusy = \"CM_IsBusy\"
 							\n
 							\nlocal selfID = fibaro:getSelfId()
-							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
+							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"true\"
 							\nif isBusy then
 							\n  fibaro:call( selfID , \"setProperty\" , \"ui.Info.value\" , \"BUSY...WAIT...\" )
 							\nelse
@@ -421,7 +430,7 @@
 							\nlocal gIsBusy = \"CM_IsBusy\"
 							\n
 							\nlocal selfID = fibaro:getSelfId()
-							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
+							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"true\"
 							\nif isBusy then
 							\n  fibaro:call( selfID , \"setProperty\" , \"ui.Info.value\" , \"BUSY...WAIT...\" )
 							\nelse
@@ -517,7 +526,7 @@
 							\nlocal modeIdx = 1
 							\n
 							\nlocal selfID = fibaro:getSelfId()
-							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
+							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"true\"
 							\nif isBusy then
 							\n  fibaro:call( selfID , \"setProperty\" , \"ui.Info.value\" , \"BUSY...WAIT...\" )
 							\nelse
@@ -598,7 +607,7 @@
 							\nlocal modeIdx = 2
 							\n
 							\nlocal selfID = fibaro:getSelfId()
-							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
+							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"true\"
 							\nif isBusy then
 							\n  fibaro:call( selfID , \"setProperty\" , \"ui.Info.value\" , \"BUSY...WAIT...\" )
 							\nelse
@@ -679,7 +688,7 @@
 							\nlocal modeIdx = 3
 							\n
 							\nlocal selfID = fibaro:getSelfId()
-							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
+							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"true\"
 							\nif isBusy then
 							\n  fibaro:call( selfID , \"setProperty\" , \"ui.Info.value\" , \"BUSY...WAIT...\" )
 							\nelse
@@ -760,7 +769,7 @@
 							\nlocal modeIdx = 4
 							\n
 							\nlocal selfID = fibaro:getSelfId()
-							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
+							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"true\"
 							\nif isBusy then
 							\n  fibaro:call( selfID , \"setProperty\" , \"ui.Info.value\" , \"BUSY...WAIT...\" )
 							\nelse
@@ -847,7 +856,7 @@
 							\nlocal windIdx = 1
 							\n
 							\nlocal selfID = fibaro:getSelfId()
-							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
+							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"true\"
 							\nif isBusy then
 							\n  fibaro:call( selfID , \"setProperty\" , \"ui.Info.value\" , \"BUSY...WAIT...\" )
 							\nelse
@@ -923,7 +932,7 @@
 							\nlocal windIdx = 2
 							\n
 							\nlocal selfID = fibaro:getSelfId()
-							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
+							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"true\"
 							\nif isBusy then
 							\n  fibaro:call( selfID , \"setProperty\" , \"ui.Info.value\" , \"BUSY...WAIT...\" )
 							\nelse
@@ -999,7 +1008,7 @@
 							\nlocal windIdx = 3
 							\n
 							\nlocal selfID = fibaro:getSelfId()
-							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
+							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"true\"
 							\nif isBusy then
 							\n  fibaro:call( selfID , \"setProperty\" , \"ui.Info.value\" , \"BUSY...WAIT...\" )
 							\nelse
@@ -1080,7 +1089,7 @@
 							\nlocal gIsBusy = \"CM_IsBusy\"
 							\n
 							\nlocal selfID = fibaro:getSelfId()
-							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
+							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"true\"
 							\nif isBusy then
 							\n  fibaro:call( selfID , \"setProperty\" , \"ui.Info.value\" , \"BUSY...WAIT...\" )
 							\nelse
@@ -1161,7 +1170,7 @@
 							\nlocal gIsBusy = \"CM_IsBusy\"
 							\n
 							\nlocal selfID = fibaro:getSelfId()
-							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
+							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"true\"
 							\nif isBusy then
 							\n  fibaro:call( selfID , \"setProperty\" , \"ui.Info.value\" , \"BUSY...WAIT...\" )
 							\nelse
@@ -1277,7 +1286,7 @@
 							\n  baisc = 1 ,
 							\n  none = 0 ,
 							\n}
-							\nlocal mDebugWeight = tDebugWeights.baisc 
+							\nlocal mDebugWeight = tDebugWeights.all 
 							\n
 							\nfunction Trace( _text , _weight , _color )
 							\n  _weight = _weight or 0
@@ -1482,13 +1491,19 @@
 							\n  end
 							\nend
 							\n
-							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
-							\nlocal isUpdate = fibaro:getGlobalValue( gIsUpdate ) == \"1\"
+							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"true\"
+							\nlocal isUpdate = fibaro:getGlobalValue( gIsUpdate ) == \"true\"
+							\nfibaro:debug( \"busy state = \" .. fibaro:getGlobalValue( gIsBusy ) )
+							\nfibaro:debug( \"update state = \" .. fibaro:getGlobalValue( gIsUpdate ) )
+							\n
+							\nfibaro:debug( \"is busy = \" .. tostring( isBusy ) )
+							\nfibaro:debug( \"is update = \" .. tostring( isUpdate ) )
 							\nif isBusy or isUpdate then
 							\n  Trace( \"busing...\" , 1 )
 							\nelse
 							\n  fibaro:setGlobal( gIsUpdate , \"true\" )
 							\n  local cmds = fibaro:getGlobal( gCmds )
+							\n  Trace( cmds , 9 , \"white\" )
 							\n  local begin , head , tail = 1 , 1 , 1
 							\n  while head ~= nil do
 							\n    head , tail = cmds:find( mExitCmd , begin )
@@ -1505,9 +1520,11 @@
 							\n    end
 							\n  end
 							\n  
+							\n  --[[避免update過程，指令增加後被刪除掉，因此從新取值]]--
+							\n  cmds = fibaro:getGlobal( gCmds )
 							\n  local ret = cmds:sub( begin )
 							\n  Trace( \"is empty? \" .. tostring( ret == nil ) .. \" / \" .. begin , 9 , \"purple\" )
-							\n  if ret == nil or begin == 1 then
+							\n  if ret == nil then
 							\n    ret = \"\"
 							\n  end
 							\n  Trace( \"return : \" .. ret , 9 , \"purple\" )
@@ -1586,7 +1603,7 @@
 							\n  return respose
 							\nend
 							\n
-							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"1\"
+							\nlocal isBusy = fibaro:getGlobalValue( gIsBusy ) == \"true\"
 							\nif isBusy then
 							\n  Trace( \"busing...\" , 1 )
 							\nelse
