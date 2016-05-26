@@ -9,7 +9,7 @@
 		"logTemp":"",
 			"mainLoop":"--[[
 			\n  @author eFa
-			\n  @date   105.03.09
+			\n  @date   105.05.25
 			\n  @brief  cool master簡易遙控器
 			\n
 			\n  @note   記得建立Global Value [gDatas]、[gCmds]、[gSync]、[gSyncTime]、[gIsBusy]
@@ -39,14 +39,7 @@
 			\n    { uid = 100 , name = \"冷氣1\" , tModeEnable = { true , true , true , true , true , true } } ,
 			\n    { uid = 101 , name = \"冷氣2\" , tModeEnable = { true , true , true , true , true , true } } ,
 			\n    { uid = 102 , name = \"冷氣3\" , tModeEnable = { true , true , true , true , true , true } } ,
-			\n    { uid = 103 , name = \"冷氣4\" , tModeEnable = { true , true , true , true , true , true } } ,
-			\n    { uid = 104 , name = \"冷氣5\" , tModeEnable = { true , true , true , true , true , true } } ,
-			\n    { uid = 105 , name = \"冷氣6\" , tModeEnable = { true , true , true , true , true , true } } ,
-			\n    { uid = 106 , name = \"冷氣7\" , tModeEnable = { true , true , true , true , true , true } } ,
-			\n    { uid = 107 , name = \"冷氣8\" , tModeEnable = { true , true , true , true , true , true } } ,
-			\n    { uid = 108 , name = \"冷氣9\" , tModeEnable = { true , true , true , true , true , true } } ,
-			\n    { uid = 109 , name = \"交換機\" , tModeEnable = { true , true , true , true , true , true } } ,
-			\n}
+			\n  }
 			\n  
 			\n  -- 功能範圍，目前寫死不能動
 			\n  mModes = { \"暖氣\" , \"冷氣\" , \"除濕\" , \"送風\" , \"自動\" , \"其他\" }
@@ -1512,6 +1505,8 @@
 							\n      if begin == 1 then
 							\n        Trace( \"do all cmds : \" .. cmds , 9 , \"green\" )
 							\n        DoCmds( cmds:sub( begin ) )
+							\n  	  --[[避免update過程，指令增加後被刪除掉，因此從新取值]]--
+							\n 		  begin = cmds:len() + 1
 							\n      end
 							\n    else
 							\n      Trace( \"do cmds : \" .. cmds:sub( begin , head - 1 ) , 9 , \"green\" )
@@ -1524,6 +1519,7 @@
 							\n  cmds = fibaro:getGlobal( gCmds )
 							\n  local ret = cmds:sub( begin )
 							\n  Trace( \"is empty? \" .. tostring( ret == nil ) .. \" / \" .. begin , 9 , \"purple\" )
+							\n  --[[避免update過程，指令增加後被刪除掉，因此從新取值]]--
 							\n  if ret == nil then
 							\n    ret = \"\"
 							\n  end
